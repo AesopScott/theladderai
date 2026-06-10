@@ -1,0 +1,71 @@
+name: Deploy to Mocahost
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:        # manual "Run workflow" button for force redeploys
+
+concurrency:
+  group: deploy-mocahost
+  # IMPORTANT: keep this `false`. With `true`, every push cancels the
+  # in-flight deploy mid-FTP, and on a busy push day no deploy ever
+  # finishes (see 2026-04-28 incident: 10 cancelled in a row, prod stuck
+  # 13+ hours behind main). `false` lets runs queue and complete in
+  # order; the latest run still wins because FTP uploads the whole tree.
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.AIP_COMMIT_TOKEN || secrets.AESOP_PAT || github.token }}
+
+      - name: Pre-deploy truncation guard
+        run: python .github/scripts/predeploy_check.py
+
+      - name: Commit any repairs back to main
+        run: |
+          git config user.name "Deploy Guard"
+          git config user.email "deploy-guard@aesopacademy.org"
+          git add -A
+          git diff --staged --quiet || git commit -m "Deploy guard: auto-repair truncated files before deploy"
+          git pull --rebase origin main
+          git push || true
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 65.181.111.131
+          username: hivetec1
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftps
+          local-dir: ./
+          server-dir: /public_html/aesop-academy/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.github/**
+            **/.claude/**
+            **/TEMP/**
+            **/archive/**
+            **/aesop-api/archive/**
+            **/Board Meetings/**
+            **/secrets.local.php
+            **/config.local.php
+            **/*.bat
+            **/*.ps1
+            **/audit_*.txt
+            **/audit_modules.py
+            **/fix_*.py
+            **/README.md
+            **/.DS_Store
+            # cPanel infrastructure — never touch
+            cgi-bin/**
+            .htaccess
