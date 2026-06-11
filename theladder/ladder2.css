@@ -887,6 +887,21 @@ body.l2 button.secondary:hover::after, body.l2 .l2-btn--ghost:hover::after { tra
 body.l2 .theme-toggle::after, body.l2 #l2Lang::after, body.l2 .nav-btn::after { display: none; }
 body.l2 .nav-btn { text-transform: none; letter-spacing: 0; font-weight: 700; }
 
+/* Prominent primary CTA — a filled gold button (matches the hero "Sign Up" primary)
+   so the key action reads as primary, not as just another underline link. Navy text
+   is hardcoded for guaranteed contrast on gold in both light and dark themes. */
+body.l2 .l2-cta {
+  background: var(--l2-gold); color: #0d1b2a;
+  padding: 0.7rem 1.4rem; border-radius: 3px; font-size: 0.9rem; white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(201, 160, 90, 0.35);
+  transition: background 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+body.l2 .l2-cta::after { display: none; }   /* filled button, not the underline style */
+body.l2 .l2-cta:hover {
+  background: var(--l2-gold-deep); color: #0d1b2a;
+  transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201, 160, 90, 0.5);
+}
+
 /* ============================================================
    FOOTER
    ============================================================ */

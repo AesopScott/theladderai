@@ -45,8 +45,9 @@ async function completeSignIn(email) {
   try {
     await signInWithEmailLink(auth, email, window.location.href);
     localStorage.removeItem(LS_EMAIL);
-    // Bind the learner id; the home page initialises the data layer + record on return.
-    localStorage.setItem('aesop-learner-id', auth.currentUser.uid);
+    // Do NOT write the learner id here — the raw uid must never become the learner id.
+    // The home page resolves it on return (DB id bound to this account → local AESOP id)
+    // via onAuthStateChanged, preserving any existing AESOP-XXXX id in this browser.
     el('caEmailEcho').textContent = auth.currentUser.email || email;
     hide('caVerifying');
     hide('caNeedEmail');

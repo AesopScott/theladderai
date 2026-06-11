@@ -55,7 +55,7 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc, addDoc, collection
+  getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
@@ -116,6 +116,83 @@ function resolveLearnerId(explicit) {
     if (stored) { currentLearnerId = stored; return stored; }
   } catch { /* localStorage may be blocked */ }
   return '';
+}
+
+// Read the active learner id without forcing a value.
+export function getLearnerId() {
+  return resolveLearnerId();
+}
+
+// Set the active learner id (e.g. after adopting the DB id bound to an account).
+// Persists to localStorage so it survives reloads; never accepts an empty value.
+export function setLearnerId(id) {
+  const clean = String(id || '').trim();
+  if (!clean) return currentLearnerId;
+  currentLearnerId = clean;
+  try { localStorage.setItem(LS_LEARNER_ID, clean); } catch { /* blocked */ }
+  return currentLearnerId;
+}
+
+// ---- account ↔ learner resolution ------------------------------------------
+//
+// The learner id is the durable, human-facing record key (AESOP-XXXX). A Firebase
+// account is bound to ONE learner record via its accountUid. These helpers let the
+// app implement the resolution precedence: DB id (bound to this account) wins, then
+// the local id, then a freshly-minted id — and the raw Firebase uid is never used as
+// the learner id.
+
+// Find the learner id previously bound to this Firebase account, on any device.
+// Rule-safe: the query filters on accountUid, which the security rules gate reads on
+// (every returned doc has accountUid == request.auth.uid). Returns null if none.
+export async function findLearnerIdByAccount(uid) {
+  await ensureInit();
+  const accountUid = String(uid || '').trim();
+  if (!accountUid || !firebaseReady || !db) return null;
+  try {
+    const snap = await getDocs(query(collection(db, 'learners'), where('accountUid', '==', accountUid)));
+    if (snap.empty) return null;
+    // Only ever adopt a real human-facing AESOP-XXXX id. A record whose id IS the raw
+    // uid is pollution from an earlier build and must not be re-adopted as the learner
+    // id — returning null lets the caller keep the clean local id and bind to it.
+    const aesopMatches = snap.docs
+      .map((d) => ({ id: d.id, data: d.data() || {} }))
+      .filter((m) => /^AESOP-/i.test(m.data.learnerId || m.id));
+    if (!aesopMatches.length) return null;
+    // Among real ids, prefer the earliest-created (most established) record.
+    aesopMatches.sort((a, b) => String(a.data.createdAt || '').localeCompare(String(b.data.createdAt || '')));
+    const chosen = aesopMatches[0];
+    return chosen.data.learnerId || chosen.id || null;
+  } catch (error) {
+    console.warn('[data-layer] findLearnerIdByAccount failed:', error);
+    return null;
+  }
+}
+
+// Bind a Firebase account (uid + email) to a learner record, stamping the account
+// fields the security rules and transcript pages rely on. Local-first, then synced.
+export async function bindAccountToLearner({ learnerId, uid, email } = {}) {
+  await ensureInit();
+  const id = resolveLearnerId(learnerId);
+  if (!id) return;
+
+  const record = readLocalRecord();
+  record.learnerId = id;
+  if (uid) record.accountUid = String(uid);
+  if (email) record.accountEmail = String(email);
+  record.lastActiveAt = new Date().toISOString();
+  writeLocalRecord(record);
+
+  if (!firebaseReady || !db) return;
+  try {
+    await setDoc(doc(db, 'learners', id), {
+      learnerId: id,
+      accountUid: record.accountUid || '',
+      accountEmail: record.accountEmail || '',
+      lastActiveAt: record.lastActiveAt,
+    }, { merge: true });
+  } catch (error) {
+    console.warn('[data-layer] bindAccountToLearner remote write failed (local cache kept):', error);
+  }
 }
 
 // ---- local cache helpers ----------------------------------------------------
