@@ -287,25 +287,28 @@ function setupNavActions() {
     }));
   }
 
-  // Release a stuck nav :hover. The gold underline can light up with no intent two ways:
-  //  - clicking an in-page anchor smooth-scrolls the section under a stationary mouse
-  //    (no mouseleave fires), and
-  //  - scrolling (incl. scroll-snap back to the top) lands a nav word under a resting
-  //    cursor — so :hover engages without any mouse movement (notably under Profile).
-  // On click or scroll, drop the words as pointer targets (clears :hover); the next
-  // real mouse move restores them so genuine hover still works.
-  let navHoverArmed = false;
-  const releaseNavHover = () => {
-    document.querySelectorAll('.l2-navlink').forEach((a) => { a.style.pointerEvents = 'none'; });
-    if (navHoverArmed) return;
-    navHoverArmed = true;
-    window.addEventListener('mousemove', () => {
-      navHoverArmed = false;
-      document.querySelectorAll('.l2-navlink').forEach((a) => { a.style.pointerEvents = ''; });
-    }, { once: true });
-  };
-  document.querySelectorAll('.l2-navlink').forEach((a) => a.addEventListener('click', releaseNavHover));
-  window.addEventListener('scroll', releaseNavHover, { passive: true });
+  // Nav underline driven by a JS class, NOT CSS :hover. :hover is geometric: when a
+  // sticky nav word lands under a resting cursor on scroll (or smooth-scroll from a
+  // click), it engages with no intent — leaving Profile permanently underlined. Here
+  // the underline is set only on a real mouseenter, cleared on mouseleave, and fully
+  // suppressed while scrolling (and ~250ms after) so scroll never lights it up.
+  const navLinks = [...document.querySelectorAll('.l2-navlink')];
+  let navScrolling = false, navScrollIdle;
+  const clearNavHover = () => navLinks.forEach((a) => a.classList.remove('is-navhover'));
+  navLinks.forEach((a) => {
+    a.addEventListener('mouseenter', () => {
+      if (navScrolling) return;           // ignore scroll-induced enters
+      clearNavHover();
+      a.classList.add('is-navhover');
+    });
+    a.addEventListener('mouseleave', () => a.classList.remove('is-navhover'));
+  });
+  window.addEventListener('scroll', () => {
+    navScrolling = true;
+    clearNavHover();
+    clearTimeout(navScrollIdle);
+    navScrollIdle = setTimeout(() => { navScrolling = false; }, 250);
+  }, { passive: true });
 }
 
 // =============================================================================

@@ -192,8 +192,11 @@ body.l2 .l2-navlink::after {
   content: ""; position: absolute; left: 0; bottom: -2px;
   width: 0; height: 2px; background: var(--l2-gold); transition: width 0.25s ease;
 }
-body.l2 .l2-navlink:hover { color: var(--l2-ink); }
-body.l2 .l2-navlink:hover::after, body.l2 .l2-navlink.is-active::after { width: 100%; }
+/* underline/color keyed on a JS class (set on real mouseenter, cleared on scroll)
+   instead of :hover — :hover is geometric and re-fires when a sticky nav word
+   lands under a resting cursor on scroll. See setupNavActions in ladder2-app.js. */
+body.l2 .l2-navlink.is-navhover { color: var(--l2-ink); }
+body.l2 .l2-navlink.is-navhover::after, body.l2 .l2-navlink.is-active::after { width: 100%; }
 body.l2 .ladder-top-actions { gap: clamp(2.4rem, 5.5vw, 5rem); }   /* match the center nav-links gap */
 /* actions match the center nav links' font + size */
 body.l2 .ladder-top-actions #l2Lang,
