@@ -68,7 +68,7 @@ a {
 .nav-links {
   display: flex;
   justify-content: center;
-  gap: clamp(1rem, 3vw, 2.8rem);
+  gap: clamp(0.85rem, 2.2vw, 2.1rem);
   color: var(--muted);
   font-size: 0.86rem;
 }
@@ -431,6 +431,8 @@ h3 {
 .steps,
 .outcome-list,
 .pathway-grid,
+.employer-grid,
+.standards-grid,
 .faq-grid {
   display: grid;
   gap: 1rem;
@@ -444,6 +446,8 @@ h3 {
 .steps article,
 .outcome-list article,
 .pathway-grid a,
+.employer-grid article,
+.standards-grid article,
 .faq-grid details {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(13, 27, 42, 0.1);
@@ -456,6 +460,8 @@ h3 {
 .steps p,
 .outcome-list p,
 .pathway-grid p,
+.employer-grid p,
+.standards-grid p,
 .faq-grid p,
 .proof-card p,
 .pricing-inline p {
@@ -464,6 +470,7 @@ h3 {
 }
 
 .pathways,
+.employers,
 .faq {
   background: var(--mist);
 }
@@ -505,6 +512,34 @@ h3 {
   background: var(--gold);
   color: var(--navy);
   font-weight: 900;
+}
+
+.employer-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.employer-grid span {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  margin-bottom: 0.8rem;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 900;
+}
+
+.standards {
+  background: #fff;
+}
+
+.standards-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.standards-grid article {
+  min-height: 150px;
 }
 
 .outcomes {
@@ -680,6 +715,8 @@ details p {
 
   .steps,
   .pathway-grid,
+  .employer-grid,
+  .standards-grid,
   .faq-grid,
   .trust-strip {
     grid-template-columns: 1fr;
