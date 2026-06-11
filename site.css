@@ -7662,7 +7662,7 @@ body.l2 .certification-mode-bar {
 }
 body.l2 .l2-cert-grid {
   border-top: 0;
-  margin-top: 2rem;
+  margin-top: 0;
 }
 body.l2 .certification-left-column {
   display: grid;
