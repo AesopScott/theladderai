@@ -23,9 +23,10 @@
   <meta name="twitter:description" content="Placement, guided AI training, validated certification, and evidence records.">
   <meta name="twitter:image" content="https://theladderai.com/components/og-welcome.png">
   <link rel="alternate" type="image/svg+xml" href="/components/og-welcome.svg">
-  <link rel="stylesheet" href="/marketing/landing.css?v=23">
+  <link rel="stylesheet" href="/marketing/welcome-landing.css?v=1">
 </head>
 <body>
+  <a class="skip-link" href="#top">Skip to main content</a>
   <nav class="site-nav" aria-label="Primary">
     <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>The Ladder AI</a>
     <div class="nav-links">
@@ -67,15 +68,15 @@
           </div>
         </div>
 
-        <aside class="hero-signup" id="l2Signup" aria-label="Learner sign up and sign in">
+        <section class="hero-signup" id="l2Signup" aria-labelledby="l2SignupTitle">
           <p class="hero-signup-eyebrow">Get trained. Get certified.</p>
-          <h2>Start learning now.</h2>
+          <h2 id="l2SignupTitle">Start learning now.</h2>
           <form class="hero-signup-form" id="l2SignupForm" novalidate>
             <input id="l2SignupEmail" class="hero-signup-input" type="email" name="email" placeholder="Enter your e-mail" autocomplete="email" aria-label="Email address">
             <button class="hero-signup-btn" type="submit">Sign Up</button>
           </form>
           <p class="hero-signup-msg" id="l2SignupMsg" hidden role="status"></p>
-          <a class="hero-signup-toggle" id="l2SigninToggle" href="#">Already have an account? Sign in</a>
+          <button class="hero-signup-toggle" id="l2SigninToggle" type="button" aria-expanded="false" aria-controls="l2SigninForm">Already have an account? Sign in</button>
           <form class="hero-signin-form" id="l2SigninForm" autocomplete="on" hidden novalidate>
             <input id="l2SigninEmail" class="hero-signup-input" type="email" name="username" placeholder="Email" autocomplete="username" aria-label="Email">
             <input id="l2SigninPw" class="hero-signup-input" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
@@ -86,7 +87,7 @@
             <a class="hero-workspace-link" href="/workspace/">Continue to workspace</a>
             <button class="hero-signup-toggle" id="l2HeroSignOut" type="button">Sign out</button>
           </div>
-        </aside>
+        </section>
       </div>
     </section>
 
@@ -303,6 +304,21 @@
           <h3>Can teams use this?</h3>
           <p>Yes. The structure is intended for learners, employers, schools, and organizations that need repeatable AI readiness signals.</p>
         </article>
+      </div>
+      <div class="policy-docs" aria-labelledby="policyDocsTitle">
+        <h3 id="policyDocsTitle">Important Policies and Documents</h3>
+        <ul>
+          <li><a href="/policies/terms-of-service.md">Terms of Service</a></li>
+          <li><a href="/policies/privacy-notice.md">Privacy Notice</a></li>
+          <li><a href="/policies/student-privacy.md">FERPA and COPPA Student Privacy</a></li>
+          <li><a href="/policies/data-retention.md">Data Retention and Disposal Policy</a></li>
+          <li><a href="/policies/ai-governance.md">AI Governance Policy</a></li>
+          <li><a href="/policies/engine-transparency.md">The Ladder AI Engine Transparency</a></li>
+          <li><a href="/policies/bias-audit.md">Bias Audit Documentation</a></li>
+          <li><a href="/policies/copyright-policy.md">Copyright Policy</a></li>
+          <li><a href="/policies/procurement.md">Institutional Procurement and Compliance</a></li>
+          <li><a href="/accessibility.md">WCAG evaluation and interim recommendations</a></li>
+        </ul>
       </div>
       <div class="final-cta" aria-labelledby="finalTitle">
         <p class="eyebrow">Ready to climb?</p>
