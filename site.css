@@ -7113,26 +7113,41 @@ body.l2 .l2-gate { margin-bottom: 2rem; }
 body.l2 .l2-gate h3 { font-family: var(--l2-display); font-weight: 800; font-size: 1.4rem; margin: 0.5rem 0; color: var(--l2-ink); }
 body.l2 .l2-gate p { color: var(--l2-ink-2); line-height: 1.6; max-width: 60ch; }
 
+body.l2 #training .l2-section-head {
+  align-items: flex-start;
+}
 body.l2 #training .workspace {
-  grid-template-columns: 1fr;
-  gap: 1.4rem;
+  grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
+  gap: 1.25rem;
+  align-items: start;
   background: none;
   border: none;
   box-shadow: none;
   padding: 0;
 }
-body.l2 .training-tier-picker {
-  max-width: min(54rem, 100%);
-  margin: 0 0 1.8rem;
-  padding-bottom: 1.4rem;
-  border-bottom: 1px solid var(--l2-line);
+body.l2 .training-nav-panel,
+body.l2 .training-left-column,
+body.l2 .training-chat-column {
+  min-width: 0;
 }
-body.l2 .training-tier-picker .rail-product-label {
-  font-size: 0.86rem;
+body.l2 .training-left-column .l2-section-lead {
+  margin-bottom: 2rem;
+}
+body.l2 .training-tier-picker {
+  width: 100%;
+  margin: 0;
+}
+body.l2 .training-focus-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 body.l2 .training-tier-picker .rail-tier-status {
   display: block;
-  margin: 0.35rem 0 1rem;
+  margin: 0 0 0.9rem;
   padding: 0;
   background: none;
   border: none;
@@ -7147,7 +7162,7 @@ body.l2 .training-tier-picker .rail-tier-status {
 }
 body.l2 .training-tier-dropdown {
   position: relative;
-  max-width: 46rem;
+  width: 100%;
 }
 body.l2 .training-tier-dropdown summary {
   display: flex;
@@ -7158,7 +7173,7 @@ body.l2 .training-tier-dropdown summary {
   padding: 1rem 1.2rem;
   border: 1px solid var(--l2-line);
   border-radius: 6px;
-  background: #fffdf8;
+  background: var(--l2-paper);
   box-shadow: 0 14px 36px rgba(13, 27, 42, 0.08);
   cursor: pointer;
   list-style: none;
@@ -7195,7 +7210,7 @@ body.l2 .training-tier-menu {
   padding: 0 !important;
   border: 1px solid var(--l2-line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--l2-paper);
   box-shadow: 0 18px 42px rgba(13, 27, 42, 0.12);
 }
 body.l2 .l2-tier-option {
@@ -7236,16 +7251,79 @@ body.l2 .l2-tier-option .l2-tier-meta strong {
 }
 body.l2 .training-selected-rungs {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 0.2rem 1rem !important;
-  max-width: 54rem;
+  width: 100%;
   padding: 1rem 0 0 !important;
 }
 body.l2 .training-selected-rungs .l2-rail-item {
-  padding: 0.5rem 0 0.5rem 0.85rem;
+  padding: 0.38rem 0 0.38rem 0.85rem;
+  font-size: 0.72rem;
+  line-height: 1.25;
 }
 body.l2 .training-selected-rungs .l2-rail-item::after {
   display: none;
+}
+body.l2 .training-rung-description {
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--l2-line);
+  color: var(--l2-gold-deep);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+body.l2 .training-chat-panel {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+body.l2 .training-account-gate {
+  flex: 0 1 34rem;
+  margin: 0;
+  padding: 0 0 0 1.5rem;
+  border-left: 1px solid var(--l2-line);
+  border-bottom: 0;
+}
+body.l2 .training-account-gate h3 {
+  font-size: 1.2rem;
+  margin: 0.25rem 0;
+}
+body.l2 .training-account-gate p {
+  max-width: none;
+  margin: 0.35rem 0 0.45rem;
+  line-height: 1.45;
+}
+body.l2 .training-chat-actions {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 2.2rem;
+}
+body.l2 .training-chat-actions #l2StartChat {
+  margin-left: auto;
+}
+body.l2 .training-chat-panel .chat-log {
+  min-height: clamp(34rem, 62vh, 44rem);
+}
+
+[data-theme="dark"] body.l2 .training-tier-dropdown summary,
+[data-theme="dark"] body.l2 .training-tier-menu {
+  background: #111c2a;
+  border-color: rgba(201, 160, 90, 0.36);
+  box-shadow: none;
+}
+[data-theme="dark"] body.l2 .training-tier-current,
+[data-theme="dark"] body.l2 .l2-tier-option .l2-tier-meta strong {
+  color: #f6f1e8;
+}
+[data-theme="dark"] body.l2 .l2-tier-option .l2-tier-meta small {
+  color: rgba(246, 241, 232, 0.72);
+}
+[data-theme="dark"] body.l2 .training-rung-description {
+  color: var(--l2-gold);
+}
+[data-theme="dark"] body.l2 .l2-tier-option:hover,
+[data-theme="dark"] body.l2 .l2-tier-option.is-active {
+  background: rgba(201, 160, 90, 0.16);
 }
 
 body.l2 .tier-rail { background: none !important; border: none !important; padding: 0 !important; }

@@ -451,6 +451,13 @@ function setupTraining() {
 
 function activeGroup() { return state.groups.find((g) => g.id === state.activeGroupId) || state.groups[0]; }
 function activeItem() { const g = activeGroup(); return g?.items.find((i) => i.id === state.activeItemId) || g?.items[0]; }
+function trainingDescriptionFor(it) {
+  if (!it) return 'Pick a rung to see what the conversation will cover.';
+  const raw = it.raw || {};
+  const description = raw.description || raw.reason || raw.summary || raw.outcome || raw.depth || '';
+  if (description) return description;
+  return `Learn what "${it.label}" means, where it applies, what can go wrong, and how to use it in a practical AI workflow.`;
+}
 
 // =============================================================================
 // COURSE CONVERSATION STORE
@@ -539,11 +546,14 @@ function renderRail() {
 
 function renderActiveItem() {
   const g = activeGroup(); const it = activeItem();
-  $('l2ActiveGroupLabel').textContent = g ? g.label : focus().label;
-  $('l2ActiveItemTitle').textContent = it ? it.label : 'Select a rung';
-  $('l2ChatSummary').textContent = it
-    ? `Learn "${it.label}" through a guided conversation. The guide teaches, challenges, applies, and checks readiness.`
-    : 'Pick a rung from the list to begin.';
+  if ($('l2ActiveGroupLabel')) $('l2ActiveGroupLabel').textContent = g ? g.label : focus().label;
+  if ($('l2ActiveItemTitle')) $('l2ActiveItemTitle').textContent = it ? it.label : 'Select a rung';
+  if ($('l2ChatSummary')) {
+    $('l2ChatSummary').textContent = it
+      ? `Learn "${it.label}" through a guided conversation. The guide teaches, challenges, applies, and checks readiness.`
+      : 'Pick a rung from the list to begin.';
+  }
+  if ($('l2RungDescription')) $('l2RungDescription').textContent = trainingDescriptionFor(it);
   renderChat($('l2ChatLog'), state.trainMessages);
   renderCertTarget();
 }
