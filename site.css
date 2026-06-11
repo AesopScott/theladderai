@@ -7401,7 +7401,7 @@ body.l2 .training-chat-actions #l2ResetChat:hover {
   color: var(--l2-gold-deep) !important;
 }
 body.l2 .training-chat-panel .chat-log {
-  min-height: clamp(28rem, calc(62vh - 8rem), 36rem);
+  min-height: clamp(24rem, calc(62vh - 12rem), 32rem);
 }
 
 [data-theme="dark"] body.l2 .training-tier-dropdown summary,
