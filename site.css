@@ -6622,6 +6622,9 @@ body.l2 .l2-section {
   padding: clamp(5.5rem, 11vh, 8rem) 0 3rem;
   box-sizing: border-box;
 }
+body.l2 #certification {
+  scroll-margin-top: -1.3in;
+}
 body.l2 .l2-section-head {
   display: flex;
   align-items: baseline;
@@ -7816,8 +7819,8 @@ body.l2 .certification-mode-action p {
 }
 body.l2 .certification-chat-panel .chat-log,
 body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
-  height: clamp(6rem, calc(62vh - 28rem), 14rem);
-  min-height: clamp(6rem, calc(62vh - 28rem), 14rem);
+  height: clamp(14rem, calc(62vh - 20rem), 22rem);
+  min-height: clamp(14rem, calc(62vh - 20rem), 22rem);
 }
 @media (max-width: 720px) {
   body.l2 .training-eval-action {
