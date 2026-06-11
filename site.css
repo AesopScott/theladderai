@@ -6533,6 +6533,7 @@ body.l2 .l2-profile-lead-row .l2-section-lead { margin-bottom: 0; }
   body.l2 .l2-profile-lead-row { flex-direction: column; gap: 1.2rem; }
   body.l2 .l2-profile-lead-row .l2-learner-id { text-align: left; }
 }
+body.l2 #profile { justify-content: flex-start; }
 /* Profile → Open courses: bulleted list, title only + inline Resume */
 body.l2 .l2-open-courses-block { margin-top: 1.6rem; }
 body.l2 .l2-open-courses-block .panel-label { margin-bottom: 0.9rem; }
