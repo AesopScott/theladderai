@@ -8057,3 +8057,31 @@ body.l2 .l2-signed-in .l2-signup-signin {
   /* shrink the email form with the page (it was pinned at 560px the whole zone) */
   body.l2 .l2-signup { margin-top: -1.5rem; width: clamp(360px, 37vw, 560px); }
 }
+
+/* Final certification exam action override: keep these as real filled buttons,
+   not inherited underline links. */
+body.l2 .certification-mode-action {
+  grid-template-columns: 16.5rem minmax(0, 1fr);
+  align-items: center;
+}
+body.l2 .certification-mode-action p {
+  margin: 0 !important;
+  text-align: left !important;
+}
+body.l2 .certification-mode-action button,
+body.l2 .certification-mode-action button.secondary {
+  justify-self: stretch !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 2.35rem !important;
+  border: 1px solid var(--l2-line) !important;
+  border-radius: 8px !important;
+  padding: 0.55rem 0.85rem !important;
+  background: var(--l2-ink) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+}
+body.l2 .certification-mode-action button::after {
+  display: none !important;
+}
