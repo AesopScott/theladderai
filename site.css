@@ -6419,10 +6419,20 @@ body.l2 .ladder-corner-controls {
 }
 body.l2 .ladder-corner-controls .theme-toggle {
   display: inline-flex !important; align-items: center; justify-content: center;
-  height: 28px !important; min-height: 0 !important; padding: 0 !important;
-  border: 0 !important; line-height: 0 !important; cursor: pointer; order: 0;
+  width: 32px !important; height: 32px !important; min-height: 0 !important; padding: 0 !important;
+  color: var(--l2-ink) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(13, 27, 42, 0.12) !important;
+  border-radius: 999px !important;
+  line-height: 0 !important; cursor: pointer; order: 0;
+  box-shadow: 0 6px 18px rgba(13, 27, 42, 0.08) !important;
 }
 body.l2 .ladder-corner-controls .theme-toggle svg { width: 28px; height: 28px; display: block; }
+[data-theme="dark"] body.l2 .ladder-corner-controls .theme-toggle {
+  color: var(--l2-gold) !important;
+  background: rgba(15, 25, 36, 0.78) !important;
+  border-color: rgba(219, 184, 122, 0.34) !important;
+}
 /* language control shows a little US flag instead of the word "English"
    (flag emoji renders as the letters "US" on Windows, so use an inline SVG). */
 body.l2 .ladder-corner-controls #l2Lang {
@@ -6443,9 +6453,9 @@ body.l2 .ladder-corner-controls .theme-toggle:hover { color: var(--l2-ink) !impo
    collide with English on the same line — tuck the sun/moon + English up into
    the very top-right corner instead (English no longer on the words' line). */
 @media (max-width: 1320px) {
-  body.l2 .ladder-corner-controls { top: 0; gap: 0.02in; }
-  body.l2 .ladder-corner-controls .theme-toggle { height: 18px !important; }
-  body.l2 .ladder-corner-controls .theme-toggle svg { width: 18px !important; height: 18px !important; }
+  body.l2 .ladder-corner-controls { top: 0.04in; gap: 0.02in; }
+  body.l2 .ladder-corner-controls .theme-toggle { width: 28px !important; height: 28px !important; }
+  body.l2 .ladder-corner-controls .theme-toggle svg { width: 20px !important; height: 20px !important; }
   body.l2 .ladder-corner-controls #l2Lang { width: 34px !important; height: 12px !important; background-size: auto 12px, 8px auto !important; }
 }
 
@@ -6737,6 +6747,12 @@ body.l2 .why-trust-list li {
   color: var(--l2-ink-2);
   font-size: 1.22rem;   /* 20% larger */
   line-height: 1.5;
+}
+[data-theme="dark"] body.l2 .why-trust-title {
+  color: var(--l2-ink) !important;
+}
+[data-theme="dark"] body.l2 .why-trust-list li {
+  color: var(--l2-ink-2) !important;
 }
 /* right-side staircase illustration (theme-swapped), centered in the right
    whitespace; vertical centre aligned with the "Every AI Product" line */
