@@ -40,6 +40,8 @@ jobs:
             **/*.bat
             **/*.ps1
             **/README.md
+            firebase.json
+            firestore.rules
             **/.DS_Store
             cgi-bin/**
             .htaccess

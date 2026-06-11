@@ -13,3 +13,8 @@ node_modules/
 
 # proxy.php holds the live API key - uploaded manually via FTP, never commit/deploy it
 aesop-api/proxy.php
+
+# never commit Firebase service-account / admin keys
+*adminsdk*.json
+*serviceaccount*.json
+serviceAccountKey*.json

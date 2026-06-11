@@ -1,0 +1,104 @@
+rules_version = '2';
+
+// The Ladder AI — Firestore security rules (project: theladderai).
+// Migrated from the Aesop ladder2 draft. Owner-scoped with an anon fallback that
+// mirrors the concept-ladder's existing behavior; admin = custom claim admin==true.
+// NOTE (carried over from the draft): the anon fallback is loose — learner docs
+// with no accountUid are world-accessible. Tighten to require auth.uid==learnerId
+// once all flows are account-bound.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
+
+    function ownsLearner(learnerId, resourceData) {
+      return isAdmin()
+        || (isSignedIn() && resourceData != null && resourceData.accountUid == request.auth.uid)
+        || (resourceData == null)
+        || (resourceData != null && (resourceData.accountUid == null || resourceData.accountUid == ''));
+    }
+
+    match /learners/{learnerId} {
+      allow read:   if ownsLearner(learnerId, resource.data);
+      allow create: if ownsLearner(learnerId, request.resource.data);
+      allow update: if ownsLearner(learnerId, resource.data)
+                    && (resource.data.accountUid == null
+                        || resource.data.accountUid == ''
+                        || !isSignedIn()
+                        || request.resource.data.accountUid == resource.data.accountUid);
+      allow delete: if isAdmin();
+    }
+
+    match /completions/{completionId} {
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.learnerId != null);
+      allow create: if request.resource.data.learnerId is string;
+      allow update, delete: if isAdmin();
+    }
+
+    match /certifications/{certificationId} {
+      allow read:   if isAdmin()
+                    || (isSignedIn() && resource.data.accountUid == request.auth.uid)
+                    || (resource.data.accountUid == null || resource.data.accountUid == '');
+      allow create: if request.resource.data.learnerId is string
+                    && request.resource.data.result in ['pass', 'non_pass'];
+      allow update, delete: if isAdmin();
+    }
+
+    match /evidencePackets/{evidencePacketId} {
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.learnerId != null);
+      allow create: if request.resource.data.learnerId is string;
+      allow update, delete: if isAdmin();
+
+      match /challengePackets/{challengePacketId} {
+        allow read:   if isAdmin() || isSignedIn();
+        allow create: if isSignedIn();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    match /certificationValidations/{validationId} {
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.learnerId != null);
+      allow create: if request.resource.data.learnerId is string
+                    && request.resource.data.evidencePacketId is string;
+      allow update, delete: if isAdmin();
+    }
+
+    match /standardsEvidence/{standardsEvidenceId} {
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.learnerId != null)
+                    || (resource.data.learnerId == null || resource.data.learnerId == '');
+      allow create: if request.resource.data.status == 'candidate'
+                    && request.resource.data.linkedStandard != null
+                    && request.resource.data.transcriptSpan != null;
+      allow update: if isAdmin()
+                    || (isSignedIn()
+                        && resource.data.status == 'candidate'
+                        && request.resource.data.status in ['learner_confirmed', 'rejected', 'stale']);
+      allow delete: if isAdmin();
+    }
+
+    // read-mostly reference catalogs — admin writes only
+    match /rungs/{rungId}               { allow read: if true; allow write: if isAdmin(); }
+    match /resources/{resourceId}       { allow read: if true; allow write: if isAdmin(); }
+    match /videos/{videoId}             { allow read: if true; allow write: if isAdmin(); }
+    match /courses/{courseId}           { allow read: if true; allow write: if isAdmin(); }
+    match /products/{productId}         { allow read: if true; allow write: if isAdmin(); }
+    match /useCases/{useCaseId}         { allow read: if true; allow write: if isAdmin(); }
+    match /assignmentLabs/{labId}       { allow read: if true; allow write: if isAdmin(); }
+    match /standardsDefinitions/{stdId} { allow read: if true; allow write: if isAdmin(); }
+    match /resourceResearchRuns/{runId} { allow read: if isAdmin(); allow write: if isAdmin(); }
+
+    // public-create, admin-read request queues
+    match /productCourseRequests/{requestId} {
+      allow create: if request.resource.data.itemId != null;
+      allow read, update, delete: if isAdmin();
+    }
+    match /useCaseTrainingRequests/{requestId} {
+      allow create: if request.resource.data.itemId != null;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
