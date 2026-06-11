@@ -292,20 +292,26 @@ function setupNavActions() {
   // click), it engages with no intent — leaving Profile permanently underlined. Here
   // the underline is set only on a real mouseenter, cleared on mouseleave, and fully
   // suppressed while scrolling (and ~250ms after) so scroll never lights it up.
-  const navLinks = [...document.querySelectorAll('.l2-navlink')];
-  let navScrolling = false, navScrollIdle;
-  const clearNavHover = () => navLinks.forEach((a) => a.classList.remove('is-navhover'));
-  navLinks.forEach((a) => {
-    a.addEventListener('mouseenter', () => {
-      if (navScrolling) return;           // ignore scroll-induced enters
-      clearNavHover();
-      a.classList.add('is-navhover');
-    });
-    a.addEventListener('mouseleave', () => a.classList.remove('is-navhover'));
-  });
+  // Underline follows deliberate pointer MOVEMENT over a nav word. Not :hover
+  // (geometric — sticks when a sticky word lands under the cursor on scroll) and
+  // not mouseenter (fires when a word appears under a RESTING cursor, then never
+  // gets a mouseleave — that was the "Profile always active" stick). mousemove only
+  // fires on real movement: a resting cursor sets nothing, moving off clears it
+  // (self-correcting), and scroll suppresses it.
+  let navHovered = null, navScrolling = false, navScrollIdle;
+  const setNavHover = (link) => {
+    if (link === navHovered) return;
+    if (navHovered) navHovered.classList.remove('is-navhover');
+    navHovered = link;
+    if (link) link.classList.add('is-navhover');
+  };
+  document.addEventListener('mousemove', (e) => {
+    if (navScrolling) return;
+    setNavHover(e.target.closest ? e.target.closest('.l2-navlink') : null);
+  }, { passive: true });
   window.addEventListener('scroll', () => {
     navScrolling = true;
-    clearNavHover();
+    setNavHover(null);
     clearTimeout(navScrollIdle);
     navScrollIdle = setTimeout(() => { navScrolling = false; }, 250);
   }, { passive: true });
