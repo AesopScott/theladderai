@@ -375,6 +375,19 @@ body.l2 .l2-section-lead {
   font-size: 1.18rem;
   line-height: 1.65;
 }
+/* Profile: lead text left, Learner ID across from it on the right */
+body.l2 .l2-profile-lead-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2.4rem;
+}
+body.l2 .l2-profile-lead-row .l2-section-lead { margin-bottom: 0; }
+@media (max-width: 700px) {
+  body.l2 .l2-profile-lead-row { flex-direction: column; gap: 1.2rem; }
+  body.l2 .l2-profile-lead-row .l2-learner-id { text-align: left; }
+}
 
 /* ============================================================
    1 · MARKETING — open editorial hero
