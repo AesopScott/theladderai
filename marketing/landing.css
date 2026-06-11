@@ -388,6 +388,7 @@ h3 {
 
 .trust-strip span {
   display: grid;
+  gap: 0.25rem;
   min-height: 66px;
   place-items: center;
   padding: 1rem;
@@ -395,6 +396,19 @@ h3 {
   color: var(--navy);
   text-align: center;
   font-weight: 800;
+}
+
+.trust-strip strong,
+.trust-strip small {
+  display: block;
+}
+
+.trust-strip small {
+  max-width: 28ch;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .trust-strip--dark {
@@ -405,6 +419,10 @@ h3 {
 .trust-strip--dark span {
   background: rgba(255, 255, 255, 0.07);
   color: #f1ece2;
+}
+
+.trust-strip--dark small {
+  color: rgba(241, 236, 226, 0.74);
 }
 
 .section {
