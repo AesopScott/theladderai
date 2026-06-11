@@ -402,8 +402,9 @@ body.l2 .hero-aurora {
   width: 100vw;
   z-index: 0;
   pointer-events: none;
-  overflow: hidden;   /* clip at the viewport edges (not the content column) so the
-                         cloud bleeds off-screen instead of stopping at the right edge */
+  overflow-x: clip;     /* clip horizontally at the viewport edges (full-bleed) */
+  overflow-y: visible;  /* but NOT vertically — let the cloud feather up into the
+                           transparent nav instead of hitting a straight clip line */
 }
 body.l2 .aurora-blob {
   position: absolute;
