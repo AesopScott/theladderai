@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, arrayUnion } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=4';
 
 const requestCollection = 'useCaseTrainingRequests';
 const offlineRequestKey = 'aesop-use-case-training-requests-v1';

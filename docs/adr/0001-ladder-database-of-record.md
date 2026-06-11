@@ -43,7 +43,7 @@ the Products/Use-Cases pathways are wired to durable persistence.
 
 ## Decision
 
-**Adopt Firestore (`playagame-f733d`) as the single database of record for all
+**Adopt Firestore (`theladderai`) as the single database of record for all
 three Ladder pathways**, unifying on the existing `learners/{learnerId}`
 document that the Concepts ladder already writes.
 
@@ -140,5 +140,5 @@ with per-pathway keys plus dedicated certification/evidence collections.
 - Should an authenticated account be **required** for Products/Use-Cases
   certifications, or is the anonymous `learnerId` acceptable at first
   (matching the Concepts ladder's `account_bound` default in doc 16)?
-- Confirm the Firebase project `playagame-f733d` is the intended production
+- Confirm the Firebase project `theladderai` is the intended production
   project for all three pathways.

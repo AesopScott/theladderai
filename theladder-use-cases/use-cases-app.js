@@ -665,7 +665,7 @@ async function getRequestDbContext() {
   const [{ initializeApp, getApps, getApp }, firestoreModule, configModule] = await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'),
-    import('/ai-academy/js/firebase-config.js?v=3')
+    import('/ai-academy/js/firebase-config.js?v=4')
   ]);
   const app = getApps().length ? getApp() : initializeApp(configModule.FIREBASE_CONFIG);
   requestDbContext = {

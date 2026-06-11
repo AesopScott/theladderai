@@ -19,13 +19,13 @@ import {
   recordCompletion, recordCertification,
   getLearnerId, setLearnerId,
   loadTrainingPedagogy, loadTrainingStandard
-} from '/theladder-shared/data-layer.js?v=3';
+} from '/theladder-shared/data-layer.js?v=4';
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getAuth, onAuthStateChanged, sendSignInLinkToEmail,
   signInWithEmailAndPassword, signOut as fbSignOut
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=4';
 
 import { LADDER_TIERS } from './ladder-data.js?v=2';
 import {

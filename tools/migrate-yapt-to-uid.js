@@ -12,7 +12,7 @@
  *
  * Prerequisites:
  *   npm i firebase-admin
- *   # auth via a service account for project playagame-f733d:
+ *   # auth via a service account for project theladderai:
  *   set GOOGLE_APPLICATION_CREDENTIALS=C:\path\to\serviceAccount.json   (Windows)
  *   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/serviceAccount.json  (POSIX)
  *
@@ -21,7 +21,7 @@
 
 const admin = require('firebase-admin');
 
-const PROJECT_ID = 'playagame-f733d';
+const PROJECT_ID = 'theladderai';
 const SRC = 'AESOP-YAPT';                                // source (legacy) record
 const DST = 'iJKSEZbNlBMgNnTjoKl1RfBDFwf1';              // destination uid record
 const EMAIL = 'scott@mojoaistudio.com';                 // account email to bind

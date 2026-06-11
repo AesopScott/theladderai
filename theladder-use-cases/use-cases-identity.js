@@ -30,7 +30,7 @@ async function getAuthContext() {
   const [{ initializeApp, getApps, getApp }, authModule, configModule] = await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
-    import('/ai-academy/js/firebase-config.js?v=3')
+    import('/ai-academy/js/firebase-config.js?v=4')
   ]);
   const app = getApps().length ? getApp() : initializeApp(configModule.FIREBASE_CONFIG);
   const auth = authModule.getAuth(app);

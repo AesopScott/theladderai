@@ -6,7 +6,7 @@ import {
   getAuth, isSignInWithEmailLink, signInWithEmailLink,
   EmailAuthProvider, linkWithCredential, updatePassword
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=4';
 
 const auth = getAuth(initializeApp(FIREBASE_CONFIG));
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';

@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=4';
 
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
