@@ -1013,6 +1013,9 @@ body.l2 .l2-signed-in {
   display: flex; gap: 1rem; align-items: center; justify-content: center;
   font-size: 1rem; color: var(--l2-ink);
 }
+/* the sign-out button inherits a stacked-layout margin-top; drop it so it
+   sits on the same line as the "Signed in as…" text */
+body.l2 .l2-signed-in .l2-signup-signin { margin-top: 0; line-height: 1; }
 @media (max-width: 560px) {
   body.l2 .l2-signup-form, body.l2 .l2-signin-form { flex-direction: column; }
   body.l2 .l2-signup-btn { padding: 0.9rem; }
