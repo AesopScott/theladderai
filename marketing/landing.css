@@ -60,10 +60,32 @@ a {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 800;
   font-size: 1.5em;
   color: var(--navy);
   letter-spacing: 0;
+}
+
+.brand-mark {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #000;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background: #fff;
+  -webkit-mask: url("/components/ladder2.png?v=1") center / contain no-repeat;
+  mask: url("/components/ladder2.png?v=1") center / contain no-repeat;
 }
 
 .nav-links {
