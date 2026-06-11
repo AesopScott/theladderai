@@ -25,18 +25,20 @@ and public credentials — in a single Fensea-inspired page (AESOP navy/gold on 
 - `docs/` — product/use-case catalogs, data model, certification architecture, ADRs, and
   `backlog.json`.
 
-## Deprecated Directories
+## Deprecated Standalone Surfaces
 
-The following legacy directories are no longer active product surfaces. Do not add new
-features or styling there unless the explicit task is archival maintenance or redirect
-cleanup:
+The following directories are deprecated as standalone product surfaces/routes, but
+they are not dead code. Their files still contain product and use-case functionality
+that has not been fully migrated into the unified Ladder experience yet:
 
 - `theladder/`
 - `theladder-products/`
 - `theladder-use-cases/`
 
-The active unified Ladder experience lives at `/` and uses `index.html`, `site.css`,
-`components/`, and `theladder-shared/`.
+Do not delete or casually rewrite these directories. Treat them as transitional source
+areas: maintain them when required, but do not build new standalone product surfaces
+there. The active user-facing Ladder experience lives at `/` and uses `index.html`,
+`site.css`, `components/`, and `theladder-shared/`.
 
 ## Skeletons — rebuild (see `docs/backlog.json`)
 

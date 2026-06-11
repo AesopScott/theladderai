@@ -1,8 +1,9 @@
-# Deprecated
+# Deprecated Standalone Surface
 
-This directory is a legacy Ladder surface and is no longer the active product.
+This directory is deprecated as a standalone Ladder surface, but it is not dead
+code.
 
-Do not add new features or styling here unless the task is explicitly archival
-maintenance or redirect cleanup. The active unified Ladder experience lives at
-the repo root in `index.html`, with shared code in `components/` and
-`theladder-shared/`.
+Files here may still be referenced as transitional source material while the
+unified Ladder experience is consolidated at the repo root. Do not delete or
+casually rewrite this directory. Maintain it when required, but do not build new
+standalone surfaces here.
