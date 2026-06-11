@@ -3,28 +3,504 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certifications — The Ladder AI</title>
+  <title>Certifications - The Ladder AI</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
   <link rel="stylesheet" href="/site.css?v=15">
   <style>
-    :root { --navy:#0d1b2a; --ink2:#33414f; --gold:#c9a05a; }
-    body { margin:0; min-height:100vh; display:grid; place-items:center;
-      font-family:'Hanken Grotesk','DM Sans',system-ui,sans-serif; background:#fff; color:var(--navy); text-align:center; padding:2rem; }
-    .eyebrow { letter-spacing:.22em; text-transform:uppercase; color:var(--gold); font-weight:800; margin:0 0 .75rem; }
-    .ai { color:var(--gold); }
-    h1 { font-size:clamp(2rem,5vw,3.5rem); margin:0 0 1rem; }
-    p { color:var(--ink2); font-size:1.1rem; line-height:1.6; max-width:34rem; margin:.4rem auto; }
-    a { color:var(--gold); font-weight:700; text-decoration:none; border-bottom:2px solid var(--gold); }
-    code { background:#f4f1ea; padding:.1em .4em; border-radius:4px; }
+    :root { --navy:#0d1b2a; --ink2:#33414f; --muted:#667789; --gold:#c9a05a; --line:#e6dfd1; --paper:#fffaf0; --soft:#f7f2e7; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Hanken Grotesk', 'DM Sans', system-ui, sans-serif;
+      background: #fff;
+      color: var(--navy);
+    }
+    .page {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      color: var(--navy);
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    .back-link {
+      color: var(--gold);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+      gap: 2rem;
+      align-items: start;
+      padding: 3rem 0 2rem;
+    }
+    .eyebrow {
+      margin: 0 0 0.65rem;
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(2.3rem, 7vw, 5.3rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+    .lead {
+      max-width: 42rem;
+      margin: 1rem 0 0;
+      color: var(--ink2);
+      font-size: 1.08rem;
+      line-height: 1.65;
+    }
+    .auth-card, .summary-card, .empty, .cert-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .auth-card {
+      padding: 1rem;
+      box-shadow: 0 16px 40px rgba(13, 27, 42, 0.08);
+    }
+    .auth-title {
+      margin: 0 0 0.8rem;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+    .auth-form {
+      display: grid;
+      gap: 0.65rem;
+    }
+    .auth-form[hidden], .signed-in[hidden] { display: none; }
+    input {
+      width: 100%;
+      min-height: 2.7rem;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.65rem 0.75rem;
+      font: inherit;
+    }
+    button {
+      min-height: 2.65rem;
+      border: 0;
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      background: var(--navy);
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    button.secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--navy);
+    }
+    .signin-toggle {
+      margin-top: 0.65rem;
+      background: transparent;
+      color: var(--gold);
+      border: 0;
+      padding: 0;
+      min-height: auto;
+      font-weight: 900;
+    }
+    .auth-msg {
+      min-height: 1.2em;
+      margin: 0.7rem 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .auth-msg[data-state="error"] { color: #9f3412; }
+    .signed-in {
+      display: grid;
+      gap: 0.55rem;
+      color: var(--ink2);
+      font-size: 0.95rem;
+    }
+    .signed-in strong, .meta-value {
+      color: var(--navy);
+      overflow-wrap: anywhere;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin: 0 0 1.4rem;
+    }
+    .summary-card {
+      padding: 1rem;
+      background: var(--paper);
+    }
+    .summary-card strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .summary-card span {
+      display: block;
+      margin-top: 0.45rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: end;
+      margin: 1.5rem 0 0.85rem;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.55rem;
+      letter-spacing: 0;
+    }
+    .record-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-align: right;
+    }
+    .cert-list {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .cert-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: start;
+      padding: 1rem;
+    }
+    .cert-card h3 {
+      margin: 0 0 0.3rem;
+      font-size: 1.05rem;
+      letter-spacing: 0;
+    }
+    .cert-card p {
+      margin: 0;
+      color: var(--ink2);
+      line-height: 1.5;
+    }
+    .cert-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.65rem;
+    }
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.25rem 0.5rem;
+      color: var(--ink2);
+      background: var(--soft);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .cert-date {
+      color: var(--muted);
+      font-size: 0.86rem;
+      white-space: nowrap;
+    }
+    .empty {
+      padding: 1.25rem;
+      color: var(--ink2);
+      background: var(--paper);
+    }
+    @media (max-width: 760px) {
+      .topbar, .section-head, .cert-card { align-items: start; flex-direction: column; }
+      .hero { grid-template-columns: 1fr; padding-top: 2rem; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cert-card { grid-template-columns: 1fr; }
+      .record-meta { text-align: left; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <p class="eyebrow">The Ladder <span class="ai">AI</span></p>
-    <h1>Certifications</h1>
-    <p>This page is being rebuilt for The Ladder AI. It was migrated from the Aesop repo as a <strong>skeleton</strong> — see <code>docs/backlog.json</code>.</p>
-    <p><a href="/">← Back to The Ladder</a></p>
+  <main class="page">
+    <nav class="topbar" aria-label="Certification navigation">
+      <a class="brand" href="/">The Ladder AI</a>
+      <a class="back-link" href="/workspace/">Back to workspace</a>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Credential Record</p>
+        <h1>Certifications</h1>
+        <p class="lead">View the certifications correlated with the signed-in learner account. These records are loaded from the same learner profile used by the workspace.</p>
+      </div>
+
+      <aside class="auth-card" aria-labelledby="authTitle">
+        <h2 class="auth-title" id="authTitle">Account</h2>
+        <div class="signed-in" id="signedInBox" hidden>
+          <span>Signed in as <strong id="signedInEmail"></strong></span>
+          <span>Learner ID <strong id="signedInLearnerId"></strong></span>
+          <button class="secondary" id="signOutBtn" type="button">Sign out</button>
+        </div>
+        <form class="auth-form" id="signupForm" novalidate>
+          <input id="signupEmail" type="email" placeholder="Enter your e-mail" autocomplete="email" aria-label="Email address">
+          <button type="submit">Create account</button>
+        </form>
+        <button class="signin-toggle" id="signinToggle" type="button" aria-expanded="false" aria-controls="signinForm">Already have an account? Sign in</button>
+        <form class="auth-form" id="signinForm" hidden novalidate>
+          <input id="signinEmail" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
+          <input id="signinPassword" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+          <button type="submit">Sign in</button>
+        </form>
+        <p class="auth-msg" id="authMsg" role="status" aria-live="polite"></p>
+      </aside>
+    </section>
+
+    <section aria-labelledby="summaryTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Summary</p>
+          <h2 id="summaryTitle">Learner certification count</h2>
+        </div>
+        <div class="record-meta">
+          <div>User ID: <span class="meta-value" id="recordLearnerId">-</span></div>
+          <div id="recordStatus">Sign in to load your remote record.</div>
+        </div>
+      </div>
+      <div class="summary-grid" aria-label="Certification count summary">
+        <div class="summary-card"><strong id="totalCount">0</strong><span>Total</span></div>
+        <div class="summary-card"><strong id="coreCount">0</strong><span>Core</span></div>
+        <div class="summary-card"><strong id="expertCount">0</strong><span>Expert</span></div>
+        <div class="summary-card"><strong id="masteryCount">0</strong><span>Mastery</span></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="certListTitle">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Record</p>
+          <h2 id="certListTitle">Certifications for this user</h2>
+        </div>
+      </div>
+      <div class="cert-list" id="certList"></div>
+    </section>
   </main>
+
+  <script type="module">
+    import {
+      initDataLayer,
+      loadLearnerRecord,
+      getLearnerId,
+      setLearnerId
+    } from '/theladder-shared/data-layer.js?v=3';
+    import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import {
+      getAuth,
+      onAuthStateChanged,
+      sendSignInLinkToEmail,
+      signInWithEmailAndPassword,
+      signOut as firebaseSignOut
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
+
+    const LS_ID = 'aesop-learner-id';
+    const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
+    const $ = (id) => document.getElementById(id);
+    let auth = null;
+    let activeUser = null;
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function depthOf(cert) {
+      const raw = `${cert.depthId || ''} ${cert.depthLabel || ''} ${cert.testDepth || ''} ${cert.certificationTier || ''} ${cert.title || ''}`.toLowerCase();
+      if (raw.includes('master')) return 'mastery';
+      if (raw.includes('expert')) return 'expert';
+      return 'core';
+    }
+
+    function certificationTitle(cert) {
+      return cert.title
+        || [cert.ladderTier, cert.certificationTier, cert.testDepth].filter(Boolean).join(' - ')
+        || 'Certification';
+    }
+
+    function certificationBody(cert) {
+      const parts = [
+        cert.pathway ? `Pathway: ${cert.pathway}` : '',
+        cert.ladderTier ? `Rung: ${cert.ladderTier}` : '',
+        cert.result ? `Result: ${cert.result}` : ''
+      ].filter(Boolean);
+      return parts.join(' · ') || 'Certification record saved for this learner.';
+    }
+
+    function renderAuth() {
+      const signedIn = Boolean(activeUser);
+      $('signedInBox').hidden = !signedIn;
+      $('signupForm').hidden = signedIn;
+      $('signinToggle').hidden = signedIn;
+      $('signinForm').hidden = signedIn || $('signinForm').hidden;
+      if (signedIn) {
+        $('signedInEmail').textContent = activeUser.email || '';
+        $('signedInLearnerId').textContent = activeUser.uid || getLearnerId() || '-';
+      }
+    }
+
+    function setStatus(message = '', kind = '') {
+      const node = $('authMsg');
+      node.textContent = message;
+      node.dataset.state = kind;
+    }
+
+    function renderRecord(record, statusText = '') {
+      const certs = Array.isArray(record?.ladderCertifications) ? record.ladderCertifications.slice() : [];
+      certs.sort((a, b) => String(b.awardedAt || b.earnedAt || '').localeCompare(String(a.awardedAt || a.earnedAt || '')));
+      const learnerId = activeUser?.uid || record?.learnerId || getLearnerId() || localStorage.getItem(LS_ID) || '-';
+      $('recordLearnerId').textContent = learnerId;
+      $('recordStatus').textContent = statusText || (activeUser ? 'Remote learner record loaded.' : 'Showing the local learner record on this machine.');
+      $('totalCount').textContent = String(certs.length);
+      $('coreCount').textContent = String(certs.filter((cert) => depthOf(cert) === 'core').length);
+      $('expertCount').textContent = String(certs.filter((cert) => depthOf(cert) === 'expert').length);
+      $('masteryCount').textContent = String(certs.filter((cert) => depthOf(cert) === 'mastery').length);
+
+      if (!certs.length) {
+        $('certList').innerHTML = `<div class="empty">${activeUser ? 'No certifications are recorded for this learner yet.' : 'Sign in to load the certifications attached to your account.'}</div>`;
+        return;
+      }
+      $('certList').innerHTML = certs.map((cert) => {
+        const depth = depthOf(cert);
+        const awarded = cert.awardedAt || cert.earnedAt || cert.dateTime || '';
+        const tags = [
+          depth,
+          cert.certificationTier,
+          cert.evidenceStatus,
+          cert.validationStatus
+        ].filter(Boolean);
+        return `<article class="cert-card">
+          <div>
+            <h3>${escapeHtml(certificationTitle(cert))}</h3>
+            <p>${escapeHtml(certificationBody(cert))}</p>
+            <div class="cert-tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>
+          </div>
+          <time class="cert-date" datetime="${escapeHtml(awarded)}">${escapeHtml(formatDate(awarded))}</time>
+        </article>`;
+      }).join('');
+    }
+
+    async function loadRecordFor(id, statusText) {
+      const record = await loadLearnerRecord(id);
+      renderRecord(record, statusText);
+    }
+
+    async function handleAuthChange(user) {
+      activeUser = user ? { email: user.email, uid: user.uid, emailVerified: user.emailVerified } : null;
+      renderAuth();
+      if (user) {
+        localStorage.setItem(LS_ID, user.uid);
+        setLearnerId(user.uid);
+        await loadRecordFor(user.uid, 'Remote learner record loaded for the signed-in user.');
+      } else {
+        const stored = localStorage.getItem(LS_ID) || '';
+        await loadRecordFor(stored, stored ? 'Signed out. Showing the last local learner record on this machine.' : 'Sign in to load your remote record.');
+      }
+    }
+
+    async function sendVerification(email) {
+      const clean = String(email || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) {
+        setStatus('Enter a valid email address.', 'error');
+        return;
+      }
+      if (!auth) {
+        setStatus('Account sign-up is unavailable right now.', 'error');
+        return;
+      }
+      try {
+        await sendSignInLinkToEmail(auth, clean, {
+          url: `${location.origin}/components/create-account.html`,
+          handleCodeInApp: true
+        });
+        localStorage.setItem(LS_EMAIL, clean);
+        setStatus(`Check ${clean} for a link to verify your email and finish creating your account.`, 'ok');
+      } catch (error) {
+        setStatus(`Could not send the link (${error.code || 'error'}).`, 'error');
+      }
+    }
+
+    async function passwordSignIn(email, password) {
+      if (!auth) {
+        setStatus('Sign-in is unavailable right now.', 'error');
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, String(email || '').trim(), password || '');
+        setStatus('', '');
+      } catch (error) {
+        setStatus('Sign in failed. Check your email and password.', 'error');
+      }
+    }
+
+    function setupForms() {
+      $('signupForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        sendVerification($('signupEmail').value);
+      });
+      $('signinToggle').addEventListener('click', () => {
+        const form = $('signinForm');
+        const expanded = form.hidden;
+        form.hidden = !expanded;
+        $('signinToggle').setAttribute('aria-expanded', String(expanded));
+        if (expanded) $('signinEmail').focus();
+      });
+      $('signinForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        passwordSignIn($('signinEmail').value, $('signinPassword').value);
+      });
+      $('signOutBtn').addEventListener('click', () => {
+        if (auth) firebaseSignOut(auth).catch(() => {});
+      });
+    }
+
+    async function init() {
+      const stored = localStorage.getItem(LS_ID) || '';
+      await initDataLayer(stored ? { learnerId: stored } : {});
+      setupForms();
+      try {
+        const app = getApps().length ? getApp() : initializeApp(FIREBASE_CONFIG);
+        auth = getAuth(app);
+        onAuthStateChanged(auth, handleAuthChange);
+      } catch (error) {
+        console.warn('[certifications] Firebase auth unavailable', error);
+        await loadRecordFor(stored, 'Auth is unavailable. Showing local certification records only.');
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
