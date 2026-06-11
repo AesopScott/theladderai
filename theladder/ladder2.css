@@ -761,6 +761,10 @@ body.l2 .placement-toolbar, body.l2 .workspace {
 }
 body.l2 .placement-summary { padding-right: 2rem; }
 body.l2 #l2PlacementStatus { font-family: var(--l2-display); font-weight: 800; }
+/* Pin the relocated Start-assessment CTA to the conversation window's upper-RIGHT corner.
+   ladder.css already makes .assessment-chat-head flex/space-between but align-items:center,
+   which vertically centers the enlarged button; override to flex-start so it sits at the top. */
+body.l2 .assessment-chat-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 body.l2 .l2-assessment-done {
   display: none; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid var(--l2-line);
