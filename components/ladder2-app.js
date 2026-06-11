@@ -1663,6 +1663,7 @@ function setupAuth() {
 
 function renderHeroSignup() {
   const signedIn = Boolean(state.authUser);
+  $('l2Signup')?.classList.toggle('is-signed-in', signedIn);
   // The forms / signed-in box use display:flex (and the link inline-block) in CSS,
   // which overrides the [hidden] attribute — so toggle inline display directly.
   const setDisp = (id, shown, mode) => {

@@ -8061,9 +8061,24 @@ body.l2 .l2-signed-in .l2-signup-signin {
   line-height: 1.1;
   text-align: center;
 }
+body.l2 .l2-signup.is-signed-in {
+  width: 360px !important;
+  max-width: calc(100vw - 6rem);
+  margin-left: auto !important;
+  margin-right: 7rem !important;
+  transform: translateX(-3rem);
+}
 @media (max-width: 560px) {
   body.l2 .l2-signup-form, body.l2 .l2-signin-form { flex-direction: column; }
   body.l2 .l2-signup-btn { padding: 0.9rem; }
+}
+@media (max-width: 900px) {
+  body.l2 .l2-signup.is-signed-in {
+    width: min(360px, calc(100vw - 2rem)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none;
+  }
 }
 
 /* ── collapse zone (placed last so it wins over the base hero rules): as the
@@ -8078,6 +8093,11 @@ body.l2 .l2-signed-in .l2-signup-signin {
   body.l2 .l2-signup:has(.l2-signed-in:not([hidden])) {
     width: min(420px, 32vw);
     margin-right: clamp(2.5rem, 9vw, 8rem);
+  }
+  body.l2 .l2-signup.is-signed-in {
+    width: 360px !important;
+    margin-right: 7rem !important;
+    transform: translateX(-3rem);
   }
 }
 
