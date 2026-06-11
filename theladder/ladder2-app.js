@@ -695,6 +695,7 @@ function renderHeroSignup() {
   setDisp('l2SigninForm', false, 'flex');       // collapsed by default; the toggle opens it
   setDisp('l2SignedIn', signedIn, 'flex');       // sign-out only when actually signed in
   if (signedIn) setText('l2SignedInEmail', state.authUser.email || '');
+  setText('l2LearnerId', state.authUser?.uid || localStorage.getItem('aesop-learner-id') || '—');
 }
 
 async function startCertification() {

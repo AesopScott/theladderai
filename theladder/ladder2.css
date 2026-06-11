@@ -324,10 +324,22 @@ body.l2 .l2-section {
 body.l2 .l2-section-head {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;   /* title left, learner ID right (Profile) */
   gap: 1.1rem;
   padding-bottom: 1.4rem;
   margin-bottom: 2.4rem;
   border-bottom: 1px solid var(--l2-line);
+}
+/* learner ID — right side of the Profile header */
+body.l2 .l2-learner-id { flex: 0 0 auto; text-align: right; line-height: 1.25; }
+body.l2 .l2-learner-id-label {
+  display: block;
+  font-family: var(--l2-display); font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.14em; font-size: 0.72rem; color: var(--l2-gold-deep);
+}
+body.l2 .l2-learner-id-value {
+  font-family: var(--l2-display); font-weight: 700; font-size: 1.15rem; color: var(--l2-ink);
+  word-break: break-all;
 }
 body.l2 .l2-num {
   font-family: var(--l2-display);
@@ -898,6 +910,9 @@ body.l2 .l2-footer-col h4 {
 body.l2 .l2-footer-col a { display: block; color: var(--l2-ink-2); text-decoration: none; margin-bottom: 0.55rem; }
 body.l2 .l2-footer-col a:hover { color: var(--l2-gold-deep); }
 body.l2 .l2-footer-legal { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--l2-line); color: var(--l2-muted); font-size: 0.82rem; line-height: 1.6; }
+/* Support & feedback, relocated to the bottom of the page (just above the footer nav) */
+body.l2 .l2-footer-support { width: min(560px, 100%); margin: 0 0 3rem; }
+body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800; font-size: 1.4rem; color: var(--l2-ink); margin: 0.35rem 0 1rem; }
 
 /* ============================================================
    RESPONSIVE

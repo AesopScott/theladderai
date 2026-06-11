@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/academy-theme.css?v=2">
   <link rel="stylesheet" href="/academy-dark-mode.css?v=2">
   <link rel="stylesheet" href="/theladder/ladder.css?v=51">
-  <link rel="stylesheet" href="/theladder/ladder2.css?v=66">
+  <link rel="stylesheet" href="/theladder/ladder2.css?v=67">
 </head>
 <body class="l2">
 
@@ -134,6 +134,10 @@
           <span class="l2-eyebrow">Your record</span>
           <h2 class="l2-section-title">Profile</h2>
         </div>
+        <div class="l2-learner-id">
+          <span class="l2-learner-id-label">Learner ID</span>
+          <span id="l2LearnerId" class="l2-learner-id-value">—</span>
+        </div>
       </div>
       <p class="l2-section-lead">Everything you've earned and where you left off — plus a direct line to support.</p>
 
@@ -178,32 +182,6 @@
           <h3 id="l2ActiveCourseTitle">No active rung yet</h3>
           <p id="l2ActiveCourseMeta">Take placement or pick a rung in Training to begin a guided conversation.</p>
           <a class="l2-btn l2-btn--ghost" href="#training">Resume training</a>
-        </div>
-
-        <div class="l2-card">
-          <span class="panel-label">Support &amp; feedback</span>
-          <h3>How can we help?</h3>
-          <form class="l2-feedback-form" id="l2FeedbackForm">
-            <div>
-              <label for="l2FeedbackType">Topic</label>
-              <select id="l2FeedbackType">
-                <option value="support">Support request</option>
-                <option value="feedback">Product feedback</option>
-                <option value="content">Content correction</option>
-                <option value="bug">Report a problem</option>
-              </select>
-            </div>
-            <div>
-              <label for="l2FeedbackEmail">Email (optional)</label>
-              <input id="l2FeedbackEmail" type="email" placeholder="name@example.com" autocomplete="email">
-            </div>
-            <div>
-              <label for="l2FeedbackMessage">Message</label>
-              <textarea id="l2FeedbackMessage" placeholder="Tell us what's going on..."></textarea>
-            </div>
-            <button type="submit">Send</button>
-            <p class="l2-feedback-sent" id="l2FeedbackSent" hidden>Thanks — your message has been recorded.</p>
-          </form>
         </div>
       </div>
     </section>
@@ -425,6 +403,31 @@
   <!-- ============ FOOTER ============ -->
   <footer class="l2-footer">
     <h2 class="l2-footer-cta">Still climbing? <a href="#assessment">Let's place you.</a></h2>
+    <section class="l2-footer-support" aria-label="Support and feedback">
+      <span class="panel-label">Support &amp; feedback</span>
+      <h3>How can we help?</h3>
+      <form class="l2-feedback-form" id="l2FeedbackForm">
+        <div>
+          <label for="l2FeedbackType">Topic</label>
+          <select id="l2FeedbackType">
+            <option value="support">Support request</option>
+            <option value="feedback">Product feedback</option>
+            <option value="content">Content correction</option>
+            <option value="bug">Report a problem</option>
+          </select>
+        </div>
+        <div>
+          <label for="l2FeedbackEmail">Email (optional)</label>
+          <input id="l2FeedbackEmail" type="email" placeholder="name@example.com" autocomplete="email">
+        </div>
+        <div>
+          <label for="l2FeedbackMessage">Message</label>
+          <textarea id="l2FeedbackMessage" placeholder="Tell us what's going on..."></textarea>
+        </div>
+        <button type="submit">Send</button>
+        <p class="l2-feedback-sent" id="l2FeedbackSent" hidden>Thanks — your message has been recorded.</p>
+      </form>
+    </section>
     <div class="l2-footer-grid">
       <div class="l2-footer-col">
         <span class="nav-brand-primary" style="font-size:1.3rem;">The Ladder AI</span>
@@ -479,6 +482,6 @@
       });
     })();
   </script>
-  <script type="module" src="/theladder/ladder2-app.js?v=5"></script>
+  <script type="module" src="/theladder/ladder2-app.js?v=6"></script>
 </body>
 </html>
