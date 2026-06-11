@@ -8,24 +8,35 @@ and public credentials — in a single Fensea-inspired page (AESOP navy/gold on 
 
 ## Entry point
 
-- `theladder/ladder2.html` — the unified Ladder (AI Concepts / Products / Use Cases via an
+- `/` (`index.html`) — the unified Ladder (AI Concepts / Products / Use Cases via an
   in-place focus toggle, one learner record). Preview with a static server from the repo
   root, e.g. `npx serve .`, then open `/`.
 
 ## Layout
 
 - `site.css` — the single consolidated website stylesheet.
-- `theladder/` — the ladder2 page, orchestrator (`ladder2-app.js`),
-  tier data (`ladder-data.js`), Concepts provider, hero images.
+- `components/` — active Ladder app scripts, tier data, Concepts provider, and images.
 - `theladder-shared/` — catalog-agnostic engines: placement, certification (AI examiner +
   independent second-model validator, 7-dimension rubric), and the data layer
   (Firestore + localStorage).
-- `theladder-products/`, `theladder-use-cases/` — the Products / Use-Cases providers.
 - `aesop-api/proxy.php` — server-side Anthropic proxy. Needs `secrets.php` at the repo root
   **or** an `ANTHROPIC_API_KEY` env var on the server.
 - `ai-academy/js/firebase-config.js` — Firebase config used by the data layer.
 - `docs/` — product/use-case catalogs, data model, certification architecture, ADRs, and
   `backlog.json`.
+
+## Deprecated Directories
+
+The following legacy directories are no longer active product surfaces. Do not add new
+features or styling there unless the explicit task is archival maintenance or redirect
+cleanup:
+
+- `theladder/`
+- `theladder-products/`
+- `theladder-use-cases/`
+
+The active unified Ladder experience lives at `/` and uses `index.html`, `site.css`,
+`components/`, and `theladder-shared/`.
 
 ## Skeletons — rebuild (see `docs/backlog.json`)
 
