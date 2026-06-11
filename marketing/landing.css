@@ -23,7 +23,8 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: 90%;
+  font-size: 80%;
+  scroll-padding-top: 68px;
 }
 
 body {
@@ -32,7 +33,7 @@ body {
   color: var(--ink);
   font-family: var(--font);
   line-height: 1.55;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,7 +68,7 @@ a {
   justify-content: center;
   gap: clamp(1rem, 3vw, 2.8rem);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
 }
 
 .nav-links a:hover {
@@ -101,10 +102,10 @@ a {
 
 .hero {
   position: relative;
-  min-height: calc(100svh - 60px);
+  min-height: auto;
   display: grid;
   align-items: center;
-  padding: clamp(3rem, 7vw, 6rem) 4vw clamp(2.4rem, 5.6vw, 4rem);
+  padding: clamp(2.6rem, 6vw, 4.8rem) 4vw clamp(2rem, 4.8vw, 3.2rem);
   overflow: hidden;
   isolation: isolate;
 }
@@ -193,15 +194,15 @@ h1 {
   margin-bottom: 1rem;
   color: var(--navy);
   font-family: var(--display);
-  font-size: clamp(2.45rem, 6.4vw, 6rem);
-  line-height: 0.94;
+  font-size: clamp(2.2rem, 5.4vw, 5rem);
+  line-height: 0.98;
   max-width: 11ch;
 }
 
 h2 {
   color: var(--navy);
   font-family: var(--display);
-  font-size: clamp(1.6rem, 3.45vw, 3.85rem);
+  font-size: clamp(1.45rem, 2.8vw, 3.05rem);
   line-height: 1.02;
   margin-bottom: 0.85rem;
 }
@@ -216,7 +217,7 @@ h3 {
 .hero-copy {
   width: min(560px, 100%);
   color: #33414f;
-  font-size: clamp(1rem, 1.45vw, 1.18rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
   margin-bottom: 1.5rem;
 }
 
@@ -234,6 +235,11 @@ h3 {
   border-block: 1px solid var(--line);
 }
 
+.section,
+.final-cta {
+  scroll-margin-top: 76px;
+}
+
 .trust-strip span {
   display: grid;
   min-height: 66px;
@@ -247,6 +253,16 @@ h3 {
 
 .section {
   padding: clamp(3rem, 6.4vw, 5.6rem) 4vw;
+}
+
+.page-section {
+  display: grid;
+  gap: clamp(1.5rem, 3.2vw, 2.6rem);
+}
+
+.page-grid {
+  width: min(1180px, 100%);
+  margin-inline: auto;
 }
 
 .section-copy {
@@ -296,7 +312,7 @@ h3 {
 .pathway-grid p,
 .faq-grid p,
 .proof-card p,
-.pricing p {
+.pricing-inline p {
   margin-bottom: 0;
   color: var(--muted);
 }
@@ -359,6 +375,10 @@ h3 {
     rgba(255, 255, 255, 0.04);
 }
 
+.proof-card p {
+  color: #f1ece2;
+}
+
 .proof-list {
   display: grid;
   gap: 0.8rem;
@@ -396,15 +416,18 @@ h3 {
   transform: translateY(-2px);
 }
 
-.pricing {
+.pricing-inline {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 2rem;
   align-items: center;
   background: #fff;
+  border: 1px solid rgba(13, 27, 42, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
 }
 
-.pricing div {
+.pricing-inline div {
   max-width: 760px;
 }
 
@@ -425,12 +448,13 @@ details p {
 }
 
 .final-cta {
-  padding: clamp(3rem, 6.4vw, 5.6rem) 4vw;
+  padding: clamp(1.5rem, 3.6vw, 3rem);
+  border-radius: 8px;
   text-align: center;
   background:
     radial-gradient(circle at 20% 10%, rgba(201, 160, 90, 0.16), transparent 28%),
     radial-gradient(circle at 80% 70%, rgba(92, 120, 153, 0.16), transparent 30%),
-    var(--cream);
+    #ffffff;
 }
 
 .final-cta h2 {
@@ -475,7 +499,7 @@ details p {
   .problem,
   .outcomes,
   .proof-card,
-  .pricing {
+  .pricing-inline {
     grid-template-columns: 1fr;
   }
 
@@ -486,7 +510,7 @@ details p {
     grid-template-columns: 1fr;
   }
 
-  .pricing .button {
+  .pricing-inline .button {
     justify-self: start;
   }
 }
