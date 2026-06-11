@@ -1665,7 +1665,12 @@ function renderHeroSignup() {
   const signedIn = Boolean(state.authUser);
   // The forms / signed-in box use display:flex (and the link inline-block) in CSS,
   // which overrides the [hidden] attribute — so toggle inline display directly.
-  const setDisp = (id, shown, mode) => { const n = $(id); if (n) n.style.display = shown ? mode : 'none'; };
+  const setDisp = (id, shown, mode) => {
+    const n = $(id);
+    if (!n) return;
+    n.hidden = !shown;
+    n.style.display = shown ? mode : 'none';
+  };
   setDisp('l2SignupForm', !signedIn, 'flex');
   setDisp('l2SigninToggle', !signedIn, 'inline-block');
   setDisp('l2SigninForm', false, 'flex');       // collapsed by default; the toggle opens it

@@ -8036,11 +8036,30 @@ body.l2 .l2-signed-in {
   display: flex; gap: 1rem; align-items: baseline; justify-content: center;
   font-size: 1rem; color: var(--l2-ink);
 }
+body.l2 .l2-signup:has(.l2-signed-in:not([hidden])) {
+  width: min(430px, calc(100vw - 4rem));
+  margin-left: auto;
+  margin-right: clamp(2rem, 8vw, 7rem);
+  padding: 1.05rem 1.15rem;
+  border-radius: 8px;
+}
+body.l2 .l2-signup:has(.l2-signed-in:not([hidden])) .l2-signed-in {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  text-align: left;
+}
+body.l2 .l2-signed-in b {
+  overflow-wrap: anywhere;
+}
 /* the sign-out button inherits a stacked-layout margin-top (and has uppercase
    padding + a 2px ::after underline). Drop the margin and the button's vertical
    padding so its text baseline lines up with the "Signed in as…" text. */
 body.l2 .l2-signed-in .l2-signup-signin {
-  margin-top: 0; padding-top: 0; padding-bottom: 0; line-height: 1;
+  margin-top: 0;
+  padding: 0.68rem 0.9rem;
+  line-height: 1.1;
+  text-align: center;
 }
 @media (max-width: 560px) {
   body.l2 .l2-signup-form, body.l2 .l2-signin-form { flex-direction: column; }
@@ -8056,6 +8075,10 @@ body.l2 .l2-signed-in .l2-signup-signin {
   body.l2 .ladder-stairs { max-width: 300px; }
   /* shrink the email form with the page (it was pinned at 560px the whole zone) */
   body.l2 .l2-signup { margin-top: -1.5rem; width: clamp(360px, 37vw, 560px); }
+  body.l2 .l2-signup:has(.l2-signed-in:not([hidden])) {
+    width: min(420px, 32vw);
+    margin-right: clamp(2.5rem, 9vw, 8rem);
+  }
 }
 
 /* Final certification exam action override: keep these as real filled buttons,
