@@ -14,26 +14,48 @@
 
 ---
 
-## 🚨 MANDATORY — APPEND TO HANDOFF AFTER EVERY COMMIT
+## 🚨 MANDATORY WORKFLOW — READ THIS FIRST
 
-**Your code WILL NOT be deployed unless you append an entry to this file.**
+**YOU ARE CURRENTLY NOT WRITING ANY CODE TO THE APPLICATION FILES.**
 
-After you:
-1. Write code
-2. Test it locally
-3. Commit to your branch (`git commit`)
-4. Push to origin (`git push origin your-branch`)
+Your worktrees show ZERO changes to index.html, /components/, CSS files, or any application code. You are only modifying .handoff-state.
 
-**YOU MUST then append an entry to this file (below the delimiter) to signal the orchestrator.**
+**THIS IS WRONG. YOU MUST EDIT ACTUAL APPLICATION FILES.**
 
-**Without an entry in handoff.md, the orchestrator has no way to know your work is ready. Your code will stay in your branch and never deploy to production.**
+### The Correct Workflow:
 
-The only way your code gets deployed is:
-- You commit + push to your branch
-- You append an entry to handoff.md
-- Orchestrator detects the entry and deploys it
+**STEP 1: WRITE CODE**
+- Edit `/index.html` 
+- Edit files in `/components/` directory
+- Edit `/academy-theme.css` or `/academy-dark-mode.css`
+- Edit `/aesop-api/` files if needed
+- Edit `/ai-academy/` files if needed
+- **DO NOT edit `/theladder/`, `/theladder-products/`, or `/theladder-use-cases/`**
 
-**No entry = no deployment.**
+**STEP 2: TEST LOCALLY**
+- Run a local server (port 3000, 5601, or your test port)
+- Verify your changes work in the browser
+
+**STEP 3: COMMIT YOUR CHANGES**
+- `git add -A` (this stages your actual code changes, not .handoff-state)
+- `git commit -m "your message"`
+- `git push origin your-branch-name`
+
+**STEP 4: APPEND TO HANDOFF**
+- Only after steps 1-3 are complete
+- Write an entry below the delimiter with what you changed
+
+**STEP 5: ORCHESTRATOR DEPLOYS**
+- Orchestrator detects your entry (every 60 seconds)
+- Orchestrator commits, pushes, merges, and deploys
+
+### What's Currently Happening:
+- You're appending to handoff.md ✓ (correct)
+- Orchestrator is running and detecting entries ✓ (correct)
+- **BUT: NO ACTUAL CODE CHANGES EXIST IN YOUR WORKTREES** ✗ (WRONG)
+- Result: Nothing deploys to production ✗
+
+**You must edit application files. Empty worktrees produce empty deployments.**
 
 ---
 
