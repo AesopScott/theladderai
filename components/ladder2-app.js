@@ -62,7 +62,25 @@ const EDUCATION_TIERS = [
   'Elementary', 'Middle School', 'High School',
   'Young Adult', 'College', 'Workforce', 'Leadership'
 ];
-const ADULT_TIERS = new Set(['Young Adult', 'College', 'Workforce', 'Leadership']);
+const PROFESSIONAL_ROLES = [
+  { id: 'ai-developer', label: 'AI Developer', source: 'O*NET 15-1255+', standards: 'O*NET, WEF, NIST AI RMF', description: 'Develop AI applications, write code for AI systems, and implement models.', roleSpec: 'Evaluate programming fluency, AI/ML framework awareness, implementation judgment, testing habits, documentation, and the ability to turn requirements into working AI solutions.' },
+  { id: 'machine-learning-engineer', label: 'Machine Learning Engineer', source: 'O*NET 15-1255+', standards: 'O*NET, WEF, NIST AI RMF', description: 'Design, train, validate, optimize, and deploy machine learning systems.', roleSpec: 'Evaluate model design, data preprocessing, feature engineering, evaluation metrics, validation, production ML lifecycle, scalability, and deployment tradeoffs.' },
+  { id: 'data-scientist', label: 'Data Scientist', source: 'O*NET 15-2051.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Analyze data, develop predictive models, and communicate usable insights.', roleSpec: 'Evaluate statistical reasoning, data cleaning, modeling, visualization, business translation, bias awareness, and communication to non-technical stakeholders.' },
+  { id: 'ai-operations-engineer', label: 'AI Operations Engineer', source: 'WEF Future of Jobs 2025', standards: 'WEF, NIST AI RMF, ISO/IEC 42001', description: 'Deploy, monitor, maintain, and troubleshoot production AI systems.', roleSpec: 'Evaluate MLOps, monitoring, incident response, model drift, versioning, cloud/container operations, reliability, and operational risk management.' },
+  { id: 'ai-product-manager', label: 'AI Product Manager', source: 'WEF Future of Jobs 2025', standards: 'WEF, O*NET Product Management', description: 'Define AI product strategy, prioritize features, and manage roadmaps.', roleSpec: 'Evaluate AI product judgment, use-case feasibility, roadmap decisions, stakeholder communication, user research, responsible AI implications, and outcome metrics.' },
+  { id: 'ai-educator', label: 'AI Educator', source: 'O*NET 25-1021.00', standards: 'O*NET, UNESCO, ISTE', description: 'Teach AI concepts, design curriculum, and train learners.', roleSpec: 'Evaluate conceptual accuracy, explanation across levels, curriculum design, assessment design, facilitation, feedback, responsible AI, and learner support.' },
+  { id: 'ai-security-specialist', label: 'AI Security Specialist', source: 'O*NET 15-3121.00', standards: 'O*NET, NIST AI RMF, OWASP', description: 'Secure AI systems through threat modeling, testing, and mitigation.', roleSpec: 'Evaluate AI threat knowledge, prompt-injection awareness, data poisoning, model theft, privacy, red teaming, secure architecture, and mitigation strategy.' },
+  { id: 'ai-governance-officer', label: 'AI Governance Officer', source: 'WEF Future of Jobs 2025', standards: 'WEF, NIST AI RMF, EU AI Act', description: 'Lead AI policy, compliance, ethics, risk, and governance frameworks.', roleSpec: 'Evaluate governance design, risk assessment, bias and transparency controls, policy implementation, audit trails, regulatory awareness, and stakeholder decision-making.' },
+  { id: 'ai-consultant', label: 'AI Consultant', source: 'O*NET 13-1111.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Advise organizations on AI readiness, strategy, and implementation.', roleSpec: 'Evaluate AI strategy, readiness assessment, roadmap planning, change management, use-case selection, risk framing, and executive communication.' },
+  { id: 'executive-leadership', label: 'Executive Leadership', source: 'WEF, NIST AI RMF', standards: 'WEF, NIST AI RMF, EU AI Act', description: 'Set AI vision, transformation strategy, governance, and investment direction.', roleSpec: 'Evaluate strategic AI literacy, business impact, governance accountability, risk ownership, team leadership, ROI judgment, and responsible transformation.' },
+  { id: 'data-analyst', label: 'Data Analyst', source: 'O*NET 15-2051.01', standards: 'O*NET, WEF, NIST AI RMF', description: 'Analyze business data, produce reports, and identify trends.', roleSpec: 'Evaluate SQL/data manipulation, cleaning, dashboards, trend analysis, business question framing, reporting accuracy, and practical AI-assisted analysis.' },
+  { id: 'ai-solutions-architect', label: 'AI Solutions Architect', source: 'O*NET 15-1299.08', standards: 'O*NET, WEF, NIST AI RMF', description: 'Design enterprise AI systems and integration patterns.', roleSpec: 'Evaluate architecture tradeoffs, cloud AI patterns, data pipelines, security, scalability, integration, cost, reliability, and business-to-technical translation.' },
+  { id: 'prompt-engineer', label: 'Prompt Engineer', source: 'WEF 2025 (Emerging)', standards: 'WEF Future of Jobs 2025', description: 'Design, test, optimize, and document prompts for AI systems.', roleSpec: 'Evaluate prompt design, model behavior awareness, iterative testing, prompt injection risk, template versioning, task decomposition, and performance measurement.' },
+  { id: 'business-analyst-ai', label: 'Business Analyst (AI)', source: 'O*NET 13-1161.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Identify AI use cases, assess business impact, and drive adoption.', roleSpec: 'Evaluate workflow mapping, requirements gathering, use-case scoping, feasibility, ROI, stakeholder translation, change management, and KPI design.' }
+];
+const PROFESSIONAL_ROLE_LABELS = new Set(PROFESSIONAL_ROLES.map((role) => role.label));
+const CERTIFICATION_LEVELS = [...EDUCATION_TIERS, ...PROFESSIONAL_ROLES.map((role) => role.label)];
+const ADULT_TIERS = new Set(['Young Adult', 'College', 'Workforce', 'Leadership', ...PROFESSIONAL_ROLE_LABELS]);
 
 // Proctoring levels surfaced in Certification (doc-16: external is scaffolded).
 const PROCTORING_MODES = [
@@ -551,6 +569,16 @@ function selectedLevelLabel() {
   return $('l2CertTierSelect')?.value || EDUCATION_TIERS[0];
 }
 
+function professionalRoleForLabel(label) {
+  return PROFESSIONAL_ROLES.find((role) => role.label === label) || null;
+}
+
+function certificationLevelOptionsHtml(selected = '') {
+  const edu = EDUCATION_TIERS.map((t) => `<option value="${escapeHtml(t)}" ${t === selected ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('');
+  const roles = PROFESSIONAL_ROLES.map((role) => `<option value="${escapeHtml(role.label)}" ${role.label === selected ? 'selected' : ''}>${escapeHtml(role.label)}</option>`).join('');
+  return `<optgroup label="Learner levels">${edu}</optgroup><optgroup label="Professional roles">${roles}</optgroup>`;
+}
+
 function standardIdFor(it, group) {
   if (focus().id === 'concepts') return `concept:${it?.raw?.id || it?.id || group?.id || 'unknown'}`;
   if (focus().id === 'products') return `product:${it?.raw?.id || it?.id || 'unknown'}`;
@@ -595,13 +623,23 @@ function criteriaByDepthFor(it, group) {
 }
 
 function defaultRoleCriteria() {
-  return Object.fromEntries(EDUCATION_TIERS.map((level) => [level, {
+  const educationCriteria = EDUCATION_TIERS.map((level) => [level, {
     languageLevel: level,
     scenarioComplexity: ADULT_TIERS.has(level) ? 'professional or organizational scenario' : 'age-appropriate learning scenario',
     evidenceExpectation: ADULT_TIERS.has(level)
       ? 'defensible explanation, practical application, and risk-aware judgment'
       : 'clear explanation, simple example, and safe-use awareness'
-  }]));
+  }]);
+  const professionalCriteria = PROFESSIONAL_ROLES.map((role) => [role.label, {
+    languageLevel: role.label,
+    scenarioComplexity: `${role.label} workplace scenario`,
+    evidenceExpectation: 'role-relevant explanation, applied judgment, defensible tradeoffs, and transcript-ready evidence',
+    employmentStandards: role.standards,
+    source: role.source,
+    roleDescription: role.description,
+    roleSpec: role.roleSpec
+  }]);
+  return Object.fromEntries([...educationCriteria, ...professionalCriteria]);
 }
 
 function localTrainingStandardFor(it, group) {
@@ -659,13 +697,13 @@ function certificationMapFor(it, group) {
       `Certification item: ${blueprint.itemLabel}`,
       `Mapped standards: ${blueprint.standards}`,
       `Education/role level now selected: ${blueprint.educationTierLabel}`,
-      `Available education/role levels: ${EDUCATION_TIERS.join(', ')}`,
+      `Available education/role levels: ${CERTIFICATION_LEVELS.join(', ')}`,
       `Depths tested: ${depthLines.join(' | ')}`
     ].join('\n');
   } catch {
     return [
       `Certification item: ${it?.label || group?.label || focus().label}`,
-      `Education/role levels: ${EDUCATION_TIERS.join(', ')}`,
+      `Education/role levels: ${CERTIFICATION_LEVELS.join(', ')}`,
       `Depths tested: ${depthLines.join(' | ')}`
     ].join('\n');
   }
@@ -872,15 +910,17 @@ function savedChatFor(pathway, itemId) {
   return messages.length ? messages : null;
 }
 
-function renderRail() {
-  const rail = $('l2GroupRail');
-  const selectedRungs = $('l2SelectedRungs');
+function renderRungPicker(ids) {
+  const rail = $(ids.rail);
+  const selectedRungs = $(ids.selectedRungs);
+  if (!rail || !selectedRungs) return;
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
-  $('l2GroupStatus').textContent = `${done}/${total} training rungs completed in ${focus().label}`;
+  setText(ids.focusLabel, focus().label);
+  setText(ids.status, `${done}/${total} training rungs completed in ${focus().label}`);
   const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
   const active = state.groups[activeIndex];
-  const summary = $('l2SelectedTierSummary');
+  const summary = $(ids.summary);
   if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : 'Choose a tier';
   rail.innerHTML = state.groups.map((g, i) =>
     `<button class="l2-tier-option ${g.id === state.activeGroupId ? 'is-active' : ''}" data-group="${g.id}" type="button">
@@ -895,20 +935,37 @@ function renderRail() {
     const g = activeGroup();
     state.activeItemId = g.items[0]?.id || null;
     state.trainMessages = [];
-    if ($('l2TierDropdown')) $('l2TierDropdown').open = false;
+    if ($(ids.dropdown)) $(ids.dropdown).open = false;
     renderRail(); renderActiveItem();
   }));
-  if (selectedRungs) {
-    selectedRungs.innerHTML = active
-      ? active.items.map((it) =>
-        `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`).join('')
-      : '';
-    selectedRungs.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
-      state.activeItemId = b.dataset.item;
-      state.trainMessages = [];
-      renderRail(); renderActiveItem();
-    }));
-  }
+  selectedRungs.innerHTML = active
+    ? active.items.map((it) =>
+      `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`).join('')
+    : '';
+  selectedRungs.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
+    state.activeItemId = b.dataset.item;
+    state.trainMessages = [];
+    renderRail(); renderActiveItem();
+  }));
+}
+
+function renderRail() {
+  renderRungPicker({
+    rail: 'l2GroupRail',
+    selectedRungs: 'l2SelectedRungs',
+    status: 'l2GroupStatus',
+    focusLabel: 'l2FocusLabel',
+    summary: 'l2SelectedTierSummary',
+    dropdown: 'l2TierDropdown'
+  });
+  renderRungPicker({
+    rail: 'l2CertGroupRail',
+    selectedRungs: 'l2CertSelectedRungs',
+    status: 'l2CertGroupStatus',
+    focusLabel: 'l2CertFocusLabel',
+    summary: 'l2CertSelectedTierSummary',
+    dropdown: 'l2CertTierDropdown'
+  });
 }
 
 function renderActiveItem() {
@@ -921,6 +978,9 @@ function renderActiveItem() {
       : 'Pick a rung from the list to begin.';
   }
   if ($('l2RungDescription')) $('l2RungDescription').textContent = trainingDescriptionFor(it);
+  if ($('l2CertRungDescription')) $('l2CertRungDescription').textContent = it
+    ? `Certification will examine this rung: ${trainingDescriptionFor(it)}`
+    : 'Pick a rung to see what the exam will cover.';
   renderChat($('l2ChatLog'), state.trainMessages);
   renderCertTarget();
 }
@@ -1112,9 +1172,10 @@ function setupCertification() {
 
 function renderCertConfig() {
   const tierSel = $('l2CertTierSelect');
-  if (tierSel && !tierSel.dataset.filled) {
-    tierSel.innerHTML = EDUCATION_TIERS.map((t) => `<option value="${t}">${t}</option>`).join('');
-    tierSel.dataset.filled = '1';
+  if (tierSel) {
+    const current = CERTIFICATION_LEVELS.includes(tierSel.value) ? tierSel.value : EDUCATION_TIERS[0];
+    tierSel.innerHTML = certificationLevelOptionsHtml(current);
+    tierSel.value = current;
   }
   const depthSel = $('l2CertDepthSelect');
   depthSel.innerHTML = focus().CERT_DEPTHS.map((d) => `<option value="${d.label}">${d.label}</option>`).join('');
@@ -1135,12 +1196,21 @@ function renderCertConfig() {
 function selectedDepth() { return focus().depthForLabel($('l2CertDepthSelect').value); }
 function selectedLevel() { return $('l2CertTierSelect').value || EDUCATION_TIERS[0]; }
 
-function renderCertTarget() {
+function renderCertTargetLegacy() {
   const it = activeItem();
   const depth = selectedDepth();
   $('l2CertTarget').textContent = it
     ? `${it.label} — ${selectedLevel()}, ${depth ? depth.label : ''}`
     : 'Choose a rung in Training, then set your level here.';
+}
+
+function renderCertTarget() {
+  const it = activeItem();
+  const depth = selectedDepth();
+  const role = professionalRoleForLabel(selectedLevel());
+  $('l2CertTarget').textContent = it
+    ? `${it.label} - ${selectedLevel()}, ${depth ? depth.label : ''}${role ? ` (${role.standards})` : ''}`
+    : 'Choose a rung, then set the learner level or professional role for the exam.';
 }
 
 function renderIdentityGate() {
@@ -1175,15 +1245,15 @@ function renderAuthGates() {
   const acctForm = $('l2AccountForm');
   const status = $('l2AccountStatus');
   const msg = $('l2AccountMsg');
-  if (acctGate) acctGate.hidden = false;
-  if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Adult account required' : 'Account optional';
+  if (acctGate) acctGate.hidden = signedIn;
+  if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Account required' : 'Account optional';
   if (msg) msg.textContent = signedIn
-    ? 'Your certifications and transcript events are saved to this account.'
-    : adultTier ? 'Adult education tiers require a verified account before certifying.'
+    ? 'Your certification attempt and transcript evidence will be saved to this account.'
+    : adultTier ? 'This certification path requires a signed-in account before certifying.'
       : 'Sign in to save certifications to your transcript (optional for non-adult tiers).';
   if (acctForm) acctForm.hidden = signedIn;
   $('l2AccountSignOut').hidden = !signedIn;
-  $('l2AdultAttestLabel').hidden = !adultTier;
+  $('l2AdultAttestLabel').hidden = !adultTier || signedIn;
 }
 
 // --- real Firebase auth: email-link sign-up + password sign-in --------------
@@ -1299,6 +1369,7 @@ async function startCertification() {
   if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth' }); return; }
 
   const depth = selectedDepth();
+  const selectedRole = professionalRoleForLabel(selectedLevel());
   const certItem = focus().certItemForGroup(activeGroup(), it);
   const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevel(), depth });
   const standard = await trainingStandardFor(it, activeGroup());
@@ -1309,6 +1380,12 @@ async function startCertification() {
   blueprint.specificTopics = standard.topics || [];
   blueprint.criteriaByDepth = standard.criteriaByDepth || {};
   blueprint.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
+  blueprint.professionalRole = selectedRole;
+  if (selectedRole) {
+    blueprint.roleCriteria = { ...defaultRoleCriteria()[selectedRole.label], ...(blueprint.roleCriteria || {}) };
+    blueprint.employmentStandards = selectedRole.standards;
+    blueprint.professionalRoleSpec = selectedRole.roleSpec;
+  }
   blueprint.activeRung = it.label;
   blueprint.certificationSet = standard.certificationSet || activeGroup()?.label || focus().label;
   const context = focus().buildCertContext({ item: certItem, depth, learnerId: state.authUser?.uid || '' });
@@ -1317,6 +1394,12 @@ async function startCertification() {
   context.specificTopics = standard.topics || [];
   context.criteriaByDepth = standard.criteriaByDepth || {};
   context.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
+  context.professionalRole = selectedRole;
+  if (selectedRole) {
+    context.roleCriteria = { ...defaultRoleCriteria()[selectedRole.label], ...(context.roleCriteria || {}) };
+    context.employmentStandards = selectedRole.standards;
+    context.professionalRoleSpec = selectedRole.roleSpec;
+  }
   context.identityAssurance = focus().buildIdentityAssurance(new Date().toISOString(), { ...state.identityGate, account: state.authUser });
   context.proctoringMode = state.identityGate.proctoringId;
 
