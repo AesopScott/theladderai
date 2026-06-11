@@ -781,6 +781,19 @@ body.l2 .placement-toolbar {
    so the conversation column sizes to its content and rides up with the centered section. */
 body.l2 #assessment .placement-chat { min-height: 0; }
 body.l2 #assessment .assessment-log { min-height: 150px; max-height: 30vh; }
+/* Enlarge Assessment-section body text for readability (scoped to #assessment so the
+   Training/Certification screens, which share these components, are unaffected). The
+   section title and the Start-assessment button are intentionally left at their base size. */
+body.l2 #assessment .l2-section-lead { font-size: 1.5rem; }
+body.l2 #assessment .panel-label { font-size: 0.92rem; }
+body.l2 #assessment #l2PlacementStatus { font-size: 2rem; }
+body.l2 #assessment .placement-summary p { font-size: 1.25rem; }
+body.l2 #assessment .assessment-chat-head strong { font-size: 1.1rem; }
+body.l2 #assessment .l2-msg__role { font-size: 0.78rem; }
+body.l2 #assessment .l2-msg__body { font-size: 1.2rem; }
+body.l2 #assessment .assessment-form textarea { font-size: 1.15rem; }
+body.l2 #assessment .placement-actions button,
+body.l2 #assessment .assessment-form button { font-size: 1.05rem; }
 body.l2 .l2-assessment-done {
   display: none; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid var(--l2-line);
