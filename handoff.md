@@ -14,6 +14,29 @@
 
 ---
 
+## 🚨 MANDATORY — APPEND TO HANDOFF AFTER EVERY COMMIT
+
+**Your code WILL NOT be deployed unless you append an entry to this file.**
+
+After you:
+1. Write code
+2. Test it locally
+3. Commit to your branch (`git commit`)
+4. Push to origin (`git push origin your-branch`)
+
+**YOU MUST then append an entry to this file (below the delimiter) to signal the orchestrator.**
+
+**Without an entry in handoff.md, the orchestrator has no way to know your work is ready. Your code will stay in your branch and never deploy to production.**
+
+The only way your code gets deployed is:
+- You commit + push to your branch
+- You append an entry to handoff.md
+- Orchestrator detects the entry and deploys it
+
+**No entry = no deployment.**
+
+---
+
 **Handoff entries below this line:**
 
 ## 2026-06-10 22:55 MDT — `claude/nice-northcutt-b9cff1` (status — already on `main`, no merge needed)
@@ -85,3 +108,16 @@
 **How verified:** `node --check` clean; simulated `depthOf()` on the live cert data → Core 1, Expert 1, Mastery 0.
 
 **⚠️ Merge note — overlaps `nice-northcutt-reset` (622b2c4):** both edit `components/ladder2-app.js` and both bump app `v12 → v13`. My change is in `renderMarketing()` (depth counts); theirs is in `renderRail()`/`renderRungPanel()` — different functions, so a 3-way merge should be clean apart from the identical app-version line. I did NOT touch CSS (theirs sets v80). Recommend merging both; keep app at the highest version.
+
+---
+
+## 2026-06-10 23:24 MDT — `claude/reverent-germain-assess` — 🚨 NOT ON MAIN YET, PLEASE MERGE
+
+**This is the Assessment layout fix. It is committed + pushed but has NEVER reached `main`, so the deployed site still shows the OLD full-width layout. Scott has now confirmed visually that the change is not live. This is the 6th attempt; every prior one died at the MERGE step, not the code.**
+
+- **Branch to merge:** `claude/reverent-germain-assess`, tip **`248d703`**, on `origin`.
+- **Current `origin/main`:** `e63556b` — does NOT contain `248d703`. Verify: `git show origin/main:components/ladder2.css | grep "max-width: 42rem"` → **0 matches** (absent on main).
+- **My branch is 2 commits behind main** (`e63556b` orchestrator auto-commit, `f57e5c6` cert fix) — fast-forward is NOT possible. **Do a real 3-way merge** of `claude/reverent-germain-assess` into `main` (or rebase it first). I only touch `components/ladder2.css` (`#assessment` rules) + `index.html` (CSS buster `v=80`); no overlap with those 2 main commits.
+- **After merge, confirm:** `git show main:components/ladder2.css | grep "max-width: 42rem"` → 1 match, and `main:index.html` references `ladder2.css?v=80`. Then deploy.
+
+**The code is correct and verified** (worktree preview port 5603, 1440×900: description 216px, conversation capped 504px, top-aligned). It just needs to be merged + deployed.
