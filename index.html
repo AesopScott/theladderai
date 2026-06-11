@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=10">
+  <link rel="stylesheet" href="/site.css?v=11">
 </head>
 <body class="l2">
 
@@ -292,6 +292,10 @@
               <textarea id="l2ChatInput" rows="2" placeholder="Answer the guide or ask for the next challenge" autocomplete="off"></textarea>
               <button type="submit">Send</button>
             </form>
+            <label class="training-text-size" for="l2TrainingTextSize">
+              <span>Text size</span>
+              <input id="l2TrainingTextSize" type="range" min="1" max="1.6" step="0.05" value="1">
+            </label>
           </section>
         </section>
       </div>
@@ -470,6 +474,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=17"></script>
+  <script type="module" src="/components/ladder2-app.js?v=18"></script>
 </body>
 </html>

@@ -7279,6 +7279,32 @@ body.l2 .training-chat-panel {
   gap: 0.8rem;
   align-content: start;
 }
+body.l2 .training-chat-panel .l2-msg__role {
+  font-size: calc(0.6rem * var(--training-chat-scale, 1));
+}
+body.l2 .training-chat-panel .l2-msg__body {
+  font-size: calc(1rem * var(--training-chat-scale, 1));
+}
+body.l2 .training-chat-panel textarea {
+  font-size: calc(1rem * var(--training-chat-scale, 1));
+}
+body.l2 .training-text-size {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 0.4rem;
+  color: var(--l2-muted);
+  font-family: var(--l2-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+body.l2 .training-text-size input {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: var(--l2-gold);
+}
 body.l2 .training-account-gate {
   flex: 0 1 34rem;
   margin: 0;

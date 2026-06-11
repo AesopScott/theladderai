@@ -39,6 +39,7 @@ const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
 const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept on the learner's machine
 const LS_ASSESSMENT = 'aesop-ladder2-assessment-draft';
+const LS_TRAINING_TEXT_SCALE = 'aesop-ladder2-training-text-scale';
 
 // Learner ID model: the Firebase Auth UID is the canonical learner id (Scott's
 // decision — "use the new UIDs"). On sign-in the uid becomes the record key
@@ -218,10 +219,26 @@ function enterToSend(textareaId) {
 async function askModel({ messages, systemPrompt, maxTokens = 800, model }) {
   const body = { messages, system_prompt: systemPrompt, max_tokens: maxTokens };
   if (model) body.model = model;
-  const res = await fetch(PROXY_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  });
-  const data = await res.json();
+  let res;
+  try {
+    res = await fetch(PROXY_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+  } catch (e) {
+    console.warn('[ladder2] AI proxy request failed', e);
+    return 'I could not reach the training AI. Please try again in a moment.';
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; }
+  catch (e) {
+    console.warn('[ladder2] AI proxy returned non-JSON', { status: res.status, text: text.slice(0, 240) });
+    return `I could not read the training AI response (${res.status}). Please try again in a moment.`;
+  }
+  if (!res.ok) {
+    console.warn('[ladder2] AI proxy returned error', { status: res.status, data });
+    return data?.error || `The training AI returned an error (${res.status}). Please try again in a moment.`;
+  }
   return data?.content?.[0]?.text || data?.error || 'I hit a snag. Please try again.';
 }
 
@@ -446,7 +463,22 @@ function setupTraining() {
   $('l2StartChat')?.addEventListener('click', startTrainingChat);
   $('l2ChatForm')?.addEventListener('submit', submitTrainingChat);
   enterToSend('l2ChatInput');
+  setupTrainingTextScale();
   $('l2CompleteBtn')?.addEventListener('click', markComplete);
+}
+
+function setTrainingTextScale(value) {
+  const scale = Math.min(1.6, Math.max(1, Number(value) || 1));
+  document.body.style.setProperty('--training-chat-scale', String(scale));
+  if ($('l2TrainingTextSize')) $('l2TrainingTextSize').value = String(scale);
+  try { localStorage.setItem(LS_TRAINING_TEXT_SCALE, String(scale)); } catch {}
+}
+
+function setupTrainingTextScale() {
+  const slider = $('l2TrainingTextSize');
+  const saved = localStorage.getItem(LS_TRAINING_TEXT_SCALE) || '1';
+  setTrainingTextScale(saved);
+  slider?.addEventListener('input', () => setTrainingTextScale(slider.value));
 }
 
 function activeGroup() { return state.groups.find((g) => g.id === state.activeGroupId) || state.groups[0]; }
@@ -572,21 +604,33 @@ async function startTrainingChat() {
 async function submitTrainingChat(e) {
   e.preventDefault();
   const input = $('l2ChatInput');
+  if (!input) return;
   const content = input.value.trim();
   if (!content) return;
   const it = activeItem();
   if (!state.trainMessages.length) await startTrainingChat();
   state.trainMessages.push({ role: 'user', content });
+  const messagesForModel = state.trainMessages.slice();
+  state.trainMessages.push({ role: 'assistant', content: 'Thinking...' });
   input.value = '';
   renderChat($('l2ChatLog'), state.trainMessages);
-  const raw = await askModel({
-    messages: state.trainMessages,
-    systemPrompt: `You are a training guide for "${it.label}" in the ${focus().label} ladder of the AESOP AI Academy. Teach through guided conversation — ask, give examples, apply, and surface limitations. Engage until the learner demonstrates sufficient understanding. When ready to end, write "COURSE_COMPLETE" on its own final line.`,
-    maxTokens: 700
-  });
-  const isDone = raw.includes('COURSE_COMPLETE');
-  const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim();
-  state.trainMessages.push({ role: 'assistant', content: visible });
+  let isDone = false;
+  try {
+    const raw = await askModel({
+      messages: messagesForModel,
+      systemPrompt: `You are a training guide for "${it.label}" in the ${focus().label} ladder of the AESOP AI Academy. Teach through guided conversation — ask, give examples, apply, and surface limitations. Engage until the learner demonstrates sufficient understanding. When ready to end, write "COURSE_COMPLETE" on its own final line.`,
+      maxTokens: 700
+    });
+    isDone = raw.includes('COURSE_COMPLETE');
+    const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim() || 'I hit a snag. Please try again.';
+    state.trainMessages[state.trainMessages.length - 1] = { role: 'assistant', content: visible };
+  } catch (err) {
+    console.warn('[ladder2] training chat failed', err);
+    state.trainMessages[state.trainMessages.length - 1] = {
+      role: 'assistant',
+      content: 'I could not get a training response. Please try again in a moment.'
+    };
+  }
   renderChat($('l2ChatLog'), state.trainMessages);
   persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
   if (isDone) markComplete();
