@@ -510,7 +510,7 @@ function renderRail() {
   const selectedRungs = $('l2SelectedRungs');
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
-  $('l2GroupStatus').textContent = `${done} / ${total} rungs in ${focus().label}`;
+  $('l2GroupStatus').textContent = `${done}/${total} training rungs completed in ${focus().label}`;
   const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
   const active = state.groups[activeIndex];
   const summary = $('l2SelectedTierSummary');
