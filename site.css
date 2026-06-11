@@ -6622,6 +6622,9 @@ body.l2 .l2-section {
   padding: clamp(5.5rem, 11vh, 8rem) 0 3rem;
   box-sizing: border-box;
 }
+body.l2 #certification {
+  scroll-margin-top: -1.8in;
+}
 body.l2 .l2-section-head {
   display: flex;
   align-items: baseline;
