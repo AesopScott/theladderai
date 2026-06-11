@@ -7807,15 +7807,34 @@ body.l2 .certification-mode-actions {
 }
 body.l2 .certification-mode-action {
   display: grid;
-  grid-template-columns: minmax(12rem, max-content) minmax(0, 1fr);
+  grid-template-columns: 16.5rem minmax(0, 1fr);
   gap: 1rem;
-  align-items: start;
+  align-items: center;
 }
 body.l2 .certification-mode-action p {
   margin: 0;
   color: var(--l2-ink-2);
   font-size: 0.86rem;
   line-height: 1.45;
+  text-align: left;
+}
+body.l2 .certification-mode-action button,
+body.l2 .certification-mode-action button.secondary {
+  justify-self: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.35rem;
+  border: 1px solid var(--l2-line);
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  background: var(--l2-ink);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+}
+body.l2 .certification-mode-action button::after {
+  display: none;
 }
 body.l2 .certification-chat-panel .chat-log,
 body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
