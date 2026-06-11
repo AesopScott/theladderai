@@ -74,7 +74,7 @@ async function sendVerification(auth) {
 
   try {
     await sendSignInLinkToEmail(auth, clean, {
-      url: `${location.origin}/components/create-account.html`,
+      url: 'https://theladderai.com/components/create-account.html',
       handleCodeInApp: true
     });
     localStorage.setItem(LS_EMAIL, clean);
