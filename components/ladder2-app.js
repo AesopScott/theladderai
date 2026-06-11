@@ -477,7 +477,7 @@ function setupNavActions() {
 // FOCUS TOGGLE
 // =============================================================================
 function setupFocusToggle() {
-  $('l2FocusToggle')?.querySelectorAll('.l2-focus-btn').forEach((btn) => {
+  document.querySelectorAll('#l2FocusToggle .l2-focus-btn, #l2CertFocusToggle .l2-focus-btn').forEach((btn) => {
     btn.addEventListener('click', () => activateFocus(btn.dataset.focus));
   });
 }
@@ -488,9 +488,10 @@ async function activateFocus(focusId) {
   localStorage.setItem(LS_FOCUS, focusId);
 
   // toggle active button
-  $('l2FocusToggle')?.querySelectorAll('.l2-focus-btn').forEach((b) =>
+  document.querySelectorAll('#l2FocusToggle .l2-focus-btn, #l2CertFocusToggle .l2-focus-btn').forEach((b) =>
     b.classList.toggle('is-active', b.dataset.focus === focusId));
-  $('l2FocusLabel').textContent = focus().label;
+  setText('l2FocusLabel', focus().label);
+  setText('l2CertFocusLabel', focus().label);
 
   $('l2GroupStatus').textContent = 'Loading rungs…';
   state.catalog = await focus().loadCatalog();

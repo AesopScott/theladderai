@@ -6322,7 +6322,13 @@ body.l2::before {
   60%  { opacity: 1; filter: blur(0); }
   100% { opacity: 1; transform: scale(1); }
 }
-body.l2-loaded .l2-preloader { opacity: 0; visibility: hidden; }
+body.l2-loaded .l2-preloader { opacity: 0; visibility: hidden; pointer-events: none; }
+body.l2.l2-loaded #l2Preloader {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 @media (prefers-reduced-motion: reduce) {
   .l2-preloader::before, .l2-preloader::after { animation: none; opacity: 0.28; transform: translate(-50%, -50%) scale(1.05); }
   .l2-preloader__img { animation: none; }
@@ -7669,13 +7675,23 @@ body.l2 .certification-nav-panel {
 body.l2 .certification-tier-picker .training-rung-description {
   margin-bottom: 0;
 }
+body.l2 .certification-focus-toggle {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  margin: 0 0 0.35rem;
+}
+body.l2 .certification-focus-toggle .l2-focus-btn {
+  font-size: 0.92rem;
+  padding: 0.45rem 0;
+}
 body.l2 .certification-chat-panel .panel-heading {
   border-bottom: 1px solid var(--l2-line);
   padding-bottom: 0.8rem;
 }
 body.l2 .certification-chat-panel .chat-log,
 body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
-  min-height: clamp(24rem, calc(62vh - 12rem), 32rem);
+  min-height: clamp(16.125rem, calc(62vh - 14.875rem), 28rem);
 }
 
 /* ============================================================
