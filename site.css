@@ -6986,7 +6986,7 @@ body.l2 #assessment { justify-content: flex-start; }
    its two children sit in the Assessment section grid. */
 body.l2 #assessment {
   display: grid;
-  grid-template-columns: minmax(220px, 32rem) minmax(360px, 42rem);
+  grid-template-columns: minmax(220px, 32rem) minmax(360px, 58.8rem);
   column-gap: clamp(2rem, 5vw, 5rem);
   row-gap: 1.25rem;
   align-content: start;
