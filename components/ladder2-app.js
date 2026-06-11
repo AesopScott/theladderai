@@ -457,6 +457,27 @@ function setupNavActions() {
     }));
   }
 
+  const scrollCertificationAnchor = () => {
+    const target = document.getElementById('certification');
+    if (!target) return;
+    const navHeight = document.querySelector('.nav')?.getBoundingClientRect().height || 48;
+    const raisePx = 144 - (navHeight / 2);
+    const targetTop = target.getBoundingClientRect().top + window.scrollY + raisePx;
+    window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+  };
+
+  document.querySelectorAll('a[href="#certification"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      history.pushState(null, '', '#certification');
+      scrollCertificationAnchor();
+    });
+  });
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#certification') setTimeout(scrollCertificationAnchor, 0);
+  });
+  if (location.hash === '#certification') setTimeout(scrollCertificationAnchor, 900);
+
   // Nav underline driven by a JS class, NOT CSS :hover. :hover is geometric: when a
   // sticky nav word lands under a resting cursor on scroll (or smooth-scroll from a
   // click), it engages with no intent — leaving Profile permanently underlined. Here
