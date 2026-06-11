@@ -2879,9 +2879,19 @@ button.secondary {
 
 
 .ladder-nav .nav-brand-group {
+  display: inline-flex !important;
+  align-items: center !important;
   flex-shrink: 0 !important;
   min-width: auto !important;
   max-width: none !important;
+}
+
+.ladder-nav .nav-brand-logo {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 2px;
+  background: #000 url("/components/ladder4.png?v=1") center / cover no-repeat;
 }
 
 .ladder-nav .nav-brand-primary {
