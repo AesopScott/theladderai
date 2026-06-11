@@ -918,8 +918,20 @@ function renderMarketing() {
   setText('l2StatCourses', `${Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length} / ${total}`);
   setText('l2StatTiers', String(state.placement?.grantedTierIds?.length || 0));
   const certs = state._record?.ladderCertifications || [];
-  const byDepth = (d) => certs.filter((c) => (c.testDepth || c.certificationTier || '').toLowerCase().includes(d)).length;
-  setText('l2StatCertified', String(byDepth('cert')));
+  // Bucket each cert by depth. Prefer the explicit depth field (depthId/depthLabel);
+  // older certs that predate those fields are inferred from the title.
+  const depthOf = (c) => {
+    const d = (c.depthId || c.depthLabel || c.testDepth || c.certificationTier || '').toLowerCase();
+    if (d.includes('master')) return 'master';
+    if (d.includes('expert')) return 'expert';
+    if (d.includes('core') || d.includes('cert')) return 'core';
+    const t = (c.title || '').toLowerCase();
+    if (/\bmaster/.test(t)) return 'master';
+    if (/\bexpert/.test(t)) return 'expert';
+    return 'core';
+  };
+  const byDepth = (cat) => certs.filter((c) => depthOf(c) === cat).length;
+  setText('l2StatCertified', String(byDepth('core')));
   setText('l2StatExpert', String(byDepth('expert')));
   setText('l2StatMastery', String(byDepth('master')));
   setText('l2HeroCertCount', String(certs.length));
