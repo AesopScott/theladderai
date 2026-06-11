@@ -700,7 +700,7 @@ async function sendVerification(email, statusId) {
     return;
   }
   try {
-    const actionCodeSettings = { url: `${location.origin}/theladder/create-account.html`, handleCodeInApp: true };
+    const actionCodeSettings = { url: `${location.origin}/components/create-account.html`, handleCodeInApp: true };
     await sendSignInLinkToEmail(auth, clean, actionCodeSettings);
     localStorage.setItem(LS_EMAIL, clean);
     setStatus(statusId, `Check <b>${escapeHtml(clean)}</b> for a link to verify your email and finish creating your account.`, 'ok');

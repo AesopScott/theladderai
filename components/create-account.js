@@ -10,7 +10,7 @@ import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
 const auth = getAuth(initializeApp(FIREBASE_CONFIG));
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
-const HOME = '/theladder/ladder2.html';
+const HOME = '/';
 
 const el = (id) => document.getElementById(id);
 const show = (id) => { const n = el(id); if (n) n.hidden = false; };
