@@ -973,7 +973,8 @@ async function loadRemote(learnerId) {
     if (!data.ladderCertifications) {
       console.log('[loadRemote] No certs from SDK, trying REST API fallback...');
       try {
-        const restUrl = `https://firestore.googleapis.com/v1/projects/playagame-f733d/databases/(default)/documents/learners/${learnerId}`;
+        const projectId = encodeURIComponent(FIREBASE_CONFIG.projectId);
+        const restUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/learners/${learnerId}`;
         console.log('[loadRemote] REST URL:', restUrl);
         const response = await fetch(restUrl);
         console.log('[loadRemote] REST response status:', response.status);
