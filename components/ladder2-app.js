@@ -42,6 +42,13 @@ const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept
 // Learner ID model: the Firebase Auth UID is the canonical learner id (Scott's
 // decision — "use the new UIDs"). On sign-in the uid becomes the record key
 // (learners/{uid}) and is what the Profile shows; there is no AESOP-XXXX scheme.
+// A leftover AESOP-#### id from the retired build is NOT a valid learner id; drop it
+// from storage so the app never resolves to or displays a stale id.
+function storedUid() {
+  const v = localStorage.getItem(LS_ID) || '';
+  if (/^AESOP-/i.test(v)) { localStorage.removeItem(LS_ID); return ''; }
+  return v;
+}
 
 // Real Firebase auth (email-link sign-up + password sign-in). Set in
 // initFirebaseAuth() after the data layer has created the default app.
@@ -242,7 +249,8 @@ async function init() {
 
   // Seed the data layer with the stored uid (from a prior sign-in) if present; an
   // anonymous visitor has no learner id until they sign in and their uid is adopted.
-  const storedId = localStorage.getItem(LS_ID) || '';
+  // storedUid() also discards any stale AESOP-#### leftover from the old build.
+  const storedId = storedUid();
   initDataLayer(storedId ? { learnerId: storedId } : {}).catch((e) => console.warn('data-layer init failed (local-only)', e));
   try {
     const rec = storedId ? await loadLearnerRecord(storedId) : null;
@@ -790,8 +798,8 @@ function renderHeroSignup() {
   setDisp('l2SigninForm', false, 'flex');       // collapsed by default; the toggle opens it
   setDisp('l2SignedIn', signedIn, 'flex');       // sign-out only when actually signed in
   if (signedIn) setText('l2SignedInEmail', state.authUser.email || '');
-  // The learner id is the Firebase uid (UID-canonical).
-  setText('l2LearnerId', state.authUser?.uid || getLearnerId() || localStorage.getItem(LS_ID) || '—');
+  // The learner id is the Firebase uid (UID-canonical); stale AESOP-#### ids are dropped.
+  setText('l2LearnerId', state.authUser?.uid || getLearnerId() || storedUid() || '—');
 }
 
 async function startCertification() {
