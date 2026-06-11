@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=30">
+  <link rel="stylesheet" href="/site.css?v=31">
 </head>
 <body class="l2">
 
@@ -310,7 +310,10 @@
                 <input id="l2EmployEval" type="checkbox" data-training-eval="employment">
                 <span>Employment Standards Evaluation</span>
               </label>
-              <button id="l2RunStandardsEval" class="training-eval-run" type="button">Run selected evaluations</button>
+              <div class="training-eval-action">
+                <button id="l2RunStandardsEval" class="training-eval-run" type="button">Run selected evaluations</button>
+                <p>Checks the current training transcript against the selected standards and saves the evaluation evidence for the rung.</p>
+              </div>
               <p id="l2StandardsEvalStatus" class="training-eval-status" role="status" aria-live="polite"></p>
             </div>
           </section>
