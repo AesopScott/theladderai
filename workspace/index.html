@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=28">
+  <link rel="stylesheet" href="/site.css?v=29">
 </head>
 <body class="l2">
 
@@ -338,10 +338,20 @@
               <p id="l2CertRungDescription" class="training-rung-description">Pick a rung to see what the exam will cover.</p>
             </div>
           </aside>
+        </div>
 
-          <div class="l2-card">
+        <!-- right: examiner conversation -->
+        <section class="topic-column training-chat-column">
+        <section class="conversation-panel training-chat-panel certification-chat-panel">
+          <div class="l2-focus-toggle certification-focus-toggle" id="l2CertFocusToggle" role="tablist" aria-label="Certification focus">
+            <button class="l2-focus-btn is-active" data-focus="concepts" role="tab" type="button">AI Concepts</button>
+            <button class="l2-focus-btn" data-focus="products" role="tab" type="button">Products</button>
+            <button class="l2-focus-btn" data-focus="use-cases" role="tab" type="button">Use Cases</button>
+          </div>
+
+          <div class="certification-setup-panel" id="l2CertSetupPanel">
             <span class="panel-label">Certify this rung</span>
-            <p id="l2CertTarget" style="margin:0.5rem 0;">Choose a rung, then set the learner level or professional role for the exam.</p>
+            <p id="l2CertTarget" class="certification-target">Choose a rung, then set the learner level or professional role for the exam.</p>
 
             <label class="evaluation-field" for="l2CertTierSelect">
               <span>Learner level / professional role</span>
@@ -352,7 +362,6 @@
               <select id="l2CertDepthSelect" class="evaluation-select"></select>
             </label>
 
-            <!-- identity assurance + proctoring -->
             <label class="evaluation-field" for="l2IdentitySelect">
               <span>Identity assurance</span>
               <select id="l2IdentitySelect" class="evaluation-select"></select>
@@ -370,61 +379,53 @@
             <p id="l2IdentityNotice" class="evaluation-cooldown" hidden></p>
             <p id="l2CertCooldown" class="evaluation-cooldown" hidden></p>
 
-            <button id="l2StartCert" type="button" style="width:100%;margin-top:0.5rem;">Start certification</button>
-            <div style="margin-top:0.75rem;display:flex;gap:0.75rem;flex-wrap:wrap;font-size:0.9rem;">
+            <div class="l2-gate certification-account-gate" id="l2AccountGate" hidden>
+              <span class="panel-label" id="l2AccountStatus">Account</span>
+              <h3>Account</h3>
+              <p id="l2AccountMsg" style="color:var(--l2-ink-2);">Adult education tiers and identity-assured certification require a verified account.</p>
+              <label class="account-attestation" id="l2AdultAttestLabel">
+                <input id="l2AdultAttest" type="checkbox">
+                <span>I confirm I am 18 or older (required for adult education tiers).</span>
+              </label>
+              <form class="account-form" id="l2AccountForm">
+                <input id="l2AccountEmail" type="email" placeholder="name@example.com" autocomplete="username">
+                <input id="l2AccountPassword" type="password" placeholder="Password" autocomplete="current-password">
+                <div class="account-actions">
+                  <button id="l2AccountSignIn" type="button">Sign in</button>
+                  <button id="l2AccountCreate" type="button" class="secondary">Create account</button>
+                </div>
+              </form>
+              <button id="l2AccountSignOut" type="button" class="secondary" style="margin-top:0.75rem;" hidden>Sign out</button>
+              <button id="l2AccountConfirmAdult" type="button" style="margin-top:0.75rem;" hidden>Confirm adult access</button>
+              <p id="l2AccountError" class="evaluation-cooldown" hidden role="alert"></p>
+            </div>
+
+            <button id="l2StartCert" class="l2-cta certification-start-btn" type="button">Start certification</button>
+            <div class="certification-record-link">
               <a href="/ladder-certifications.html">Certification record</a>
             </div>
           </div>
 
-          <!-- account gate -->
-          <div class="l2-gate" id="l2AccountGate" style="margin-top:1.25rem;" hidden>
-            <span class="panel-label" id="l2AccountStatus">Account</span>
-            <h3>Account</h3>
-            <p id="l2AccountMsg" style="color:var(--l2-ink-2);">Adult education tiers and identity-assured certification require a verified account.</p>
-            <label class="account-attestation" id="l2AdultAttestLabel">
-              <input id="l2AdultAttest" type="checkbox">
-              <span>I confirm I am 18 or older (required for adult education tiers).</span>
-            </label>
-            <form class="account-form" id="l2AccountForm">
-              <input id="l2AccountEmail" type="email" placeholder="name@example.com" autocomplete="username">
-              <input id="l2AccountPassword" type="password" placeholder="Password" autocomplete="current-password">
-              <div class="account-actions">
-                <button id="l2AccountSignIn" type="button">Sign in</button>
-                <button id="l2AccountCreate" type="button" class="secondary">Create account</button>
+          <div id="l2CertExamPanel" class="certification-exam-panel" hidden>
+            <div class="panel-heading">
+              <div>
+                <h3 id="l2CertExamTitle">Certification exam</h3>
+                <p id="l2CertExamSummary">Start certification to begin the examined conversation.</p>
               </div>
+            </div>
+            <div id="l2CertModeBar" class="certification-mode-bar" hidden>
+              <span class="panel-label">Exam in progress</span>
+              <div class="certification-mode-actions" style="display:flex;gap:0.6rem;margin-top:0.5rem;">
+                <button id="l2FinalizeCert" type="button">Finalize my determination</button>
+                <button id="l2EndCert" class="secondary" type="button">End exam</button>
+              </div>
+            </div>
+            <div id="l2CertLog" class="chat-log" aria-live="polite"></div>
+            <form id="l2CertForm" class="chat-form">
+              <textarea id="l2CertInput" rows="2" placeholder="Respond to the examiner" autocomplete="off"></textarea>
+              <button type="submit">Send</button>
             </form>
-            <button id="l2AccountSignOut" type="button" class="secondary" style="margin-top:0.75rem;" hidden>Sign out</button>
-            <button id="l2AccountConfirmAdult" type="button" style="margin-top:0.75rem;" hidden>Confirm adult access</button>
-            <p id="l2AccountError" class="evaluation-cooldown" hidden role="alert"></p>
           </div>
-        </div>
-
-        <!-- right: examiner conversation -->
-        <section class="topic-column training-chat-column">
-        <section class="conversation-panel training-chat-panel certification-chat-panel">
-          <div class="l2-focus-toggle certification-focus-toggle" id="l2CertFocusToggle" role="tablist" aria-label="Certification focus">
-            <button class="l2-focus-btn is-active" data-focus="concepts" role="tab" type="button">AI Concepts</button>
-            <button class="l2-focus-btn" data-focus="products" role="tab" type="button">Products</button>
-            <button class="l2-focus-btn" data-focus="use-cases" role="tab" type="button">Use Cases</button>
-          </div>
-          <div class="panel-heading">
-            <div>
-              <h3 id="l2CertExamTitle">Certification exam</h3>
-              <p id="l2CertExamSummary">Start a certification above to begin the examined conversation.</p>
-            </div>
-          </div>
-          <div id="l2CertModeBar" class="certification-mode-bar" hidden>
-            <span class="panel-label">Exam in progress</span>
-            <div class="certification-mode-actions" style="display:flex;gap:0.6rem;margin-top:0.5rem;">
-              <button id="l2FinalizeCert" type="button">Finalize my determination</button>
-              <button id="l2EndCert" class="secondary" type="button">End exam</button>
-            </div>
-          </div>
-          <div id="l2CertLog" class="chat-log" aria-live="polite"></div>
-          <form id="l2CertForm" class="chat-form">
-            <textarea id="l2CertInput" rows="2" placeholder="Respond to the examiner" autocomplete="off"></textarea>
-            <button type="submit">Send</button>
-          </form>
         </section>
         </section>
       </div>
@@ -501,6 +502,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=29"></script>
+  <script type="module" src="/components/ladder2-app.js?v=30"></script>
 </body>
 </html>

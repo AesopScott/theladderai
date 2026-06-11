@@ -1246,7 +1246,7 @@ function renderAuthGates() {
   const acctForm = $('l2AccountForm');
   const status = $('l2AccountStatus');
   const msg = $('l2AccountMsg');
-  if (acctGate) acctGate.hidden = signedIn;
+  if (acctGate) acctGate.hidden = signedIn || !adultTier;
   if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Account required' : 'Account optional';
   if (msg) msg.textContent = signedIn
     ? 'Your certification attempt and transcript evidence will be saved to this account.'
@@ -1367,7 +1367,7 @@ async function startCertification() {
   const it = activeItem();
   if (!it) { alert('Pick a rung in Training first.'); return; }
   const adultTier = ADULT_TIERS.has(selectedLevel());
-  if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth' }); return; }
+  if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
   const depth = selectedDepth();
   const selectedRole = professionalRoleForLabel(selectedLevel());
@@ -1406,6 +1406,8 @@ async function startCertification() {
 
   state.activeCert = { item: it, level: selectedLevel(), depth, blueprint, context };
   state.certMessages = [{ role: 'user', content: 'I am ready to begin the certification exam.' }];
+  if ($('l2CertSetupPanel')) $('l2CertSetupPanel').hidden = true;
+  if ($('l2CertExamPanel')) $('l2CertExamPanel').hidden = false;
   $('l2CertModeBar').hidden = false;
   $('l2CertExamSummary').textContent = `Examining: ${it.label} — ${selectedLevel()}, ${depth.label}. An independent model validates the result before any credential is recorded.`;
   renderChat($('l2CertLog'), []);
@@ -1429,7 +1431,7 @@ async function callExaminer() {
 
 async function submitCertChat(e) {
   e.preventDefault();
-  if (!state.activeCert) { alert('Start a certification above first.'); return; }
+  if (!state.activeCert) { alert('Start certification first.'); return; }
   const input = $('l2CertInput');
   const content = input.value.trim();
   if (!content) return;
@@ -1488,6 +1490,8 @@ function appendSystemNote(text) {
 
 function endCertification() {
   state.activeCert = null; state.certMessages = []; state._pendingResult = null;
+  if ($('l2CertSetupPanel')) $('l2CertSetupPanel').hidden = false;
+  if ($('l2CertExamPanel')) $('l2CertExamPanel').hidden = true;
   $('l2CertModeBar').hidden = true;
   $('l2CertExamSummary').textContent = 'Start a certification above to begin the examined conversation.';
   renderChat($('l2CertLog'), []);
