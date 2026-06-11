@@ -474,6 +474,7 @@ async function activateFocus(focusId) {
 // =============================================================================
 function setupTraining() {
   $('l2StartChat')?.addEventListener('click', startTrainingChat);
+  $('l2ResetChat')?.addEventListener('click', resetTrainingChat);
   $('l2ChatForm')?.addEventListener('submit', submitTrainingChat);
   enterToSend('l2ChatInput');
   setupTrainingTextScale();
@@ -761,6 +762,12 @@ function saveCourses(map) {
   try { localStorage.setItem(LS_COURSES, JSON.stringify(map)); }
   catch (e) { console.warn('[ladder2] course save failed', e); }
 }
+function deleteActiveChat() {
+  const it = activeItem(); if (!it) return;
+  const map = loadCourses();
+  delete map[courseKey(focus().pathway, it.id)];
+  saveCourses(map);
+}
 // Persist the ACTIVE course's full conversation. status: 'open' | 'completed'.
 function persistActiveChat(status) {
   const it = activeItem(); if (!it) return;
@@ -857,6 +864,19 @@ async function startTrainingChat() {
     : [{ role: 'assistant', content: trainingOpeningFor(it, activeGroup(), standard) }];
   renderChat($('l2ChatLog'), state.trainMessages);
   persistActiveChat('open');   // course is now open (appears in Profile → Open courses)
+  renderProfile();
+}
+
+function resetTrainingChat() {
+  const it = activeItem();
+  if (!it) return;
+  deleteActiveChat();
+  state.trainMessages = [];
+  delete state.completed[`${focus().pathway}:${it.id}`];
+  if ($('l2ChatInput')) $('l2ChatInput').value = '';
+  renderChat($('l2ChatLog'), state.trainMessages);
+  renderRail();
+  renderMarketing();
   renderProfile();
 }
 

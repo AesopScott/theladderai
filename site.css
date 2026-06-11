@@ -7334,11 +7334,23 @@ body.l2 .training-account-gate p {
 }
 body.l2 .training-chat-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.6rem;
   min-height: 2.2rem;
 }
 body.l2 .training-chat-actions #l2StartChat {
   margin-left: auto;
+}
+body.l2 .training-chat-actions #l2ResetChat {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--l2-muted) !important;
+  padding: 0.85rem 0.6rem;
+}
+body.l2 .training-chat-actions #l2ResetChat:hover {
+  background: transparent !important;
+  color: var(--l2-gold-deep) !important;
 }
 body.l2 .training-chat-panel .chat-log {
   min-height: clamp(28rem, calc(62vh - 8rem), 36rem);

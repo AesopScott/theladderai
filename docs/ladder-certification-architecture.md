@@ -246,6 +246,44 @@ The architecture separates AI roles so the same prompt is not both teaching and 
 
 The first production implementation may use one model call path, but data should preserve these logical roles.
 
+## Guided Training And Standards Evaluation
+
+Training conversations are guided lessons, not exams and not open-ended Q&A. The guide should lead the learner through a specific rung destination: vocabulary, concept, application, limitation/risk, and a short readiness check. The guide may use the Firestore training standard to teach the right material, but that prompt context is not evidence that the learner met the standard.
+
+The evidence is the completed chat transcript, especially the learner-authored turns. AI guide messages are useful context, but they must not be counted as learner proof. After a rung conversation is complete, a separate evaluator must review the transcript against the Firestore standard for that rung.
+
+That creates two separate phases:
+
+```text
+training guide
+  -> teaches the rung and records the conversation transcript
+  -> learner reaches a natural close
+  -> standards evaluator loads the rung standard from Firestore
+  -> evaluator scores only the transcript evidence against the standard
+  -> candidate evidence is written for transcript and certification readiness
+```
+
+The evaluator should receive the completed transcript and the authoritative standard record, not depend on the training guide's hidden prompt. This matters because a dynamic conversation can wander, skip, or overemphasize topics. Completion should mean the learner produced enough evidence in the transcript, not that the guide had the right instructions.
+
+Every rung standard is a matrix:
+
+```text
+rung x education/role level x depth(Core, Expert, Mastery) x standards references
+```
+
+The evaluator must produce:
+
+- standards assessed
+- standards satisfied
+- standards needing more evidence
+- criteria results for Core, Expert, and Mastery
+- exact transcript spans used as evidence
+- rationale for each satisfied or insufficient criterion
+- confidence label
+- human-review trigger when evidence is weak, high-stakes, or near threshold
+
+This evaluation is still not the same as a certification exam. It can support readiness, remediation, transcript evidence, and suggested certification level. Certification requires an independent certification attempt and validation path.
+
 ## Rubric Requirements
 
 Every certification test needs a written rubric. The AI cannot invent the grading criteria at runtime.
