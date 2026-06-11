@@ -70,22 +70,12 @@ a {
 }
 
 .brand-mark {
-  position: relative;
   width: 34px;
   height: 34px;
   flex: 0 0 auto;
   overflow: hidden;
   border-radius: 2px;
-  background: #000;
-}
-
-.brand-mark::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  background: #fff;
-  -webkit-mask: url("/components/ladder2.png?v=1") center / contain no-repeat;
-  mask: url("/components/ladder2.png?v=1") center / contain no-repeat;
+  background: #000 url("/components/ladder4.png?v=1") center / cover no-repeat;
 }
 
 .nav-links {
@@ -237,8 +227,8 @@ a {
 
 .hero-ladder-mark {
   position: absolute;
-  top: calc(clamp(3rem, 6vw, 5.2rem) - 2in);
-  right: calc(100% + 1.75rem - 0.125in);
+  top: calc(clamp(3rem, 6vw, 5.2rem) - 0.5in);
+  right: calc(100% + 1.75rem - 0.1875in);
   width: clamp(170px, 18vw, 270px);
   height: auto;
   pointer-events: none;
