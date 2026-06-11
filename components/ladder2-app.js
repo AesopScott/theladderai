@@ -226,20 +226,24 @@ async function askModel({ messages, systemPrompt, maxTokens = 800, model }) {
     });
   } catch (e) {
     console.warn('[ladder2] AI proxy request failed', e);
-    return 'I could not reach the training AI. Please try again in a moment.';
+    return 'The AI service is temporarily unavailable. Please try again in a moment.';
   }
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; }
   catch (e) {
     console.warn('[ladder2] AI proxy returned non-JSON', { status: res.status, text: text.slice(0, 240) });
-    return `I could not read the training AI response (${res.status}). Please try again in a moment.`;
+    return 'The AI service is temporarily unavailable. Please try again in a moment.';
   }
   if (!res.ok) {
     console.warn('[ladder2] AI proxy returned error', { status: res.status, data });
-    return data?.error || `The training AI returned an error (${res.status}). Please try again in a moment.`;
+    return data?.error || 'The AI service is temporarily unavailable. Please try again in a moment.';
   }
   return data?.content?.[0]?.text || data?.error || 'I hit a snag. Please try again.';
+}
+
+function isTransientAiMessage(content) {
+  return /AI service is temporarily unavailable|could not read the training AI response|could not reach the training AI|training AI returned an error|could not get a training response/i.test(content || '');
 }
 
 function renderChat(el, messages) {
@@ -533,8 +537,9 @@ function openCourses() {
 // Saved (resumable) conversation for a course, or null.
 function savedChatFor(pathway, itemId) {
   const c = loadCourses()[courseKey(pathway, itemId)];
-  return (c && Array.isArray(c.messages) && c.messages.length && c.status !== 'completed')
-    ? c.messages.slice() : null;
+  if (!c || !Array.isArray(c.messages) || !c.messages.length || c.status === 'completed') return null;
+  const messages = c.messages.filter((m) => !isTransientAiMessage(m.content));
+  return messages.length ? messages : null;
 }
 
 function renderRail() {
@@ -615,6 +620,7 @@ async function submitTrainingChat(e) {
   input.value = '';
   renderChat($('l2ChatLog'), state.trainMessages);
   let isDone = false;
+  let transientFailure = false;
   try {
     const raw = await askModel({
       messages: messagesForModel,
@@ -623,16 +629,18 @@ async function submitTrainingChat(e) {
     });
     isDone = raw.includes('COURSE_COMPLETE');
     const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim() || 'I hit a snag. Please try again.';
+    transientFailure = isTransientAiMessage(visible);
     state.trainMessages[state.trainMessages.length - 1] = { role: 'assistant', content: visible };
   } catch (err) {
     console.warn('[ladder2] training chat failed', err);
+    transientFailure = true;
     state.trainMessages[state.trainMessages.length - 1] = {
       role: 'assistant',
-      content: 'I could not get a training response. Please try again in a moment.'
+      content: 'The AI service is temporarily unavailable. Please try again in a moment.'
     };
   }
   renderChat($('l2ChatLog'), state.trainMessages);
-  persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
+  if (!transientFailure) persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
   if (isDone) markComplete();
 }
 
