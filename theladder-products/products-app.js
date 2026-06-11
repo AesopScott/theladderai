@@ -168,7 +168,7 @@ async function getAuthContext() {
   const [{ initializeApp, getApps, getApp }, authModule, configModule] = await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
-    import('/ai-academy/js/firebase-config.js')
+    import('/ai-academy/js/firebase-config.js?v=3')
   ]);
   const app = getApps().length ? getApp() : initializeApp(configModule.FIREBASE_CONFIG);
   const auth = authModule.getAuth(app);
@@ -678,7 +678,7 @@ async function getRequestDbContext() {
   const [{ initializeApp, getApps, getApp }, firestoreModule, configModule] = await Promise.all([
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'),
-    import('/ai-academy/js/firebase-config.js')
+    import('/ai-academy/js/firebase-config.js?v=3')
   ]);
   const app = getApps().length ? getApp() : initializeApp(configModule.FIREBASE_CONFIG);
   requestDbContext = {

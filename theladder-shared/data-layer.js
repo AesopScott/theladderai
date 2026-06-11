@@ -62,7 +62,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
 
 // ---- constants --------------------------------------------------------------
 

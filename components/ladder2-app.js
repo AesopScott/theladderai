@@ -25,7 +25,7 @@ import {
   getAuth, onAuthStateChanged, sendSignInLinkToEmail,
   signInWithEmailAndPassword, signOut as fbSignOut
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
+import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
 
 import { LADDER_TIERS } from './ladder-data.js?v=2';
 import {
