@@ -249,8 +249,8 @@ export function buildUseCasePlacementDescriptor(useCases, topicRanges = USE_CASE
 export const CERT_DEPTHS = [
   {
     id: 'certification',
-    label: 'Certification',
-    certificationTierLabel: 'Use Case Certification',
+    label: 'Core',
+    certificationTierLabel: 'Use Case Core',
     outcome: 'certification path evidence',
     evidence: 'clear competency evidence for the selected use case at the certification tier',
     passingStandard: 'solid rubric performance with no critical failures',
@@ -258,8 +258,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'expert-challenge',
-    label: 'Expert certification',
-    certificationTierLabel: 'Use Case Expert Certification',
+    label: 'Expert',
+    certificationTierLabel: 'Use Case Expert',
     outcome: 'expert-level evidence for advanced credit',
     evidence: 'strong transfer, edge-case reasoning, and defensible tradeoff analysis',
     passingStandard: 'high rubric performance, independent reasoning, and confident defense under challenge',
@@ -267,8 +267,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'mastery-challenge',
-    label: 'Master certification',
-    certificationTierLabel: 'Use Case Master Certification',
+    label: 'Mastery',
+    certificationTierLabel: 'Use Case Mastery',
     outcome: 'mastery evidence and portfolio-quality artifact',
     evidence: 'original synthesis, portfolio-grade artifact, standards mapping, and leadership-level defense',
     passingStandard: 'near-expert rubric performance across all dimensions with no unresolved evidence gaps',

@@ -164,6 +164,26 @@ export function createCertificationEngine(options = {}) {
 
   // ---- Examiner prompt --------------------------------------------------
 
+  function listBlueprintItems(items) {
+    const cleaned = (items || []).map((item) => String(item || '').trim()).filter(Boolean);
+    return cleaned.length ? cleaned.join(', ') : 'Not specified.';
+  }
+
+  function criteriaForDepth(blueprint) {
+    const key = String(blueprint.depthLabel || blueprint.certificationTierLabel || '').toLowerCase();
+    const criteriaByDepth = blueprint.criteriaByDepth || {};
+    const candidates = [
+      blueprint.depthId,
+      key.includes('master') ? 'mastery' : '',
+      key.includes('expert') ? 'expert' : '',
+      key.includes('cert') || key.includes('core') ? 'certification' : ''
+    ].filter(Boolean);
+    const criteria = candidates.map((id) => criteriaByDepth[id]).find((value) => Array.isArray(value) && value.length)
+      || criteriaByDepth.certification
+      || [];
+    return criteria.length ? criteria.map((item) => `- ${item}`).join('\n') : 'Not specified.';
+  }
+
   function buildExaminerSystemPrompt(blueprint = {}) {
     const languageLabel = blueprint.languageLabel || 'English';
     return `You are a structured AI examiner inside AESOP AI Academy. You are strictly scoped to: ${blueprint.itemLabel}.
@@ -174,6 +194,9 @@ Preferred language: ${languageLabel}. Translate your learner-facing responses in
 
 Active certification mode: YES.
 Item under test: ${blueprint.itemLabel}.
+Active rung under test: ${blueprint.activeRung || blueprint.itemLabel}.
+Training standard ID: ${blueprint.trainingStandardId || 'Not specified'}.
+Certification set: ${blueprint.certificationSet || blueprint.itemLabel}.
 Education tier (teaching/standards level): ${blueprint.educationTierLabel}.
 Certification tier: ${blueprint.certificationTierLabel}.
 Mapped standards family: ${blueprint.standards}.
@@ -181,12 +204,19 @@ Certification depth: ${blueprint.depthLabel} (${blueprint.depthOutcome}).
 Required evidence level: ${blueprint.depthEvidence}.
 Passing standard: ${blueprint.depthPassingStandard}.
 Review posture: ${blueprint.depthReview}.
+Required vocabulary: ${listBlueprintItems(blueprint.requiredVocabulary)}.
+Specific topics in scope: ${listBlueprintItems(blueprint.specificTopics)}.
+Depth-specific criteria for this attempt:
+${criteriaForDepth(blueprint)}
+Role/education criteria: ${blueprint.roleCriteria ? JSON.stringify(blueprint.roleCriteria) : 'Not specified.'}
 
 ${rubricDisclosure()}
 
-Before asking the first substantive question, briefly state the rubric dimensions in plain language. Then deliver a dynamic test with vocabulary, scenario judgment, applied task, risk/limitation question, artifact or evidence statement, and defense of reasoning.
+Before asking the first substantive question, briefly state the rubric dimensions in plain language and name the active rung, depth, and education/role level. Then deliver a dynamic test with vocabulary, scenario judgment, applied task, risk/limitation question, artifact or evidence statement, and defense of reasoning.
 
 For Certification, test for competent and defensible use. For Expert challenge, increase ambiguity, require transfer to a new context, and press harder on edge cases. For Mastery challenge, require original synthesis, portfolio-quality evidence, standards mapping, and leadership-level defense.
+
+You must test the required vocabulary and the specific topics in scope. Do not invent a different standard at runtime. If the learner supplies evidence outside the active rung or certification set, acknowledge it but bring the exam back to the mapped standard above.
 
 Do not award a final credential in one short response. Collect evidence first. When you are ready to make a determination, explain pass or non-pass with specific learner evidence, missing evidence, standards implications, selected depth expectations, and a challenge path. If evidence is insufficient, say what would change the decision. If confidence is low, say human review is recommended.
 

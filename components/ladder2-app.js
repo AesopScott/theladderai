@@ -13,12 +13,13 @@
  * ========================================================================== */
 
 import { createPlacementEngine } from '/theladder-shared/placement-engine.js';
-import { createCertificationEngine } from '/theladder-shared/certification-engine.js';
+import { createCertificationEngine } from '/theladder-shared/certification-engine.js?v=2';
 import {
   initDataLayer, loadLearnerRecord, saveLearnerProgress,
   recordCompletion, recordCertification,
-  getLearnerId, setLearnerId
-} from '/theladder-shared/data-layer.js?v=2';
+  getLearnerId, setLearnerId,
+  loadTrainingPedagogy, loadTrainingStandard
+} from '/theladder-shared/data-layer.js?v=3';
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getAuth, onAuthStateChanged, sendSignInLinkToEmail,
@@ -27,9 +28,9 @@ import {
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
 import { LADDER_TIERS } from './ladder-data.js?v=2';
-import * as Concepts from './concepts-ladder.js';
-import * as Products from '/theladder-products/products-ladder.js';
-import * as UseCases from '/theladder-use-cases/use-cases-ladder.js';
+import * as Concepts from './concepts-ladder.js?v=2';
+import * as Products from '/theladder-products/products-ladder.js?v=2';
+import * as UseCases from '/theladder-use-cases/use-cases-ladder.js?v=2';
 
 const PROXY_URL = '/aesop-api/proxy.php';
 const LS_FOCUS = 'aesop-ladder2-focus';
@@ -108,11 +109,14 @@ const FOCUSES = {
       return tiers.map((tier) => ({
         id: tier.id,
         label: `${tier.name}: ${tier.title}`,
+        raw: tier,
         items: (tier.topics || []).map((t) => ({ id: `topic-${t.id}`, label: t.title, raw: t }))
       }));
     },
     placementDescriptor(tiers) { return Concepts.buildConceptsPlacementDescriptor(tiers); },
-    certItemForGroup(group) { return { tier: { id: group.id, name: group.label.split(':')[0], title: (group.label.split(':')[1] || '').trim(), topics: group.items.map((i) => i.raw) } }; },
+    certItemForGroup(group) {
+      return { tier: group.raw || { id: group.id, name: group.label.split(':')[0], title: (group.label.split(':')[1] || '').trim(), topics: group.items.map((i) => i.raw) } };
+    },
     CERT_DEPTHS: Concepts.CERT_DEPTHS,
     depthForLabel: Concepts.depthForLabel,
     buildBlueprint: ({ item, level, depth }) => Concepts.buildConceptsBlueprint({ tier: item.tier, level, depth }),
@@ -186,6 +190,8 @@ const state = {
   groups: [],
   activeGroupId: null,
   activeItemId: null,
+  trainingPedagogy: null,
+  trainingStandards: {},
   placement: null,
   assessMessages: [],
   trainMessages: [],
@@ -330,6 +336,9 @@ async function init() {
   // storedUid() also discards any stale AESOP-#### leftover from the old build.
   const storedId = storedUid();
   initDataLayer(storedId ? { learnerId: storedId } : {}).catch((e) => console.warn('data-layer init failed (local-only)', e));
+  loadTrainingPedagogy()
+    .then((pedagogy) => { state.trainingPedagogy = pedagogy; })
+    .catch((e) => console.warn('training pedagogy load failed (local fallback)', e));
   try {
     const rec = storedId ? await loadLearnerRecord(storedId) : null;
     if (rec) hydrate(rec);
@@ -495,6 +504,248 @@ function trainingDescriptionFor(it) {
   return `Learn what "${it.label}" means, where it applies, what can go wrong, and how to use it in a practical AI workflow.`;
 }
 
+function listText(items, limit = 18) {
+  const cleaned = (items || []).map((item) => String(item || '').trim()).filter(Boolean);
+  if (!cleaned.length) return 'Not specified in the catalog.';
+  const visible = cleaned.slice(0, limit).join(', ');
+  return cleaned.length > limit ? `${visible}, plus ${cleaned.length - limit} more` : visible;
+}
+
+function groupTopicsFor(group) {
+  const rawTopics = group?.raw?.topics || [];
+  const topics = rawTopics.length ? rawTopics : (group?.items || []).map((item) => item.raw || item.label);
+  return topics.map((topic) => topic?.title || topic?.name || topic).filter(Boolean);
+}
+
+function vocabularyFor(it, group) {
+  const raw = it?.raw || {};
+  const fromGroup = group?.raw?.vocabulary || [];
+  const fromItem = raw.vocabulary || raw.keywords || [];
+  const derived = [raw.type, raw.topic, raw.depth].filter(Boolean);
+  return [...new Set([...fromGroup, ...fromItem, ...derived].map((term) => String(term || '').trim()).filter(Boolean))];
+}
+
+function selectedLevelLabel() {
+  return $('l2CertTierSelect')?.value || EDUCATION_TIERS[0];
+}
+
+function standardIdFor(it, group) {
+  if (focus().id === 'concepts') return `concept:${it?.raw?.id || it?.id || group?.id || 'unknown'}`;
+  if (focus().id === 'products') return `product:${it?.raw?.id || it?.id || 'unknown'}`;
+  if (focus().id === 'use-cases') return `use-case:${it?.raw?.id || it?.id || 'unknown'}`;
+  return `${focus().pathway}:${it?.id || group?.id || 'unknown'}`;
+}
+
+function neighboringTopicsFor(it, group) {
+  const topics = groupTopicsFor(group);
+  const index = topics.findIndex((topic) => topic === it?.label);
+  if (index < 0) return topics.filter((topic) => topic !== it?.label).slice(0, 3);
+  return [topics[index - 1], topics[index + 1]].filter(Boolean);
+}
+
+function criteriaByDepthFor(it, group) {
+  const title = it?.label || 'this rung';
+  const neighbors = neighboringTopicsFor(it, group);
+  const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby rung topics';
+  return {
+    certification: [
+      `Defines "${title}" accurately in plain language.`,
+      `Uses the most relevant tier vocabulary while explaining "${title}".`,
+      `Distinguishes "${title}" from ${neighborText}.`,
+      `Applies "${title}" to one bounded, realistic AI workflow.`,
+      `Identifies one limitation, risk, or human-review checkpoint for "${title}".`
+    ],
+    expert: [
+      `Transfers "${title}" to an unfamiliar or higher-stakes scenario.`,
+      `Compares "${title}" with ${neighborText} and defends when to use each.`,
+      `Handles edge cases, ambiguity, or failure modes related to "${title}".`,
+      `Explains tradeoffs for "${title}" at the selected education or role level.`,
+      `Gives feedback or coaching that would help another learner improve on "${title}".`
+    ],
+    mastery: [
+      `Synthesizes "${title}" with multiple topics in the same certification set.`,
+      `Produces portfolio-quality reasoning, design, or evidence involving "${title}".`,
+      `Maps "${title}" to standards, governance, risk, or organizational impact.`,
+      `Anticipates second-order effects and failure modes around "${title}".`,
+      `Can teach, lead, or review others against the "${title}" standard.`
+    ]
+  };
+}
+
+function defaultRoleCriteria() {
+  return Object.fromEntries(EDUCATION_TIERS.map((level) => [level, {
+    languageLevel: level,
+    scenarioComplexity: ADULT_TIERS.has(level) ? 'professional or organizational scenario' : 'age-appropriate learning scenario',
+    evidenceExpectation: ADULT_TIERS.has(level)
+      ? 'defensible explanation, practical application, and risk-aware judgment'
+      : 'clear explanation, simple example, and safe-use awareness'
+  }]));
+}
+
+function localTrainingStandardFor(it, group) {
+  const id = standardIdFor(it, group);
+  const topics = groupTopicsFor(group);
+  const vocabulary = vocabularyFor(it, group);
+  const depthMap = criteriaByDepthFor(it, group);
+  return {
+    id,
+    version: 'local-fallback-v1',
+    pathway: focus().pathway,
+    focusLabel: focus().label,
+    scope: 'rung',
+    title: it?.label || group?.label || focus().label,
+    certificationSet: group?.label || focus().label,
+    activeRung: it?.label || '',
+    topics,
+    vocabulary,
+    certificationDepths: (focus().CERT_DEPTHS || []).map((depth) => ({
+      id: depth.id,
+      label: depth.label,
+      outcome: depth.outcome,
+      evidence: depth.evidence,
+      passingStandard: depth.passingStandard,
+      criteria: depthMap[depth.id] || depthMap.certification
+    })),
+    criteriaByDepth: depthMap,
+    roleCriteria: defaultRoleCriteria(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+async function trainingStandardFor(it, group) {
+  const fallback = localTrainingStandardFor(it, group);
+  const id = fallback.id;
+  if (state.trainingStandards[id]) return state.trainingStandards[id];
+  try {
+    const remote = await loadTrainingStandard(id);
+    state.trainingStandards[id] = remote || fallback;
+  } catch {
+    state.trainingStandards[id] = fallback;
+  }
+  return state.trainingStandards[id];
+}
+
+function certificationMapFor(it, group) {
+  const depthLines = (focus().CERT_DEPTHS || []).map((depth) =>
+    `${depth.label}: ${depth.outcome || depth.passingStandard || 'certification depth'}`
+  );
+  try {
+    const certItem = focus().certItemForGroup(group, it);
+    const depth = focus().CERT_DEPTHS[0];
+    const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevelLabel(), depth });
+    return [
+      `Certification item: ${blueprint.itemLabel}`,
+      `Mapped standards: ${blueprint.standards}`,
+      `Education/role level now selected: ${blueprint.educationTierLabel}`,
+      `Available education/role levels: ${EDUCATION_TIERS.join(', ')}`,
+      `Depths tested: ${depthLines.join(' | ')}`
+    ].join('\n');
+  } catch {
+    return [
+      `Certification item: ${it?.label || group?.label || focus().label}`,
+      `Education/role levels: ${EDUCATION_TIERS.join(', ')}`,
+      `Depths tested: ${depthLines.join(' | ')}`
+    ].join('\n');
+  }
+}
+
+function trainingContextFor(it, group, standard = null) {
+  const raw = it?.raw || {};
+  const groupLabel = group?.label || focus().label;
+  const topics = standard?.topics || groupTopicsFor(group);
+  const vocabulary = standard?.vocabulary || vocabularyFor(it, group);
+  const depthCriteria = standard?.certificationDepths?.length
+    ? standard.certificationDepths.map((depth) => `${depth.label}: ${(depth.criteria || []).join('; ')}`).join('\n')
+    : Object.entries(standard?.criteriaByDepth || criteriaByDepthFor(it, group)).map(([depth, criteria]) => `${depth}: ${criteria.join('; ')}`).join('\n');
+  const roleCriteria = standard?.roleCriteria?.[selectedLevelLabel()] || defaultRoleCriteria()[selectedLevelLabel()];
+  const detailLines = [
+    raw.type ? `Type/product family: ${raw.type}` : '',
+    raw.topic ? `Topic/category: ${raw.topic}` : '',
+    raw.outcome ? `Outcome: ${raw.outcome}` : '',
+    raw.depth ? `Depth: ${raw.depth}` : '',
+    raw.reason ? `Why this matters: ${raw.reason}` : '',
+    raw.summary ? `Summary: ${raw.summary}` : '',
+    raw.description ? `Description: ${raw.description}` : ''
+  ].filter(Boolean);
+
+  return {
+    title: it?.label || 'this rung',
+    groupLabel,
+    description: trainingDescriptionFor(it),
+    topics,
+    vocabulary,
+    standardId: standard?.id || standardIdFor(it, group),
+    depthCriteria,
+    roleCriteria,
+    certificationMap: certificationMapFor(it, group),
+    details: detailLines.length ? detailLines.join('\n') : 'No extended catalog notes are available for this rung; infer a practical beginner-to-capable lesson from the rung title and tier context.'
+  };
+}
+
+function buildTrainingSystemPrompt(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  const pedagogy = state.trainingPedagogy
+    ? `Global pedagogy: ${state.trainingPedagogy.name || 'AESOP guided training pedagogy'}\nPrinciples: ${listText(state.trainingPedagogy.principles || [], 8)}\nLesson arc: ${listText((state.trainingPedagogy.lessonArc || []).map((step) => `${step.id}: ${step.purpose}`), 8)}`
+    : 'Global pedagogy: use the AESOP guided lesson arc below.';
+  return `You are the AESOP AI Academy training guide for a guided lesson, not an examiner and not a generic Q&A assistant.
+
+${pedagogy}
+
+Training focus: ${focus().label}
+Tier/category: ${ctx.groupLabel}
+Rung: ${ctx.title}
+Training standard ID: ${ctx.standardId}
+Rung description: ${ctx.description}
+Required vocabulary for this tier/rung:
+${listText(ctx.vocabulary)}
+Specific topics in this certification set:
+${listText(ctx.topics)}
+Certification map:
+${ctx.certificationMap}
+Depth-specific criteria:
+${ctx.depthCriteria}
+Selected education/role criteria:
+${JSON.stringify(ctx.roleCriteria)}
+Catalog context:
+${ctx.details}
+
+Your job is to lead the learner somewhere specific: by the end, they should be able to explain the rung in their own words, recognize when it applies, name at least one limitation or risk, and use it in a practical AI workflow.
+
+Run a short guided lesson with this arc:
+1. Orient: state the destination in plain language and ask one diagnostic question only if needed.
+2. Teach: explain one core idea at a time using a concrete example.
+3. Apply: give the learner a small scenario or task that makes them use the idea.
+4. Check and close: ask them to explain or apply the idea back. Mark complete only after they show usable understanding.
+
+Teaching rules:
+- Lead the learner through the path. Do not wait for them to choose the curriculum.
+- Do not behave like a certification exam. Be instructional, warm, and practical.
+- Do not answer as a one-off Q&A unless the answer moves the lesson forward.
+- Explicitly teach the most relevant vocabulary terms for this rung, and connect the rung back to the broader tier topics that certification will test.
+- Call out when a point matters for Core, Expert, or Mastery depth, especially when the learner is near that level.
+- Adapt examples and expectations to the selected education/role level.
+- Ask one question or give one task per turn.
+- Keep responses concise enough for chat: usually 2-5 short paragraphs.
+- If the learner gives a vague answer, teach the next missing piece and ask a better follow-up.
+- If the learner asks an unrelated question, answer briefly if useful, then bridge back to this rung.
+- Use COURSE_COMPLETE on its own final line only when the learner has demonstrated the target understanding.`;
+}
+
+function trainingOpeningFor(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  return `Let's work through "${ctx.title}". By the end, you should be able to explain what it means, when it applies, what can go wrong, and how to use it in a practical AI workflow.
+
+First, in your own words: what do you think "${ctx.title}" means right now?`;
+}
+
+function upgradeSavedTrainingMessages(messages, it, group, standard) {
+  const upgraded = (messages || []).slice();
+  if (upgraded[0]?.role === 'assistant' && /where would you like to start\?/i.test(upgraded[0].content || '')) {
+    upgraded[0] = { role: 'assistant', content: trainingOpeningFor(it, group, standard) };
+  }
+  return upgraded;
+}
+
 // =============================================================================
 // COURSE CONVERSATION STORE
 // Full guided-conversation content is kept locally (localStorage) per course so
@@ -600,7 +851,10 @@ async function startTrainingChat() {
   if (!it) return;
   // resume the saved conversation for this course if one exists, else open fresh
   const saved = savedChatFor(focus().pathway, it.id);
-  state.trainMessages = saved || [{ role: 'assistant', content: `Let's work through "${it.label}". What do you already know about it, and where would you like to start?` }];
+  const standard = await trainingStandardFor(it, activeGroup());
+  state.trainMessages = saved
+    ? upgradeSavedTrainingMessages(saved, it, activeGroup(), standard)
+    : [{ role: 'assistant', content: trainingOpeningFor(it, activeGroup(), standard) }];
   renderChat($('l2ChatLog'), state.trainMessages);
   persistActiveChat('open');   // course is now open (appears in Profile → Open courses)
   renderProfile();
@@ -622,10 +876,11 @@ async function submitTrainingChat(e) {
   let isDone = false;
   let transientFailure = false;
   try {
+    const standard = await trainingStandardFor(it, activeGroup());
     const raw = await askModel({
       messages: messagesForModel,
-      systemPrompt: `You are a training guide for "${it.label}" in the ${focus().label} ladder of the AESOP AI Academy. Teach through guided conversation — ask, give examples, apply, and surface limitations. Engage until the learner demonstrates sufficient understanding. When ready to end, write "COURSE_COMPLETE" on its own final line.`,
-      maxTokens: 700
+      systemPrompt: buildTrainingSystemPrompt(it, activeGroup(), standard),
+      maxTokens: 900
     });
     isDone = raw.includes('COURSE_COMPLETE');
     const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim() || 'I hit a snag. Please try again.';
@@ -947,8 +1202,22 @@ async function startCertification() {
   const depth = selectedDepth();
   const certItem = focus().certItemForGroup(activeGroup(), it);
   const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevel(), depth });
+  const standard = await trainingStandardFor(it, activeGroup());
   blueprint.languageLabel = 'English';
+  blueprint.depthId = depth.id;
+  blueprint.trainingStandardId = standard.id;
+  blueprint.requiredVocabulary = standard.vocabulary || [];
+  blueprint.specificTopics = standard.topics || [];
+  blueprint.criteriaByDepth = standard.criteriaByDepth || {};
+  blueprint.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
+  blueprint.activeRung = it.label;
+  blueprint.certificationSet = standard.certificationSet || activeGroup()?.label || focus().label;
   const context = focus().buildCertContext({ item: certItem, depth, learnerId: state.authUser?.uid || '' });
+  context.trainingStandardId = standard.id;
+  context.requiredVocabulary = standard.vocabulary || [];
+  context.specificTopics = standard.topics || [];
+  context.criteriaByDepth = standard.criteriaByDepth || {};
+  context.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
   context.identityAssurance = focus().buildIdentityAssurance(new Date().toISOString(), { ...state.identityGate, account: state.authUser });
   context.proctoringMode = state.identityGate.proctoringId;
 

@@ -159,8 +159,8 @@ export function buildProductPlacementDescriptor(products, categoryRanges) {
 export const CERT_DEPTHS = [
   {
     id: 'certification',
-    label: 'Certification',
-    certificationTierLabel: 'Product Certification',
+    label: 'Core',
+    certificationTierLabel: 'Product Core',
     outcome: 'Competent, defensible everyday use of the product for common work.',
     evidence: 'A guided assignment plus explanations of core features, fit, and one limitation.',
     passingStandard: 'Demonstrates correct core-feature use, safe defaults, and accurate explanation.',
@@ -168,8 +168,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'expert',
-    label: 'Expert certification',
-    certificationTierLabel: 'Product Expert Certification',
+    label: 'Expert',
+    certificationTierLabel: 'Product Expert',
     outcome: 'Chooses the right workflow, troubleshoots limits, compares alternatives, and can teach another learner.',
     evidence: 'A non-trivial scenario solved with a justified workflow, plus a comparison against an alternative product.',
     passingStandard: 'Transfers skill to a new context, handles edge cases, and defends tool choice.',
@@ -177,8 +177,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'master',
-    label: 'Master certification',
-    certificationTierLabel: 'Product Master Certification',
+    label: 'Mastery',
+    certificationTierLabel: 'Product Mastery',
     outcome: 'Designs a production workflow, evaluates risk, documents evidence, and defends every choice.',
     evidence: 'Portfolio-quality artifact: a production-ready workflow design with risk controls and evidence.',
     passingStandard: 'Original synthesis, standards mapping, risk governance, and leadership-level defense.',

@@ -49,6 +49,11 @@
 //      upgrades status beyond 'candidate'; confirmation is a separate reviewer
 //      flow. See docs/ladder-data-model.md section 7.
 //
+//  loadTrainingPedagogy() / loadTrainingStandard(standardId)
+//      Read Firestore-backed lesson rules and certification criteria. These are
+//      read-mostly reference records; callers provide local fallbacks when the
+//      database is unavailable.
+//
 // All functions are no-throw at the boundary: remote failures are logged and
 // swallowed so the local-first UX never breaks.
 // =============================================================================
@@ -63,6 +68,8 @@ import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
 const LS_LEARNER_ID = 'aesop-learner-id';
 const LS_UNIFIED_CACHE = 'aesop-ladder-unified-record-v1';
+const LS_TRAINING_PEDAGOGY = 'aesop-ladder-training-pedagogy-v1';
+const LS_TRAINING_STANDARDS = 'aesop-ladder-training-standards-v1';
 
 const PATHWAY_KEYS = {
   'concept': 'ladderProgress',
@@ -490,6 +497,53 @@ export async function recordStandardsEvidence(candidate) {
     }
   }
   return { standardsEvidenceId };
+}
+
+// ---- public: Firestore-backed training standards ---------------------------
+
+function readJsonLocal(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null') || fallback; }
+  catch { return fallback; }
+}
+
+function writeJsonLocal(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* blocked */ }
+}
+
+export async function loadTrainingPedagogy() {
+  await ensureInit();
+  const local = readJsonLocal(LS_TRAINING_PEDAGOGY, null);
+  if (!firebaseReady || !db) return local;
+  try {
+    const snap = await getDoc(doc(db, 'trainingPedagogy', 'default'));
+    if (!snap.exists()) return local;
+    const data = { id: snap.id, ...snap.data() };
+    writeJsonLocal(LS_TRAINING_PEDAGOGY, data);
+    return data;
+  } catch (error) {
+    console.warn('[data-layer] loadTrainingPedagogy failed (local fallback kept):', error);
+    return local;
+  }
+}
+
+export async function loadTrainingStandard(standardId) {
+  await ensureInit();
+  const id = String(standardId || '').trim();
+  if (!id) return null;
+  const localMap = readJsonLocal(LS_TRAINING_STANDARDS, {});
+  const local = localMap[id] || null;
+  if (!firebaseReady || !db) return local;
+  try {
+    const snap = await getDoc(doc(db, 'trainingStandards', id));
+    if (!snap.exists()) return local;
+    const data = { id: snap.id, ...snap.data() };
+    localMap[id] = data;
+    writeJsonLocal(LS_TRAINING_STANDARDS, localMap);
+    return data;
+  } catch (error) {
+    console.warn('[data-layer] loadTrainingStandard failed (local fallback kept):', error);
+    return local;
+  }
 }
 
 export function isFirebaseReady() {
