@@ -661,6 +661,13 @@ function certificationMapFor(it, group) {
   }
 }
 
+function approximateTrainingTimeFor(it) {
+  const raw = it?.raw || {};
+  const explicit = raw.estimatedTime || raw.estimated_time || raw.timeEstimate || raw.duration || raw.timeToComplete;
+  if (explicit) return String(explicit);
+  return 'about 10-15 minutes for the guided lesson, or 20-30 minutes if you pause to practice and revise your answers';
+}
+
 function trainingContextFor(it, group, standard = null) {
   const raw = it?.raw || {};
   const groupLabel = group?.label || focus().label;
@@ -690,6 +697,7 @@ function trainingContextFor(it, group, standard = null) {
     depthCriteria,
     roleCriteria,
     certificationMap: certificationMapFor(it, group),
+    approximateTime: approximateTrainingTimeFor(it),
     details: detailLines.length ? detailLines.join('\n') : 'No extended catalog notes are available for this rung; infer a practical beginner-to-capable lesson from the rung title and tier context.'
   };
 }
@@ -720,16 +728,28 @@ Selected education/role criteria:
 ${JSON.stringify(ctx.roleCriteria)}
 Catalog context:
 ${ctx.details}
+Approximate completion time:
+${ctx.approximateTime}
 
 Your job is to lead the learner somewhere specific: by the end, they should be able to explain the rung in their own words, recognize when it applies, name at least one limitation or risk, and use it in a practical AI workflow.
 
+Before the lesson begins, follow this readiness sequence:
+1. The first assistant message must only preview the lesson content and required vocabulary, then ask whether the learner is ready to begin.
+2. When the learner says they are ready, show the test criteria they will need to satisfy.
+3. After the criteria, show the approximate time to complete this rung.
+4. Then ask one short readiness question before beginning the lesson.
+5. Begin the actual lesson only after that readiness gate is complete.
+If the conversation already contains "Test criteria:" and "Approximate time to complete this rung:" and the learner says they are ready, do not repeat the criteria; begin the lesson.
+
 Run a short guided lesson with this arc:
-1. Orient: state the destination in plain language and ask one diagnostic question only if needed.
+1. Orient: state the destination in plain language after the readiness sequence is complete, and ask one diagnostic question only if needed.
 2. Teach: explain one core idea at a time using a concrete example.
 3. Apply: give the learner a small scenario or task that makes them use the idea.
 4. Check and close: ask them to explain or apply the idea back. Mark complete only after they show usable understanding.
 
 Teaching rules:
+- Do not begin the lesson in the first assistant message.
+- If the learner has not confirmed readiness yet, ask whether they are ready instead of teaching.
 - Lead the learner through the path. Do not wait for them to choose the curriculum.
 - Do not behave like a certification exam. Be instructional, warm, and practical.
 - Do not answer as a one-off Q&A unless the answer moves the lesson forward.
@@ -745,9 +765,40 @@ Teaching rules:
 
 function trainingOpeningFor(it, group, standard = null) {
   const ctx = trainingContextFor(it, group, standard);
-  return `Let's work through "${ctx.title}". By the end, you should be able to explain what it means, when it applies, what can go wrong, and how to use it in a practical AI workflow.
+  return `Let's preview "${ctx.title}" before the lesson begins.
 
-First, in your own words: what do you think "${ctx.title}" means right now?`;
+Lesson content:
+${listText(ctx.topics, 6)}
+
+Required vocabulary:
+${listText(ctx.vocabulary, 8)}
+
+When you are ready, I will show the test criteria, the approximate time to complete this rung, and then ask one quick ready-to-begin question before we start the lesson. Are you ready?`;
+}
+
+function isReadyResponse(content) {
+  return /\b(ready|yes|yep|yeah|sure|start|begin|let'?s go|go ahead)\b/i.test(content || '');
+}
+
+function shouldShowPreLessonBriefing(messages, content) {
+  if (!isReadyResponse(content)) return false;
+  const assistantMessages = (messages || []).filter((message) => message.role === 'assistant');
+  if (assistantMessages.length !== 1) return false;
+  const opening = assistantMessages[0]?.content || '';
+  return opening.includes('before the lesson begins') && opening.includes('Are you ready?');
+}
+
+function preLessonBriefingFor(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  return `Great. Here is what you will be tested against before the lesson begins.
+
+Test criteria:
+${ctx.depthCriteria}
+
+Approximate time to complete this rung:
+${ctx.approximateTime}
+
+When you are ready to begin the lesson, say "ready."`;
 }
 
 function upgradeSavedTrainingMessages(messages, it, group, standard) {
@@ -900,6 +951,14 @@ async function submitTrainingChat(e) {
   const it = activeItem();
   if (!state.trainMessages.length) await startTrainingChat();
   state.trainMessages.push({ role: 'user', content });
+  const standard = await trainingStandardFor(it, activeGroup());
+  if (shouldShowPreLessonBriefing(state.trainMessages, content)) {
+    state.trainMessages.push({ role: 'assistant', content: preLessonBriefingFor(it, activeGroup(), standard) });
+    input.value = '';
+    renderChat($('l2ChatLog'), state.trainMessages, { scroll: 'latest-assistant' });
+    persistActiveChat('open');
+    return;
+  }
   const messagesForModel = state.trainMessages.slice();
   state.trainMessages.push({ role: 'assistant', content: 'Thinking...' });
   input.value = '';
@@ -907,7 +966,6 @@ async function submitTrainingChat(e) {
   let isDone = false;
   let transientFailure = false;
   try {
-    const standard = await trainingStandardFor(it, activeGroup());
     const raw = await askModel({
       messages: messagesForModel,
       systemPrompt: buildTrainingSystemPrompt(it, activeGroup(), standard),
