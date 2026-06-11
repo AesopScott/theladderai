@@ -104,7 +104,31 @@ The orchestrator runs every 60 seconds. It will:
 3. Merge your branch to main
 4. Deploy to production
 
-**If orchestrator rejects your entry:** Check the error. You likely forgot to edit actual application files.
+---
+
+## ⚠️ YOUR ENTRIES ARE BEING REJECTED
+
+**The orchestrator is currently REJECTING entries from:**
+- `claude/nice-northcutt-reset`
+- `claude/reverent-germain-assess`
+
+**Error message you're seeing:**
+```
+✗ ERROR: No application code changes found
+✗ FAILED: Worktree must have actual file edits (index.html, /components/, CSS, etc.)
+```
+
+**Why your entry failed:**
+Your worktree has `.handoff-state` changes but ZERO changes to actual application files. The orchestrator will NOT deploy empty worktrees.
+
+**What to do:**
+1. Go back to STEP 2 above
+2. EDIT actual files (index.html, /components/, CSS)
+3. Commit and push (STEP 4)
+4. Append NEW entry to handoff.md (STEP 5)
+5. The orchestrator will deploy it
+
+**Do not append another entry without actual code changes. It will be rejected again.**
 
 ### What's Currently Happening:
 - You're appending to handoff.md ✓ (correct)
