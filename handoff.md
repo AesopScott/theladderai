@@ -14,6 +14,28 @@
 
 ---
 
+## YOUR RESPONSIBILITIES
+
+**YOU must:**
+1. **Write code** in your worktree — CSS, HTML, JavaScript changes to the correct files (`/index.html`, `/components/`, etc.)
+2. **Test locally** — verify your changes work in the browser before committing
+3. **Commit to your branch** — `git add -A` and `git commit -m "your message"`
+4. **Push to origin** — `git push origin your-branch-name`
+5. **Append to handoff.md** — only AFTER code is committed and pushed
+
+**THE ORCHESTRATOR will:**
+- Detect your handoff entry every 60 seconds
+- Commit any changes in your worktree
+- Push your branch to origin
+- Merge to main
+- Promote to production
+- Run GitHub Actions deployment
+
+**You don't commit the changes to main. You don't push to main. You don't merge. You don't deploy.**
+**That's the orchestrator's job. Your job is: write code, test it, commit it, push it, then append to handoff.**
+
+---
+
 **Handoff entries below this line:**
 
 ## 2026-06-10 22:55 MDT — `claude/nice-northcutt-b9cff1` (status — already on `main`, no merge needed)
