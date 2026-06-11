@@ -237,8 +237,8 @@ a {
 
 .hero-ladder-mark {
   position: absolute;
-  top: calc(clamp(3rem, 6vw, 5.2rem) - 1in);
-  right: calc(100% + 1.75rem);
+  top: calc(clamp(3rem, 6vw, 5.2rem) - 2in);
+  right: calc(100% + 1.75rem - 0.125in);
   width: clamp(170px, 18vw, 270px);
   height: auto;
   pointer-events: none;
