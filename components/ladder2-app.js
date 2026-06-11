@@ -17,7 +17,7 @@ import { createCertificationEngine } from '/theladder-shared/certification-engin
 import {
   initDataLayer, loadLearnerRecord, saveLearnerProgress,
   recordCompletion, recordCertification,
-  findLearnerIdByAccount, bindAccountToLearner, getLearnerId, setLearnerId
+  getLearnerId, setLearnerId
 } from '/theladder-shared/data-layer.js?v=2';
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
@@ -39,27 +39,9 @@ const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
 const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept on the learner's machine
 
-// Learner ID model: a durable, human-facing AESOP-XXXX id is the record key — NEVER
-// the raw Firebase uid. Resolution precedence (see onAuthChange): the id bound to this
-// account in the DB wins, then the local id (which is never overwritten by the uid),
-// then a freshly-minted id when none exists locally.
-function generateLearnerId() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 4; i += 1) code += chars[Math.floor(Math.random() * chars.length)];
-  return `AESOP-${code}`;
-}
-function normalizeLearnerId(value) {
-  const id = String(value || '').trim().toUpperCase();
-  return id.startsWith('AESOP-') ? id : '';
-}
-// Guarantee an anonymous local id exists on first visit; reject any non-AESOP value
-// (e.g. a uid written by an older build) so the local id is always a real learner id.
-function ensureLocalLearnerId() {
-  let id = normalizeLearnerId(localStorage.getItem(LS_ID));
-  if (!id) { id = generateLearnerId(); localStorage.setItem(LS_ID, id); }
-  return id;
-}
+// Learner ID model: the Firebase Auth UID is the canonical learner id (Scott's
+// decision — "use the new UIDs"). On sign-in the uid becomes the record key
+// (learners/{uid}) and is what the Profile shows; there is no AESOP-XXXX scheme.
 
 // Real Firebase auth (email-link sign-up + password sign-in). Set in
 // initFirebaseAuth() after the data layer has created the default app.
@@ -258,12 +240,12 @@ async function init() {
   setupAuth();
   renderHeroSignup();   // set the signed-out display state before first paint
 
-  // First visit gets a durable local AESOP-XXXX id; seed the data layer with it so the
-  // record loads under that id (not an empty/anonymous one) before auth resolves.
-  const localId = ensureLocalLearnerId();
-  initDataLayer({ learnerId: localId }).catch((e) => console.warn('data-layer init failed (local-only)', e));
+  // Seed the data layer with the stored uid (from a prior sign-in) if present; an
+  // anonymous visitor has no learner id until they sign in and their uid is adopted.
+  const storedId = localStorage.getItem(LS_ID) || '';
+  initDataLayer(storedId ? { learnerId: storedId } : {}).catch((e) => console.warn('data-layer init failed (local-only)', e));
   try {
-    const rec = await loadLearnerRecord(localId);
+    const rec = storedId ? await loadLearnerRecord(storedId) : null;
     if (rec) hydrate(rec);
   } catch (e) { console.warn('learner record load failed', e); }
   initFirebaseAuth();
@@ -721,24 +703,17 @@ function initFirebaseAuth() {
 async function onAuthChange(user) {
   if (user) {
     state.authUser = { email: user.email, uid: user.uid, emailVerified: user.emailVerified };
-    // Resolve the learner id with precedence: DB id bound to this account wins; else
-    // keep the local AESOP id and bind the account to it; the uid is NEVER the id.
+    // UID-canonical: the Firebase uid IS the learner id. Adopt it and load its record.
     try {
-      const dbId = await findLearnerIdByAccount(user.uid);
-      if (dbId) {
-        setLearnerId(dbId);                                  // adopt + persist (replaces local)
-      } else {
-        const localId = ensureLocalLearnerId();
-        setLearnerId(localId);
-        await bindAccountToLearner({ learnerId: localId, uid: user.uid, email: user.email });
-      }
-      const rec = await loadLearnerRecord(getLearnerId());   // restore the account's record
+      localStorage.setItem(LS_ID, user.uid);
+      setLearnerId(user.uid);
+      const rec = await loadLearnerRecord(user.uid);
       if (rec) hydrate(rec);
     } catch (e) {
       console.warn('[ladder2] learner-id resolution failed', e);
     }
   } else {
-    state.authUser = null;   // keep the local id on sign-out; do not clear it
+    state.authUser = null;   // keep the stored uid on sign-out; do not clear it
   }
   localStorage.removeItem(LS_AUTH);   // retire the old local-prototype token
   renderAuthGates();
@@ -815,8 +790,8 @@ function renderHeroSignup() {
   setDisp('l2SigninForm', false, 'flex');       // collapsed by default; the toggle opens it
   setDisp('l2SignedIn', signedIn, 'flex');       // sign-out only when actually signed in
   if (signedIn) setText('l2SignedInEmail', state.authUser.email || '');
-  // Always the durable AESOP-XXXX id (resolved from DB-bound id → local), never the uid.
-  setText('l2LearnerId', getLearnerId() || normalizeLearnerId(localStorage.getItem(LS_ID)) || '—');
+  // The learner id is the Firebase uid (UID-canonical).
+  setText('l2LearnerId', state.authUser?.uid || getLearnerId() || localStorage.getItem(LS_ID) || '—');
 }
 
 async function startCertification() {

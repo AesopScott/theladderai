@@ -45,9 +45,8 @@ async function completeSignIn(email) {
   try {
     await signInWithEmailLink(auth, email, window.location.href);
     localStorage.removeItem(LS_EMAIL);
-    // Do NOT write the learner id here — the raw uid must never become the learner id.
-    // The home page resolves it on return (DB id bound to this account → local AESOP id)
-    // via onAuthStateChanged, preserving any existing AESOP-XXXX id in this browser.
+    // The learner id (the Firebase uid, UID-canonical) is adopted on the home page
+    // when onAuthStateChanged fires after the redirect — no need to write it here.
     el('caEmailEcho').textContent = auth.currentUser.email || email;
     hide('caVerifying');
     hide('caNeedEmail');
