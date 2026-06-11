@@ -186,11 +186,13 @@ export function createCertificationEngine(options = {}) {
 
   function buildExaminerSystemPrompt(blueprint = {}) {
     const languageLabel = blueprint.languageLabel || 'English';
+    const languageExpectation = blueprint.languageExpectation || `Conduct learner-facing certification exam language in ${languageLabel}.`;
     return `You are a structured AI examiner inside AESOP AI Academy. You are strictly scoped to: ${blueprint.itemLabel}.
 
 You deliver a certification test, not a course lesson. The learner is allowed to test out without taking a course first.
 
 Preferred language: ${languageLabel}. Translate your learner-facing responses into this language unless the learner asks otherwise.
+${languageExpectation}
 
 Active certification mode: YES.
 Item under test: ${blueprint.itemLabel}.

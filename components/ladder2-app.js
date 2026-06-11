@@ -28,6 +28,10 @@ import {
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
 import { LADDER_TIERS } from './ladder-data.js?v=2';
+import {
+  WORKSPACE_LANGUAGE_KEY, WELCOME_LANGUAGE_KEY, WORKSPACE_LANGUAGES,
+  workspaceLanguageInfo, workspaceText, formatText
+} from './workspace-i18n.js?v=3';
 import * as Concepts from './concepts-ladder.js?v=2';
 import * as Products from '/theladder-products/products-ladder.js?v=2';
 import * as UseCases from '/theladder-use-cases/use-cases-ladder.js?v=2';
@@ -227,6 +231,7 @@ let placementEngine = null;
 
 const state = {
   focusId: localStorage.getItem(LS_FOCUS) || 'concepts',
+  languageCode: initialLanguageCode(),
   catalog: null,
   groups: [],
   activeGroupId: null,
@@ -248,6 +253,27 @@ const $ = (id) => document.getElementById(id);
 const setText = (id, v) => { const e = $(id); if (e) e.textContent = v; };
 const focus = () => FOCUSES[state.focusId];
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function initialLanguageCode() {
+  const saved = localStorage.getItem(WORKSPACE_LANGUAGE_KEY) || localStorage.getItem(WELCOME_LANGUAGE_KEY) || 'en';
+  return WORKSPACE_LANGUAGES.some((item) => item.code === saved) ? saved : 'en';
+}
+function languageInfo() { return workspaceLanguageInfo(state.languageCode); }
+function tx() { return workspaceText(state.languageCode); }
+function fmt(template, params = {}) { return formatText(template, params); }
+function languagePromptLabel() { return languageInfo().promptLabel; }
+function languageDirective(area) {
+  const text = tx();
+  const template = area === 'certification' ? text.certification.promptInstruction : text.training.promptInstruction;
+  return fmt(template, { language: languagePromptLabel() });
+}
+function focusDisplayLabel(focusId = state.focusId) {
+  const labels = {
+    concepts: tx().training.concepts,
+    products: tx().training.products,
+    'use-cases': tx().training.useCases
+  };
+  return labels[focusId] || FOCUSES[focusId]?.label || focus().label;
+}
 
 // Chat textareas: Enter sends the prompt, Shift+Enter inserts a newline.
 function enterToSend(textareaId) {
@@ -375,6 +401,7 @@ function clearAssessmentDraft() {
 // =============================================================================
 async function init() {
   setupTheme();
+  setupWorkspaceLanguage();
   setupNavActions();
   setupFocusToggle();
   setupAssessment();
@@ -404,6 +431,7 @@ async function init() {
   renderMarketing();
   renderLadderL();
   renderProfile();
+  applyWorkspaceLanguage();
 }
 
 function hydrate(rec) {
@@ -438,11 +466,177 @@ function setupTheme() {
     sync();
   });
   sync();
-  // minimal language select (placeholder — unified i18n is a follow-up)
+}
+
+function setNodeText(selector, value) {
+  const node = document.querySelector(selector);
+  if (node && value !== undefined) node.textContent = value;
+}
+
+function setNodesText(selector, values) {
+  document.querySelectorAll(selector).forEach((node, index) => {
+    if (values[index] !== undefined) node.textContent = values[index];
+  });
+}
+
+function setNodeAttr(selector, attr, value) {
+  const node = document.querySelector(selector);
+  if (node && value !== undefined) node.setAttribute(attr, value);
+}
+
+function setupWorkspaceLanguage() {
   const lang = $('l2Lang');
-  if (lang && !lang.options.length) {
-    lang.innerHTML = '<option value="en">English</option>';
-  }
+  if (!lang) return;
+  lang.innerHTML = WORKSPACE_LANGUAGES.map((item) =>
+    `<option value="${escapeHtml(item.code)}">${escapeHtml(item.label)}</option>`
+  ).join('');
+  lang.value = state.languageCode;
+  lang.addEventListener('change', () => {
+    state.languageCode = lang.value;
+    localStorage.setItem(WORKSPACE_LANGUAGE_KEY, state.languageCode);
+    localStorage.setItem(WELCOME_LANGUAGE_KEY, state.languageCode);
+    applyWorkspaceLanguage();
+    renderRail();
+    renderActiveItem();
+    renderAuthGates();
+    renderHeroSignup();
+    renderMarketing();
+    renderProfile();
+  });
+}
+
+function applyWorkspaceLanguage() {
+  const t = tx();
+  const info = languageInfo();
+  document.documentElement.lang = info.code;
+  document.documentElement.dir = info.dir || 'ltr';
+  document.body.dir = info.dir || 'ltr';
+  document.title = t.metaTitle;
+  setNodeAttr('meta[name="description"]', 'content', t.metaDescription);
+  setNodeAttr('meta[property="og:title"]', 'content', t.metaTitle);
+  setNodeAttr('meta[property="og:description"]', 'content', t.metaDescription);
+  setNodeAttr('meta[name="twitter:title"]', 'content', t.metaTitle);
+  setNodeAttr('meta[name="twitter:description"]', 'content', t.metaDescription);
+
+  const lang = $('l2Lang');
+  if (lang) lang.value = state.languageCode;
+
+  setNodesText('.l2-navlink[href="#profile"]', [t.nav.profile]);
+  setNodesText('.l2-navlink[href="#assessment"]', [t.nav.assessment]);
+  setNodesText('.l2-navlink[href="#training"]', [t.nav.training]);
+  setNodesText('.l2-navlink[href="#certification"]', [t.nav.certification]);
+  setNodesText('.l2-navlink[href="#support"]', [t.nav.support]);
+
+  setNodeText('#marketing .eyebrow', t.marketing.eyebrow);
+  setNodesText('.hero-cascade-line', t.marketing.cascade.slice(0, 3));
+  setNodeText('.hero-cascade-final', t.marketing.cascade[3]);
+  setNodeText('.l2-hero-primary-cta', t.marketing.cta);
+  setNodeText('.why-trust-title', t.marketing.trustTitle);
+  setNodesText('.why-trust-list li', t.marketing.trust);
+  setNodeText('.ladder-stairs-caption', t.marketing.broughtBy);
+  setNodeText('.l2-signup-eyebrow', t.marketing.signupEyebrow);
+  setNodeAttr('#l2SignupEmail', 'placeholder', t.marketing.emailPlaceholder);
+  setNodeAttr('#l2SigninEmail', 'placeholder', t.marketing.email);
+  setNodeAttr('#l2SigninPw', 'placeholder', t.marketing.password);
+  setNodeText('#l2SignupForm button[type="submit"]', t.marketing.signup);
+  setNodeText('#l2SigninToggle', t.marketing.signinToggle);
+  setNodeText('#l2SigninForm button[type="submit"]', t.marketing.signin);
+  setNodeText('#l2AccountSignOut', t.marketing.signout);
+  setNodeText('#l2HeroSignOut', t.marketing.signout);
+  const signedInLabel = document.querySelector('#l2SignedIn span');
+  if (signedInLabel?.firstChild) signedInLabel.firstChild.textContent = `${t.marketing.signedInAs} `;
+
+  setNodeText('#profile .l2-eyebrow', t.profile.eyebrow);
+  setNodeText('#profile .l2-section-title', t.profile.title);
+  setNodeText('#profile .l2-section-lead', t.profile.lead);
+  setNodeText('.l2-learner-id-label', t.profile.learnerId);
+  setNodeText('.hero-cert-label', t.profile.certsEarned);
+  setNodesText('.hero-progress-label', [t.profile.tiersCompleted, t.profile.tiersPlacedOut]);
+  setNodesText('.hero-cert-name', [t.profile.core, t.profile.expert, t.profile.mastery]);
+  setNodeText('.l2-cert-strip .l2-btn', t.profile.viewRecord);
+  setNodeText('#l2OpenCoursesCard .l2-card-title', t.profile.openCourses);
+
+  setNodeText('#assessment .l2-eyebrow', t.assessment.eyebrow);
+  setNodeText('#assessment .l2-section-title', t.assessment.title);
+  setNodeText('#assessment .l2-section-lead', t.assessment.lead);
+  setNodeText('#l2PlacementToolbar .placement-summary .panel-label', t.assessment.panel);
+  setNodeText('#l2PlacementStatus', t.assessment.notPlaced);
+  setNodeText('#l2PlacementSummary', t.assessment.summary);
+  setNodeText('#l2PlacementToolbar .assessment-chat-head .panel-label', t.assessment.conversation);
+  setNodeText('#l2StartPlacement', t.assessment.start);
+  setNodeText('#l2ResetPlacement', t.assessment.reset);
+  setNodeAttr('#l2AssessInput', 'placeholder', t.assessment.placeholder);
+  setNodeText('#l2AssessSend', t.assessment.send);
+  setNodeText('#l2AssessmentDone strong', t.assessment.complete);
+  setNodeText('#l2AssessmentDone p', t.assessment.completeCopy);
+  setNodeText('#l2AssessmentDone .l2-btn', t.assessment.continueTraining);
+
+  setNodeText('#training .l2-eyebrow', t.training.eyebrow);
+  setNodeText('#training .l2-section-title', t.training.title);
+  setNodeText('#l2TrainingGate .panel-label', t.training.gateLabel);
+  setNodeText('#l2TrainingGate h3', t.training.gateTitle);
+  setNodeText('#l2TrainingGate p', t.training.gateCopy);
+  setNodeText('#l2TrainingGate .l2-btn', t.training.signInBelow);
+  setNodeText('#training .training-left-column > .l2-section-lead', t.training.lead);
+  setNodesText('#l2FocusToggle .l2-focus-btn', [t.training.concepts, t.training.products, t.training.useCases]);
+  setNodeAttr('.training-nav-panel', 'aria-label', t.training.navLabel);
+  setNodeAttr('.training-tier-picker', 'aria-label', t.training.tierSelection);
+  setNodeText('#l2StartChat', t.training.startConversation);
+  setNodeText('#l2ResetChat', t.training.reset);
+  setNodeAttr('#l2ChatInput', 'placeholder', t.training.chatPlaceholder);
+  setNodeText('#l2ChatForm button[type="submit"]', t.training.send);
+  setNodeText('.training-text-size span', t.training.textSize);
+  setNodeAttr('.training-standards-eval', 'aria-label', t.training.evalOptions);
+  setNodesText('.training-eval-check span', [t.training.eduEval, t.training.employEval]);
+  setNodeText('#l2RunStandardsEval', t.training.runEval);
+  setNodeText('.training-eval-action p', t.training.evalCopy);
+
+  setNodeText('#certification .l2-eyebrow', t.certification.eyebrow);
+  setNodeText('#certification .l2-section-title', t.certification.title);
+  setNodeText('#certification .certification-left-column > .l2-section-lead', t.certification.lead);
+  setNodeAttr('.certification-nav-panel', 'aria-label', t.certification.navLabel);
+  setNodeAttr('.certification-tier-picker', 'aria-label', t.certification.selection);
+  setNodeText('#l2CertSetupPanel > .panel-label', t.certification.certifyThisRung);
+  setNodeText('#l2CertTarget', t.certification.target);
+  setNodesText('#l2CertSetupPanel .evaluation-field span', [t.certification.level, t.certification.masteryLevel, t.certification.identity, t.certification.proctoring]);
+  setNodeText('#l2IdentityAttestLabel span', t.certification.identityAttest);
+  setNodeText('#l2AccountGate h3', t.certification.account);
+  setNodeText('#l2AccountMsg', t.certification.accountMsg);
+  setNodeText('#l2AdultAttestLabel span', t.certification.adultAttest);
+  setNodeAttr('#l2AccountEmail', 'placeholder', t.certification.emailPlaceholder);
+  setNodeAttr('#l2AccountPassword', 'placeholder', t.certification.passwordPlaceholder);
+  setNodeText('#l2AccountSignIn', t.certification.signIn);
+  setNodeText('#l2AccountCreate', t.certification.createAccount);
+  setNodeText('#l2AccountConfirmAdult', t.certification.confirmAdult);
+  setNodeText('#l2StartCert', t.certification.start);
+  setNodeText('.certification-record-link a', t.certification.record);
+  setNodeText('#l2CertExamTitle', t.certification.examTitle);
+  setNodeText('#l2CertExamSummary', t.certification.examSummary);
+  setNodeText('#l2CertModeBar .panel-label', t.certification.inProgress);
+  setNodeText('#l2FinalizeCert', t.certification.finalize);
+  setNodeText('#l2FinalizeCert + p', t.certification.finalizeCopy);
+  setNodeText('#l2EndCert', t.certification.end);
+  setNodeText('#l2EndCert + p', t.certification.endCopy);
+  setNodeAttr('#l2CertInput', 'placeholder', t.certification.placeholder);
+  setNodeText('#l2CertForm button[type="submit"]', t.certification.send);
+
+  const footerCta = document.querySelector('.l2-footer-cta a');
+  if (footerCta) footerCta.textContent = t.support.footerCta;
+  setNodeText('.l2-footer-support .panel-label', t.support.label);
+  setNodeText('.l2-footer-support h3', t.support.title);
+  setNodeText('label[for="l2FeedbackType"]', t.support.topic);
+  setNodesText('#l2FeedbackType option', t.support.options);
+  setNodeText('label[for="l2FeedbackEmail"]', t.support.email);
+  setNodeAttr('#l2FeedbackEmail', 'placeholder', t.support.emailPlaceholder);
+  setNodeText('label[for="l2FeedbackMessage"]', t.support.message);
+  setNodeAttr('#l2FeedbackMessage', 'placeholder', t.support.messagePlaceholder);
+  setNodeText('#l2FeedbackForm button', t.support.send);
+  setNodeText('#l2FeedbackSent', t.support.sent);
+  setNodeText('.l2-footer-grid p', t.support.footerCopy);
+  setNodeText('.l2-footer-col h4', t.support.linksTitle);
+  setNodesText('.l2-footer-col:nth-of-type(2) a', [t.support.placement, t.support.training, t.support.certification, t.support.support, t.support.profile]);
+  setNodeText('.l2-footer-col:nth-of-type(3) h4', t.support.academy);
+  setNodeText('.l2-footer-col:nth-of-type(3) a', t.support.record);
 }
 
 function setupNavActions() {
@@ -528,7 +722,7 @@ async function activateFocus(focusId) {
   setText('l2FocusLabel', focus().label);
   setText('l2CertFocusLabel', focus().label);
 
-  $('l2GroupStatus').textContent = 'Loading rungs…';
+  $('l2GroupStatus').textContent = tx().training.loadingRungs;
   state.catalog = await focus().loadCatalog();
   state.groups = focus().buildGroups(state.catalog);
   placementEngine = createPlacementEngine(focus().placementDescriptor(state.catalog));
@@ -574,7 +768,7 @@ function setupTrainingTextScale() {
 function activeGroup() { return state.groups.find((g) => g.id === state.activeGroupId) || state.groups[0]; }
 function activeItem() { const g = activeGroup(); return g?.items.find((i) => i.id === state.activeItemId) || g?.items[0]; }
 function trainingDescriptionFor(it) {
-  if (!it) return 'Pick a rung to see what the conversation will cover.';
+  if (!it) return tx().training.descriptionFallback;
   const raw = it.raw || {};
   const description = raw.description || raw.reason || raw.summary || raw.outcome || raw.depth || '';
   if (description) return description;
@@ -826,6 +1020,9 @@ function buildTrainingSystemPrompt(it, group, standard = null) {
     ? `Global pedagogy: ${state.trainingPedagogy.name || 'AESOP guided training pedagogy'}\nPrinciples: ${listText(state.trainingPedagogy.principles || [], 8)}\nLesson arc: ${listText((state.trainingPedagogy.lessonArc || []).map((step) => `${step.id}: ${step.purpose}`), 8)}`
     : 'Global pedagogy: use the AESOP guided lesson arc below.';
   return `You are the AESOP AI Academy training guide for a guided lesson, not an examiner and not a generic Q&A assistant.
+
+Preferred language: ${languagePromptLabel()}.
+${languageDirective('training')}
 
 ${pedagogy}
 
@@ -1229,17 +1426,17 @@ function renderRungPicker(ids) {
   if (!rail || !selectedRungs) return;
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
-  setText(ids.focusLabel, focus().label);
-  setText(ids.status, `${done}/${total} training rungs completed in ${focus().label}`);
+  setText(ids.focusLabel, focusDisplayLabel());
+  setText(ids.status, `${done}/${total} - ${focusDisplayLabel()}`);
   const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
   const active = state.groups[activeIndex];
   const summary = $(ids.summary);
-  if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : 'Choose a tier';
+  if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : tx().training.chooseTier;
   rail.innerHTML = state.groups.map((g, i) =>
     `<button class="l2-tier-option ${g.id === state.activeGroupId ? 'is-active' : ''}" data-group="${g.id}" type="button">
       <span class="l2-rail-num">${i + 1}</span>
       <span class="l2-tier-meta">
-        <small>${g.items.length} rungs</small>
+        <small>${g.items.length}</small>
         <strong>${escapeHtml(g.label)}</strong>
       </span>
     </button>`).join('');
@@ -1283,17 +1480,17 @@ function renderRail() {
 
 function renderActiveItem() {
   const g = activeGroup(); const it = activeItem();
-  if ($('l2ActiveGroupLabel')) $('l2ActiveGroupLabel').textContent = g ? g.label : focus().label;
+  if ($('l2ActiveGroupLabel')) $('l2ActiveGroupLabel').textContent = g ? g.label : focusDisplayLabel();
   if ($('l2ActiveItemTitle')) $('l2ActiveItemTitle').textContent = it ? it.label : 'Select a rung';
   if ($('l2ChatSummary')) {
     $('l2ChatSummary').textContent = it
-      ? `Learn "${it.label}" through a guided conversation. The guide teaches, challenges, applies, and checks readiness.`
-      : 'Pick a rung from the list to begin.';
+      ? fmt(tx().training.learnSummary, { item: it.label })
+      : tx().training.pickRungToBegin;
   }
   if ($('l2RungDescription')) $('l2RungDescription').textContent = trainingDescriptionFor(it);
   if ($('l2CertRungDescription')) $('l2CertRungDescription').textContent = it
-    ? `Certification will examine this rung: ${trainingDescriptionFor(it)}`
-    : 'Pick a rung to see what the exam will cover.';
+    ? fmt(tx().certification.willExamine, { description: trainingDescriptionFor(it) })
+    : tx().certification.pickRungExam;
   renderChat($('l2ChatLog'), state.trainMessages);
   renderCertTarget();
 }
@@ -1394,7 +1591,7 @@ function setupAssessment() {
     state.assessMessages = []; state.placement = null;
     clearAssessmentDraft();
     document.body.classList.remove('placement-complete');
-    $('l2PlacementStatus').textContent = 'Not placed yet';
+    $('l2PlacementStatus').textContent = tx().assessment.notPlaced;
     if ($('l2AssessInput')) $('l2AssessInput').value = '';
     renderChat($('l2AssessLog'), state.assessMessages);
     renderPlacementProgress();
@@ -1429,7 +1626,7 @@ async function submitAssessment(e) {
   saveAssessmentDraft();
   const raw = await askModel({
     messages: state.assessMessages,
-    systemPrompt: placementEngine.buildSystemPrompt({ languageLabel: 'English' }),
+    systemPrompt: placementEngine.buildSystemPrompt({ languageLabel: languagePromptLabel() }),
     maxTokens: 800
   });
   const { placement, visibleText } = placementEngine.parsePlacementResponse(raw);
@@ -1442,8 +1639,8 @@ async function submitAssessment(e) {
 
 function applyPlacement(placement) {
   state.placement = placement;
-  $('l2PlacementStatus').textContent = 'Placement complete';
-  $('l2PlacementSummary').textContent = placement.reasoning || 'Your placed-out tiers and assigned rungs are saved.';
+  $('l2PlacementStatus').textContent = tx().assessment.complete;
+  $('l2PlacementSummary').textContent = placement.reasoning || tx().assessment.completeCopy;
   document.body.classList.add('placement-complete');
   clearAssessmentDraft();
   saveLearnerProgress(focus().pathway, {
@@ -1454,7 +1651,7 @@ function applyPlacement(placement) {
 }
 
 function renderPlacementProgress() {
-  $('l2AssessTurns').textContent = `${learnerTurns()} responses`;
+  $('l2AssessTurns').textContent = `${learnerTurns()} ${tx().assessment.responses}`;
   const pct = Math.min(100, Math.round((learnerTurns() / 6) * 100));
   const bar = $('l2AssessProgressBar');
   if (bar) bar.style.width = `${pct}%`;
@@ -1546,6 +1743,7 @@ function renderIdentityGate() {
 
 // --- simplified account gate (prototype auth: local identity bound to email) ---
 function renderAuthGates() {
+  const t = tx();
   const signedIn = Boolean(state.authUser);
   const adultTier = ADULT_TIERS.has(selectedLevel());
 
@@ -1559,11 +1757,11 @@ function renderAuthGates() {
   const status = $('l2AccountStatus');
   const msg = $('l2AccountMsg');
   if (acctGate) acctGate.hidden = signedIn || !adultTier;
-  if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Account required' : 'Account optional';
+  if (status) status.textContent = signedIn ? fmt(t.auth.signedIn, { email: state.authUser.email }) : adultTier ? t.auth.accountRequired : t.auth.accountOptional;
   if (msg) msg.textContent = signedIn
-    ? 'Your certification attempt and transcript evidence will be saved to this account.'
-    : adultTier ? 'This certification path requires a signed-in account before certifying.'
-      : 'Sign in to save certifications to your transcript (optional for non-adult tiers).';
+    ? t.auth.accountSaved
+    : adultTier ? t.auth.accountRequiredMsg
+      : t.auth.accountOptionalMsg;
   if (acctForm) acctForm.hidden = signedIn;
   $('l2AccountSignOut').hidden = !signedIn;
   $('l2AdultAttestLabel').hidden = !adultTier || signedIn;
@@ -1616,20 +1814,20 @@ function setStatus(id, message, kind) {
 async function sendVerification(email, statusId) {
   const clean = String(email || '').trim();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) {
-    setStatus(statusId, 'Enter a valid email address.', 'error');
+    setStatus(statusId, tx().auth.invalidEmail, 'error');
     return;
   }
   if (!auth) {
-    setStatus(statusId, 'Sign-up is unavailable right now. Please try again shortly.', 'error');
+    setStatus(statusId, tx().auth.unavailable, 'error');
     return;
   }
   try {
     const actionCodeSettings = { url: `${location.origin}/components/create-account.html`, handleCodeInApp: true };
     await sendSignInLinkToEmail(auth, clean, actionCodeSettings);
     localStorage.setItem(LS_EMAIL, clean);
-    setStatus(statusId, `Check <b>${escapeHtml(clean)}</b> for a link to verify your email and finish creating your account.`, 'ok');
+    setStatus(statusId, fmt(tx().auth.checkEmail, { email: escapeHtml(clean) }), 'ok');
   } catch (e) {
-    setStatus(statusId, `Could not send the link (${e.code || 'error'}). Please try again.`, 'error');
+    setStatus(statusId, fmt(tx().auth.sendFailed, { code: e.code || 'error' }), 'error');
   }
 }
 
@@ -1639,7 +1837,7 @@ async function passwordSignIn(email, password, statusId) {
     await signInWithEmailAndPassword(auth, String(email).trim(), password);
     setStatus(statusId, '', '');
   } catch (e) {
-    setStatus(statusId, 'Sign in failed — check your email and password.', 'error');
+    setStatus(statusId, tx().auth.signinFailed, 'error');
   }
 }
 
@@ -1683,7 +1881,7 @@ function renderHeroSignup() {
 
 async function startCertification() {
   const it = activeItem();
-  if (!it) { alert('Pick a rung in Training first.'); return; }
+  if (!it) { alert(tx().auth.pickRungFirst); return; }
   const adultTier = ADULT_TIERS.has(selectedLevel());
   if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
@@ -1692,7 +1890,8 @@ async function startCertification() {
   const certItem = focus().certItemForGroup(activeGroup(), it);
   const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevel(), depth });
   const standard = await trainingStandardFor(it, activeGroup());
-  blueprint.languageLabel = 'English';
+  blueprint.languageLabel = languagePromptLabel();
+  blueprint.languageExpectation = languageDirective('certification');
   blueprint.depthId = depth.id;
   blueprint.trainingStandardId = standard.id;
   blueprint.requiredVocabulary = standard.vocabulary || [];
@@ -1708,6 +1907,7 @@ async function startCertification() {
   blueprint.activeRung = it.label;
   blueprint.certificationSet = standard.certificationSet || activeGroup()?.label || focus().label;
   const context = focus().buildCertContext({ item: certItem, depth, learnerId: state.authUser?.uid || '' });
+  context.languageLabel = languagePromptLabel();
   context.trainingStandardId = standard.id;
   context.requiredVocabulary = standard.vocabulary || [];
   context.specificTopics = standard.topics || [];
@@ -1727,7 +1927,7 @@ async function startCertification() {
   if ($('l2CertSetupPanel')) $('l2CertSetupPanel').hidden = true;
   if ($('l2CertExamPanel')) $('l2CertExamPanel').hidden = false;
   $('l2CertModeBar').hidden = false;
-  $('l2CertExamSummary').textContent = `Examining: ${it.label} — ${selectedLevel()}, ${depth.label}. An independent model validates the result before any credential is recorded.`;
+  $('l2CertExamSummary').textContent = `Examining: ${it.label} - ${selectedLevel()}, ${depth.label}. An independent model validates the result before any credential is recorded.`;
   renderChat($('l2CertLog'), []);
   await callExaminer();
 }
@@ -1749,7 +1949,7 @@ async function callExaminer() {
 
 async function submitCertChat(e) {
   e.preventDefault();
-  if (!state.activeCert) { alert('Start certification first.'); return; }
+  if (!state.activeCert) { alert(tx().auth.startCertFirst); return; }
   const input = $('l2CertInput');
   const content = input.value.trim();
   if (!content) return;
@@ -1927,14 +2127,14 @@ function renderOpenCourses() {
   if (!wrap) return;
   const list = openCourses();
   if (!list.length) {
-    wrap.innerHTML = '<p class="l2-open-empty">No open courses yet — pick a rung in Training to begin a guided conversation.</p>';
+    wrap.innerHTML = `<p class="l2-open-empty">${escapeHtml(tx().profile.noOpenCourses)}</p>`;
     return;
   }
   wrap.innerHTML = '<ul class="l2-open-list">' + list.map((c) =>
     `<li class="l2-open-item">
        <span class="l2-open-title">${escapeHtml(c.title)}</span>
        <button class="l2-open-resume" type="button"
-         data-focus="${escapeHtml(c.focusId)}" data-group="${escapeHtml(c.groupId || '')}" data-item="${escapeHtml(c.itemId)}">Resume</button>
+         data-focus="${escapeHtml(c.focusId)}" data-group="${escapeHtml(c.groupId || '')}" data-item="${escapeHtml(c.itemId)}">${escapeHtml(tx().profile.resume)}</button>
      </li>`).join('') + '</ul>';
   wrap.querySelectorAll('.l2-open-resume').forEach((b) => b.addEventListener('click', () =>
     resumeCourse(b.dataset.focus, b.dataset.group, b.dataset.item)));
