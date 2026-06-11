@@ -6361,7 +6361,23 @@ body.l2 .ladder-nav {
   box-sizing: border-box;
   position: relative;
 }
-body.l2 .nav-brand-group { flex: 0 0 auto; }   /* empty logo slot, left */
+body.l2 {
+  --l2-nav-logo-size: 44px;
+  --l2-nav-word-top: 0.43in;
+  --l2-nav-word-center-adjust: calc(0.85rem + 6px);
+  --l2-nav-logo-edge: calc(var(--l2-nav-word-top) + var(--l2-nav-word-center-adjust) - (var(--l2-nav-logo-size) / 2));
+}
+body.l2 .nav-brand-group {
+  position: absolute;
+  top: var(--l2-nav-logo-edge);
+  left: var(--l2-nav-logo-edge);
+  z-index: 220;
+  flex: 0 0 auto;
+}
+body.l2 .nav-brand-logo {
+  width: var(--l2-nav-logo-size);
+  height: var(--l2-nav-logo-size);
+}
 /* Two equal zones split at the page center: links right-aligned to (center-0.5in),
    actions left-aligned to (center+0.5in) -> the gap between Certification and
    English is centered over the middle ornament's two circles. */
