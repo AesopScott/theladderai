@@ -388,6 +388,38 @@ body.l2 .l2-profile-lead-row .l2-section-lead { margin-bottom: 0; }
   body.l2 .l2-profile-lead-row { flex-direction: column; gap: 1.2rem; }
   body.l2 .l2-profile-lead-row .l2-learner-id { text-align: left; }
 }
+/* Profile → Open courses: bulleted list, title only + inline Resume */
+body.l2 .l2-open-courses-block { margin-top: 1.6rem; }
+body.l2 .l2-open-courses-block .panel-label { margin-bottom: 0.9rem; }
+body.l2 .l2-open-list {
+  list-style: disc;
+  padding-left: 1.4rem;
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+body.l2 .l2-open-item {
+  color: var(--l2-ink);
+  font-size: 1.15rem;
+  line-height: 1.4;
+}
+body.l2 .l2-open-item::marker { color: var(--l2-gold); }
+body.l2 .l2-open-resume {
+  margin-left: 0.9rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--l2-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--l2-gold-deep);
+  vertical-align: 0.06em;
+}
+body.l2 .l2-open-resume:hover { text-decoration: underline; }
+body.l2 .l2-open-empty { color: var(--l2-ink-2); font-size: 1.08rem; margin: 0; }
 
 /* ============================================================
    1 · MARKETING — open editorial hero
@@ -780,6 +812,20 @@ body.l2.placement-complete #assessment .ladder-toolbar { display: none; }
 body.l2.placement-complete .l2-assessment-done { display: flex; }
 body.l2 .l2-assessment-done strong { font-family: var(--l2-display); font-weight: 800; font-size: 1.5rem; color: var(--l2-ink); display: block; }
 
+/* Assessment body copy sized up ~1.5x for readability. The section title and
+   the Start assessment button are intentionally left alone (handled separately). */
+body.l2 #assessment .l2-section-lead { font-size: 1.6rem; line-height: 1.6; }
+body.l2 #assessment .panel-label { font-size: 1.05rem; }
+body.l2 #assessment .placement-summary p,
+body.l2 #assessment #l2PlacementSummary { font-size: 1.35rem; line-height: 1.6; }
+body.l2 #assessment #l2PlacementStatus { font-size: 2.1rem; }
+body.l2 #assessment .assessment-chat-head strong { font-size: 1.15rem; }
+body.l2 #assessment .l2-msg__role { font-size: 0.85rem; }
+body.l2 #assessment .l2-msg__body { font-size: 1.35rem; line-height: 1.65; }
+body.l2 #assessment .assessment-form textarea { font-size: 1.35rem; }
+body.l2 #assessment #l2ResetPlacement,
+body.l2 #assessment #l2AssessSend { font-size: 1.15rem; }
+
 /* ============================================================
    4 · TRAINING — text-tab focus toggle + open rail
    ============================================================ */
@@ -1010,12 +1056,15 @@ body.l2 .l2-signup-signin {
 }
 body.l2 .l2-signup-signin:hover { text-decoration: underline; }
 body.l2 .l2-signed-in {
-  display: flex; gap: 1rem; align-items: center; justify-content: center;
+  display: flex; gap: 1rem; align-items: baseline; justify-content: center;
   font-size: 1rem; color: var(--l2-ink);
 }
-/* the sign-out button inherits a stacked-layout margin-top; drop it so it
-   sits on the same line as the "Signed in as…" text */
-body.l2 .l2-signed-in .l2-signup-signin { margin-top: 0; line-height: 1; }
+/* the sign-out button inherits a stacked-layout margin-top (and has uppercase
+   padding + a 2px ::after underline). Drop the margin and the button's vertical
+   padding so its text baseline lines up with the "Signed in as…" text. */
+body.l2 .l2-signed-in .l2-signup-signin {
+  margin-top: 0; padding-top: 0; padding-bottom: 0; line-height: 1;
+}
 @media (max-width: 560px) {
   body.l2 .l2-signup-form, body.l2 .l2-signin-form { flex-direction: column; }
   body.l2 .l2-signup-btn { padding: 0.9rem; }
