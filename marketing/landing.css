@@ -5,6 +5,7 @@
   --muted: #5d6874;
   --line: #e5dfd4;
   --gold: #c9a05a;
+  --gold-text: #7a5520;
   --gold-2: #dbb87a;
   --cream: #faf8f4;
   --paper: #ffffff;
@@ -42,6 +43,34 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  padding: 0.7rem 0.9rem;
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--navy);
+  font-weight: 900;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .site-nav {
@@ -298,7 +327,7 @@ a {
 
 .eyebrow {
   margin: 0 0 0.9rem;
-  color: var(--gold);
+  color: var(--gold-text);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.16em;
@@ -361,7 +390,7 @@ h3 {
 
 .hero-signup-eyebrow {
   margin: 0 0 0.5rem;
-  color: var(--gold);
+  color: var(--gold-text);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -403,8 +432,13 @@ h3 {
 
 .hero-signup-input:focus {
   outline: none;
-  border-color: var(--gold);
+  border-color: var(--gold-text);
   box-shadow: 0 0 0 3px rgba(201, 160, 90, 0.2);
+}
+
+.hero-signup-input:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .hero-signup-btn {
@@ -444,7 +478,7 @@ h3 {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font: inherit;
   font-weight: 900;
   cursor: pointer;
@@ -523,7 +557,7 @@ h3 {
 }
 
 .trust-strip--dark small {
-  color: rgba(241, 236, 226, 0.74);
+  color: #f8f3e8;
 }
 
 .section {
@@ -612,6 +646,12 @@ h3 {
 .employers h2,
 .employers h3 {
   color: #fff;
+}
+
+.how .eyebrow,
+.proof .eyebrow,
+.employers .eyebrow {
+  color: #f8f3e8;
 }
 
 .employers .outcomes p,
@@ -780,6 +820,35 @@ h3 {
   margin-bottom: 0.7rem;
 }
 
+.policy-docs {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid rgba(13, 27, 42, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 36px rgba(13, 27, 42, 0.05);
+}
+
+.policy-docs h3 {
+  margin-bottom: 0.75rem;
+}
+
+.policy-docs ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem 1rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.policy-docs a {
+  color: var(--gold-text);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 .final-cta {
   padding: clamp(1.5rem, 3.6vw, 3rem);
   border-radius: 8px;
@@ -852,6 +921,7 @@ h3 {
   .employer-grid,
   .standards-grid,
   .faq-grid,
+  .policy-docs ul,
   .trust-strip {
     grid-template-columns: 1fr;
   }

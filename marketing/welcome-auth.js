@@ -32,17 +32,27 @@ function setStatus(message = '', kind = '') {
   else node.textContent = message;
 }
 
+function setShown(id, shown, mode) {
+  const node = $(id);
+  if (!node) return;
+  node.hidden = !shown;
+  node.style.display = shown ? mode : 'none';
+}
+
+function setSigninExpanded(expanded) {
+  const toggle = $('l2SigninToggle');
+  setShown('l2SigninForm', expanded, 'flex');
+  if (toggle) toggle.setAttribute('aria-expanded', String(expanded));
+  if (expanded) $('l2SigninEmail')?.focus();
+}
+
 function showSignedIn(user) {
   const signedIn = Boolean(user);
-  const setDisplay = (id, shown, mode) => {
-    const node = $(id);
-    if (node) node.style.display = shown ? mode : 'none';
-  };
 
-  setDisplay('l2SignupForm', !signedIn, 'flex');
-  setDisplay('l2SigninToggle', !signedIn, 'inline-block');
-  setDisplay('l2SigninForm', false, 'flex');
-  setDisplay('l2SignedIn', signedIn, 'flex');
+  setShown('l2SignupForm', !signedIn, 'flex');
+  setShown('l2SigninToggle', !signedIn, 'inline-block');
+  setSigninExpanded(false);
+  setShown('l2SignedIn', signedIn, 'flex');
 
   if (signedIn) {
     localStorage.setItem(LS_ID, user.uid);
@@ -99,13 +109,10 @@ function setupMarketingAuth() {
     sendVerification(auth);
   });
 
-  $('l2SigninToggle')?.addEventListener('click', (event) => {
-    event.preventDefault();
+  $('l2SigninToggle')?.addEventListener('click', () => {
     const form = $('l2SigninForm');
     if (!form) return;
-    const opening = form.style.display !== 'flex';
-    form.style.display = opening ? 'flex' : 'none';
-    if (opening) $('l2SigninEmail')?.focus();
+    setSigninExpanded(form.hidden);
   });
 
   $('l2SigninForm')?.addEventListener('submit', (event) => {
