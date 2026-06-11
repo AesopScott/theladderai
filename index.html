@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="/academy-theme.css?v=2">
   <link rel="stylesheet" href="/academy-dark-mode.css?v=2">
   <link rel="stylesheet" href="/components/ladder.css?v=51">
-  <link rel="stylesheet" href="/components/ladder2.css?v=78">
+  <link rel="stylesheet" href="/components/ladder2.css?v=79">
 </head>
 <body class="l2">
 
@@ -217,9 +217,6 @@
           <span class="panel-label">Placement assessment</span>
           <h2 id="l2PlacementStatus" style="font-family:var(--l2-display);font-size:2rem;margin:0.3rem 0;">Not placed yet</h2>
           <p id="l2PlacementSummary">Start the assessment to test out of tiers and receive assigned rungs based on capability and interest.</p>
-          <div class="placement-actions" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.75rem;">
-            <button id="l2ResetPlacement" class="secondary" type="button">Reset</button>
-          </div>
           <div id="l2PlacementMetrics" class="placement-metrics" style="margin-top:1rem;"></div>
         </div>
         <div class="placement-chat">
@@ -228,7 +225,10 @@
               <span class="panel-label">Assessment conversation</span>
               <strong id="l2AssessTurns">0 responses</strong>
             </div>
-            <button id="l2StartPlacement" class="l2-cta" type="button">Start assessment</button>
+            <div class="assessment-head-actions">
+              <button id="l2StartPlacement" class="l2-cta" type="button">Start assessment</button>
+              <button id="l2ResetPlacement" class="secondary" type="button">Reset</button>
+            </div>
           </div>
           <div id="l2AssessLog" class="assessment-log chat-log" aria-live="polite" tabindex="0" aria-label="Placement assessment conversation"></div>
           <div class="progress-meter" style="margin:0.5rem 0;"><span id="l2AssessProgressBar"></span></div>

@@ -810,6 +810,11 @@ body.l2 #l2PlacementStatus { font-family: var(--l2-display); font-weight: 800; }
    ladder.css already makes .assessment-chat-head flex/space-between but align-items:center,
    which vertically centers the enlarged button; override to flex-start so it sits at the top. */
 body.l2 .assessment-chat-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+/* Group Start assessment + Reset together at the header's upper-right. */
+body.l2 .assessment-head-actions { display: flex; gap: 0.6rem; align-items: center; }
+/* Reset: strip the inherited dark navy fill so it reads as a plain text button beside the gold CTA. */
+body.l2 #l2ResetPlacement { background: none !important; box-shadow: none !important; color: var(--l2-muted) !important; padding: 0.85rem 0.6rem; }
+body.l2 #l2ResetPlacement:hover { background: none !important; color: var(--l2-gold-deep) !important; }
 /* ladder.css styled .placement-toolbar as a dark navy box with white/pale text; ladder2
    makes the toolbar transparent, so re-tint its text to the page ink palette (theme-aware
    vars keep dark mode correct — ink/ink-2 flip to light there). Without this the heading
