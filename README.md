@@ -10,7 +10,7 @@ and public credentials — in a single Fensea-inspired page (AESOP navy/gold on 
 
 - `theladder/ladder2.html` — the unified Ladder (AI Concepts / Products / Use Cases via an
   in-place focus toggle, one learner record). Preview with a static server from the repo
-  root, e.g. `npx serve .`, then open `/theladder/ladder2.html`.
+  root, e.g. `npx serve .`, then open `/`.
 
 ## Layout
 
