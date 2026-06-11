@@ -252,12 +252,23 @@ function isTransientAiMessage(content) {
   return /AI service is temporarily unavailable|could not read the training AI response|could not reach the training AI|training AI returned an error|could not get a training response/i.test(content || '');
 }
 
-function renderChat(el, messages) {
+function renderChat(el, messages, options = {}) {
+  if (!el) return;
   el.innerHTML = messages.map((m) => `
     <div class="l2-msg l2-msg--${m.role === 'user' ? 'user' : 'guide'}">
       <span class="l2-msg__role">${m.role === 'user' ? 'You' : 'Guide'}</span>
       <div class="l2-msg__body">${escapeHtml(m.content).replace(/\n/g, '<br>')}</div>
     </div>`).join('');
+  if (options.scroll === 'latest-assistant') {
+    const assistantMessages = el.querySelectorAll('.l2-msg--guide');
+    const target = assistantMessages[assistantMessages.length - 1];
+    if (target) {
+      const maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
+      const targetTop = target.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop;
+      el.scrollTop = Math.min(maxScroll, Math.max(0, targetTop - 8));
+      return;
+    }
+  }
   el.scrollTop = el.scrollHeight;
 }
 
@@ -914,7 +925,7 @@ async function submitTrainingChat(e) {
       content: 'The AI service is temporarily unavailable. Please try again in a moment.'
     };
   }
-  renderChat($('l2ChatLog'), state.trainMessages);
+  renderChat($('l2ChatLog'), state.trainMessages, { scroll: 'latest-assistant' });
   if (!transientFailure) persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
   if (isDone) markComplete();
 }
@@ -982,7 +993,7 @@ async function submitAssessment(e) {
   });
   const { placement, visibleText } = placementEngine.parsePlacementResponse(raw);
   state.assessMessages.push({ role: 'assistant', content: visibleText });
-  renderChat($('l2AssessLog'), state.assessMessages);
+  renderChat($('l2AssessLog'), state.assessMessages, { scroll: 'latest-assistant' });
   renderPlacementProgress();
   saveAssessmentDraft();
   if (placementEngine.shouldApplyPlacement(placement, learnerTurns())) applyPlacement(placement);
@@ -1258,7 +1269,7 @@ async function callExaminer() {
   });
   const { certificationResult, rubricDimensions, visibleText } = certificationEngine.parseExaminerResponse(raw);
   state.certMessages.push({ role: 'assistant', content: visibleText });
-  renderChat($('l2CertLog'), state.certMessages.filter((m) => m.content));
+  renderChat($('l2CertLog'), state.certMessages.filter((m) => m.content), { scroll: 'latest-assistant' });
   state._pendingResult = certificationResult;
   state._pendingRubric = rubricDimensions;
   if (certificationResult) finalizeCertification(false);
