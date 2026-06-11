@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=29">
+  <link rel="stylesheet" href="/site.css?v=30">
 </head>
 <body class="l2">
 
@@ -353,12 +353,6 @@
         <!-- right: examiner conversation -->
         <section class="topic-column training-chat-column">
         <section class="conversation-panel training-chat-panel certification-chat-panel">
-          <div class="l2-focus-toggle certification-focus-toggle" id="l2CertFocusToggle" role="tablist" aria-label="Certification focus">
-            <button class="l2-focus-btn is-active" data-focus="concepts" role="tab" type="button">AI Concepts</button>
-            <button class="l2-focus-btn" data-focus="products" role="tab" type="button">Products</button>
-            <button class="l2-focus-btn" data-focus="use-cases" role="tab" type="button">Use Cases</button>
-          </div>
-
           <div class="certification-setup-panel" id="l2CertSetupPanel">
             <span class="panel-label">Certify this rung</span>
             <p id="l2CertTarget" class="certification-target">Choose a rung, then set the learner level or professional role for the exam.</p>
@@ -425,9 +419,15 @@
             </div>
             <div id="l2CertModeBar" class="certification-mode-bar" hidden>
               <span class="panel-label">Exam in progress</span>
-              <div class="certification-mode-actions" style="display:flex;gap:0.6rem;margin-top:0.5rem;">
-                <button id="l2FinalizeCert" type="button">Finalize my determination</button>
-                <button id="l2EndCert" class="secondary" type="button">End exam</button>
+              <div class="certification-mode-actions">
+                <div class="certification-mode-action">
+                  <button id="l2FinalizeCert" type="button">Finalize my determination</button>
+                  <p>Ask the examiner to stop questioning and render the certification determination for this attempt.</p>
+                </div>
+                <div class="certification-mode-action">
+                  <button id="l2EndCert" class="secondary" type="button">End exam</button>
+                  <p>Stop this attempt and return to setup without recording a credential.</p>
+                </div>
               </div>
             </div>
             <div id="l2CertLog" class="chat-log" aria-live="polite"></div>
@@ -512,6 +512,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=30"></script>
+  <script type="module" src="/components/ladder2-app.js?v=31"></script>
 </body>
 </html>
