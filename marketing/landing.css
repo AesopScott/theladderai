@@ -173,7 +173,18 @@ a {
 }
 
 .hero-content {
+  position: relative;
   width: min(660px, 100%);
+}
+
+.hero-ladder-mark {
+  position: absolute;
+  top: clamp(3rem, 6vw, 5.2rem);
+  right: calc(100% + 0.25rem);
+  width: clamp(34px, 3.6vw, 54px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 .hero-grid {
@@ -698,6 +709,10 @@ details p {
 
   .hero-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-ladder-mark {
+    display: none;
   }
 
   .hero::after {
