@@ -102,7 +102,10 @@ function setupMarketingAuth() {
   $('l2SigninToggle')?.addEventListener('click', (event) => {
     event.preventDefault();
     const form = $('l2SigninForm');
-    if (form) form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+    if (!form) return;
+    const opening = form.style.display !== 'flex';
+    form.style.display = opening ? 'flex' : 'none';
+    if (opening) $('l2SigninEmail')?.focus();
   });
 
   $('l2SigninForm')?.addEventListener('submit', (event) => {

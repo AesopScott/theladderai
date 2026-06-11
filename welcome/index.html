@@ -55,14 +55,14 @@
           <p class="hero-signup-eyebrow">Get trained. Get certified.</p>
           <h2>Start learning now.</h2>
           <form class="hero-signup-form" id="l2SignupForm" novalidate>
-            <input id="l2SignupEmail" class="hero-signup-input" type="email" placeholder="Enter your e-mail" autocomplete="email" aria-label="Email address">
+            <input id="l2SignupEmail" class="hero-signup-input" type="email" name="email" placeholder="Enter your e-mail" autocomplete="email" aria-label="Email address">
             <button class="hero-signup-btn" type="submit">Sign Up</button>
           </form>
           <p class="hero-signup-msg" id="l2SignupMsg" hidden role="status"></p>
           <a class="hero-signup-toggle" id="l2SigninToggle" href="#">Already have an account? Sign in</a>
-          <form class="hero-signin-form" id="l2SigninForm" hidden novalidate>
-            <input id="l2SigninEmail" class="hero-signup-input" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
-            <input id="l2SigninPw" class="hero-signup-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+          <form class="hero-signin-form" id="l2SigninForm" autocomplete="on" hidden novalidate>
+            <input id="l2SigninEmail" class="hero-signup-input" type="email" name="username" placeholder="Email" autocomplete="username" aria-label="Email">
+            <input id="l2SigninPw" class="hero-signup-input" type="password" name="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
             <button class="hero-signup-btn" type="submit">Sign in</button>
           </form>
           <div class="hero-signed-in" id="l2SignedIn" hidden>
@@ -302,6 +302,6 @@
     <a href="/workspace/">Workspace</a>
     <span>&copy; 2026 AESOP AI Academy</span>
   </footer>
-  <script type="module" src="/marketing/welcome-auth.js?v=1"></script>
+  <script type="module" src="/marketing/welcome-auth.js?v=2"></script>
 </body>
 </html>
