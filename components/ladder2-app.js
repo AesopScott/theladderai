@@ -37,6 +37,7 @@ const LS_FEEDBACK = 'aesop-ladder2-feedback';
 const LS_AUTH = 'aesop-ladder2-auth';
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
+const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept on the learner's machine
 
 // Learner ID model: a durable, human-facing AESOP-XXXX id is the record key — NEVER
 // the raw Firebase uid. Resolution precedence (see onAuthChange): the id bound to this
@@ -208,6 +209,18 @@ const $ = (id) => document.getElementById(id);
 const setText = (id, v) => { const e = $(id); if (e) e.textContent = v; };
 const focus = () => FOCUSES[state.focusId];
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Chat textareas: Enter sends the prompt, Shift+Enter inserts a newline.
+function enterToSend(textareaId) {
+  const ta = $(textareaId);
+  if (!ta) return;
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      ta.form?.requestSubmit();
+    }
+  });
+}
 
 // =============================================================================
 // PROXY helper (placement / training / examiner share one body shape)
@@ -384,11 +397,58 @@ async function activateFocus(focusId) {
 function setupTraining() {
   $('l2StartChat')?.addEventListener('click', startTrainingChat);
   $('l2ChatForm')?.addEventListener('submit', submitTrainingChat);
+  enterToSend('l2ChatInput');
   $('l2CompleteBtn')?.addEventListener('click', markComplete);
 }
 
 function activeGroup() { return state.groups.find((g) => g.id === state.activeGroupId) || state.groups[0]; }
 function activeItem() { const g = activeGroup(); return g?.items.find((i) => i.id === state.activeItemId) || g?.items[0]; }
+
+// =============================================================================
+// COURSE CONVERSATION STORE
+// Full guided-conversation content is kept locally (localStorage) per course so
+// an open course can be resumed exactly where the learner left off, and the
+// Profile section can list every open (started, not completed) course.
+// =============================================================================
+function courseKey(pathway, itemId) { return `${pathway}:${itemId}`; }
+function loadCourses() {
+  try { return JSON.parse(localStorage.getItem(LS_COURSES) || '{}') || {}; }
+  catch { return {}; }
+}
+function saveCourses(map) {
+  try { localStorage.setItem(LS_COURSES, JSON.stringify(map)); }
+  catch (e) { console.warn('[ladder2] course save failed', e); }
+}
+// Persist the ACTIVE course's full conversation. status: 'open' | 'completed'.
+function persistActiveChat(status) {
+  const it = activeItem(); if (!it) return;
+  const map = loadCourses();
+  const key = courseKey(focus().pathway, it.id);
+  const prev = map[key] || {};
+  map[key] = {
+    focusId: state.focusId,
+    pathway: focus().pathway,
+    itemId: it.id,
+    groupId: state.activeGroupId,
+    title: it.label,
+    messages: state.trainMessages.slice(),   // complete conversation content
+    status: status || prev.status || 'open',
+    updatedAt: new Date().toISOString()
+  };
+  saveCourses(map);
+}
+// Open courses = started, not yet completed; most-recently active first.
+function openCourses() {
+  return Object.values(loadCourses())
+    .filter((c) => c && c.status !== 'completed' && Array.isArray(c.messages) && c.messages.length)
+    .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
+}
+// Saved (resumable) conversation for a course, or null.
+function savedChatFor(pathway, itemId) {
+  const c = loadCourses()[courseKey(pathway, itemId)];
+  return (c && Array.isArray(c.messages) && c.messages.length && c.status !== 'completed')
+    ? c.messages.slice() : null;
+}
 
 function renderRail() {
   const rail = $('l2GroupRail');
@@ -434,8 +494,12 @@ function renderActiveItem() {
 async function startTrainingChat() {
   const it = activeItem();
   if (!it) return;
-  state.trainMessages = [{ role: 'assistant', content: `Let's work through "${it.label}". What do you already know about it, and where would you like to start?` }];
+  // resume the saved conversation for this course if one exists, else open fresh
+  const saved = savedChatFor(focus().pathway, it.id);
+  state.trainMessages = saved || [{ role: 'assistant', content: `Let's work through "${it.label}". What do you already know about it, and where would you like to start?` }];
   renderChat($('l2ChatLog'), state.trainMessages);
+  persistActiveChat('open');   // course is now open (appears in Profile → Open courses)
+  renderProfile();
 }
 
 async function submitTrainingChat(e) {
@@ -457,6 +521,7 @@ async function submitTrainingChat(e) {
   const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim();
   state.trainMessages.push({ role: 'assistant', content: visible });
   renderChat($('l2ChatLog'), state.trainMessages);
+  persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
   if (isDone) markComplete();
 }
 
@@ -464,6 +529,7 @@ function markComplete() {
   const it = activeItem(); if (!it) return;
   const key = `${focus().pathway}:${it.id}`;
   state.completed[key] = true;
+  persistActiveChat('completed');   // retain the conversation, drop it from Open courses
   recordCompletion({
     pathway: focus().pathway, itemId: it.id, itemType: focus().label,
     itemName: it.label, level: '', status: 'completed', source: 'ai_verified',
@@ -486,6 +552,7 @@ function setupAssessment() {
     renderPlacementProgress();
   });
   $('l2AssessForm')?.addEventListener('submit', submitAssessment);
+  enterToSend('l2AssessInput');
 }
 
 function startPlacement() {
@@ -558,6 +625,7 @@ function setupCertification() {
   $('l2AccountSignOut')?.addEventListener('click', signOut);
   $('l2StartCert')?.addEventListener('click', startCertification);
   $('l2CertForm')?.addEventListener('submit', submitCertChat);
+  enterToSend('l2CertInput');
   $('l2FinalizeCert')?.addEventListener('click', () => finalizeCertification(true));
   $('l2EndCert')?.addEventListener('click', endCertification);
 }
@@ -926,11 +994,40 @@ function setupProfile() {
 
 function renderProfile() {
   setText('l2ProfileCertCount', String(certCount()));
-  const it = activeItem();
-  if (it) {
-    setText('l2ActiveCourseTitle', it.label);
-    setText('l2ActiveCourseMeta', `${focus().label} · ${activeGroup()?.label || ''}`);
+  renderOpenCourses();
+}
+
+// Profile → Open courses: a bulleted list of started-but-unfinished courses,
+// title only, each with a Resume button that restores the full conversation.
+function renderOpenCourses() {
+  const wrap = $('l2OpenCourses');
+  if (!wrap) return;
+  const list = openCourses();
+  if (!list.length) {
+    wrap.innerHTML = '<p class="l2-open-empty">No open courses yet — pick a rung in Training to begin a guided conversation.</p>';
+    return;
   }
+  wrap.innerHTML = '<ul class="l2-open-list">' + list.map((c) =>
+    `<li class="l2-open-item">
+       <span class="l2-open-title">${escapeHtml(c.title)}</span>
+       <button class="l2-open-resume" type="button"
+         data-focus="${escapeHtml(c.focusId)}" data-group="${escapeHtml(c.groupId || '')}" data-item="${escapeHtml(c.itemId)}">Resume</button>
+     </li>`).join('') + '</ul>';
+  wrap.querySelectorAll('.l2-open-resume').forEach((b) => b.addEventListener('click', () =>
+    resumeCourse(b.dataset.focus, b.dataset.group, b.dataset.item)));
+}
+
+// Restore focus, rung, and the saved conversation, then jump to Training.
+async function resumeCourse(focusId, groupId, itemId) {
+  await activateFocus(focusId);                 // loads catalog/groups (resets selection + chat)
+  if (state.groups.some((g) => g.id === groupId)) state.activeGroupId = groupId;
+  state.activeItemId = itemId;
+  renderRail();
+  renderActiveItem();
+  const saved = savedChatFor(focus().pathway, itemId) || [];
+  state.trainMessages = saved;
+  renderChat($('l2ChatLog'), state.trainMessages);
+  document.getElementById('training')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 init();
