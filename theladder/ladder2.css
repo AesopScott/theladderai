@@ -771,7 +771,12 @@ body.l2 .placement-toolbar p, body.l2 .placement-toolbar small { color: var(--l2
    level as the description (instead of the description cell stretching to match the tall
    chat box), and keep the conversation compact so the section's centered content leaves
    whitespace at the bottom rather than the chat box reaching the page edge. */
-body.l2 .placement-toolbar { align-items: start; }
+body.l2 .placement-toolbar {
+  align-items: start;
+  /* narrow the description column (cap its right edge) so the conversation window pulls
+     left and sits right next to it; the conversation takes the remaining width. */
+  grid-template-columns: minmax(240px, 22rem) minmax(0, 1fr);
+}
 /* ladder.css pins .placement-chat at min-height:480px (legacy fixed panel); drop that floor
    so the conversation column sizes to its content and rides up with the centered section. */
 body.l2 #assessment .placement-chat { min-height: 0; }
