@@ -13,12 +13,13 @@
  * ========================================================================== */
 
 import { createPlacementEngine } from '/theladder-shared/placement-engine.js';
-import { createCertificationEngine } from '/theladder-shared/certification-engine.js';
+import { createCertificationEngine } from '/theladder-shared/certification-engine.js?v=2';
 import {
   initDataLayer, loadLearnerRecord, saveLearnerProgress,
   recordCompletion, recordCertification,
-  getLearnerId, setLearnerId
-} from '/theladder-shared/data-layer.js?v=2';
+  getLearnerId, setLearnerId,
+  loadTrainingPedagogy, loadTrainingStandard
+} from '/theladder-shared/data-layer.js?v=3';
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getAuth, onAuthStateChanged, sendSignInLinkToEmail,
@@ -27,9 +28,9 @@ import {
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js';
 
 import { LADDER_TIERS } from './ladder-data.js?v=2';
-import * as Concepts from './concepts-ladder.js';
-import * as Products from '/theladder-products/products-ladder.js';
-import * as UseCases from '/theladder-use-cases/use-cases-ladder.js';
+import * as Concepts from './concepts-ladder.js?v=2';
+import * as Products from '/theladder-products/products-ladder.js?v=2';
+import * as UseCases from '/theladder-use-cases/use-cases-ladder.js?v=2';
 
 const PROXY_URL = '/aesop-api/proxy.php';
 const LS_FOCUS = 'aesop-ladder2-focus';
@@ -38,6 +39,21 @@ const LS_AUTH = 'aesop-ladder2-auth';
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
 const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept on the learner's machine
+const LS_ASSESSMENT = 'aesop-ladder2-assessment-draft';
+const LS_TRAINING_TEXT_SCALE = 'aesop-ladder2-training-text-scale';
+const LS_EVALUATIONS = 'aesop-ladder2-standards-evaluations';
+const EVALUATION_SKILLS = {
+  education: {
+    label: 'Education Standards Evaluation',
+    file: '/skills/EDU_eval.md?v=1',
+    families: ['ISTE', 'UNESCO AI Competency Framework', 'EU AI Act', 'NIST AI RMF']
+  },
+  employment: {
+    label: 'Employment Standards Evaluation',
+    file: '/skills/EMPLOY_eval.md?v=1',
+    families: ['O*NET', 'World Economic Forum Future of Jobs']
+  }
+};
 
 // Learner ID model: the Firebase Auth UID is the canonical learner id (Scott's
 // decision — "use the new UIDs"). On sign-in the uid becomes the record key
@@ -59,7 +75,123 @@ const EDUCATION_TIERS = [
   'Elementary', 'Middle School', 'High School',
   'Young Adult', 'College', 'Workforce', 'Leadership'
 ];
-const ADULT_TIERS = new Set(['Young Adult', 'College', 'Workforce', 'Leadership']);
+const PROFESSIONAL_ROLES = [
+  {
+    id: 'ai-developer',
+    label: 'AI Developer',
+    source: 'O*NET 15-1255+',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Develop AI applications, write code for AI systems, and implement models.',
+    roleSpec: 'Evaluate programming fluency, AI/ML framework awareness, implementation judgment, testing habits, documentation, and the ability to turn requirements into working AI solutions.'
+  },
+  {
+    id: 'machine-learning-engineer',
+    label: 'Machine Learning Engineer',
+    source: 'O*NET 15-1255+',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Design, train, validate, optimize, and deploy machine learning systems.',
+    roleSpec: 'Evaluate model design, data preprocessing, feature engineering, evaluation metrics, validation, production ML lifecycle, scalability, and deployment tradeoffs.'
+  },
+  {
+    id: 'data-scientist',
+    label: 'Data Scientist',
+    source: 'O*NET 15-2051.00',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Analyze data, develop predictive models, and communicate usable insights.',
+    roleSpec: 'Evaluate statistical reasoning, data cleaning, modeling, visualization, business translation, bias awareness, and communication to non-technical stakeholders.'
+  },
+  {
+    id: 'ai-operations-engineer',
+    label: 'AI Operations Engineer',
+    source: 'WEF Future of Jobs 2025',
+    standards: 'WEF, NIST AI RMF, ISO/IEC 42001',
+    description: 'Deploy, monitor, maintain, and troubleshoot production AI systems.',
+    roleSpec: 'Evaluate MLOps, monitoring, incident response, model drift, versioning, cloud/container operations, reliability, and operational risk management.'
+  },
+  {
+    id: 'ai-product-manager',
+    label: 'AI Product Manager',
+    source: 'WEF Future of Jobs 2025',
+    standards: 'WEF, O*NET Product Management',
+    description: 'Define AI product strategy, prioritize features, and manage roadmaps.',
+    roleSpec: 'Evaluate AI product judgment, use-case feasibility, roadmap decisions, stakeholder communication, user research, responsible AI implications, and outcome metrics.'
+  },
+  {
+    id: 'ai-educator',
+    label: 'AI Educator',
+    source: 'O*NET 25-1021.00',
+    standards: 'O*NET, UNESCO, ISTE',
+    description: 'Teach AI concepts, design curriculum, and train learners.',
+    roleSpec: 'Evaluate conceptual accuracy, explanation across levels, curriculum design, assessment design, facilitation, feedback, responsible AI, and learner support.'
+  },
+  {
+    id: 'ai-security-specialist',
+    label: 'AI Security Specialist',
+    source: 'O*NET 15-3121.00',
+    standards: 'O*NET, NIST AI RMF, OWASP',
+    description: 'Secure AI systems through threat modeling, testing, and mitigation.',
+    roleSpec: 'Evaluate AI threat knowledge, prompt-injection awareness, data poisoning, model theft, privacy, red teaming, secure architecture, and mitigation strategy.'
+  },
+  {
+    id: 'ai-governance-officer',
+    label: 'AI Governance Officer',
+    source: 'WEF Future of Jobs 2025',
+    standards: 'WEF, NIST AI RMF, EU AI Act',
+    description: 'Lead AI policy, compliance, ethics, risk, and governance frameworks.',
+    roleSpec: 'Evaluate governance design, risk assessment, bias and transparency controls, policy implementation, audit trails, regulatory awareness, and stakeholder decision-making.'
+  },
+  {
+    id: 'ai-consultant',
+    label: 'AI Consultant',
+    source: 'O*NET 13-1111.00',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Advise organizations on AI readiness, strategy, and implementation.',
+    roleSpec: 'Evaluate AI strategy, readiness assessment, roadmap planning, change management, use-case selection, risk framing, and executive communication.'
+  },
+  {
+    id: 'executive-leadership',
+    label: 'Executive Leadership',
+    source: 'WEF, NIST AI RMF',
+    standards: 'WEF, NIST AI RMF, EU AI Act',
+    description: 'Set AI vision, transformation strategy, governance, and investment direction.',
+    roleSpec: 'Evaluate strategic AI literacy, business impact, governance accountability, risk ownership, team leadership, ROI judgment, and responsible transformation.'
+  },
+  {
+    id: 'data-analyst',
+    label: 'Data Analyst',
+    source: 'O*NET 15-2051.01',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Analyze business data, produce reports, and identify trends.',
+    roleSpec: 'Evaluate SQL/data manipulation, cleaning, dashboards, trend analysis, business question framing, reporting accuracy, and practical AI-assisted analysis.'
+  },
+  {
+    id: 'ai-solutions-architect',
+    label: 'AI Solutions Architect',
+    source: 'O*NET 15-1299.08',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Design enterprise AI systems and integration patterns.',
+    roleSpec: 'Evaluate architecture tradeoffs, cloud AI patterns, data pipelines, security, scalability, integration, cost, reliability, and business-to-technical translation.'
+  },
+  {
+    id: 'prompt-engineer',
+    label: 'Prompt Engineer',
+    source: 'WEF 2025 (Emerging)',
+    standards: 'WEF Future of Jobs 2025',
+    description: 'Design, test, optimize, and document prompts for AI systems.',
+    roleSpec: 'Evaluate prompt design, model behavior awareness, iterative testing, prompt injection risk, template versioning, task decomposition, and performance measurement.'
+  },
+  {
+    id: 'business-analyst-ai',
+    label: 'Business Analyst (AI)',
+    source: 'O*NET 13-1161.00',
+    standards: 'O*NET, WEF, NIST AI RMF',
+    description: 'Identify AI use cases, assess business impact, and drive adoption.',
+    roleSpec: 'Evaluate workflow mapping, requirements gathering, use-case scoping, feasibility, ROI, stakeholder translation, change management, and KPI design.'
+  }
+];
+const PROFESSIONAL_ROLE_LABELS = new Set(PROFESSIONAL_ROLES.map((role) => role.label));
+const CERTIFICATION_LEVELS = [...EDUCATION_TIERS, ...PROFESSIONAL_ROLES.map((role) => role.label)];
+const ADULT_TIERS = new Set(['Young Adult', 'College', 'Workforce', 'Leadership', ...PROFESSIONAL_ROLE_LABELS]);
 
 // Proctoring levels surfaced in Certification (doc-16: external is scaffolded).
 const PROCTORING_MODES = [
@@ -69,7 +201,7 @@ const PROCTORING_MODES = [
 ];
 
 // --- Products catalog config (kept local so the live Products files are untouched) ---
-const PRODUCTS_CATALOG_URL = '/docs/theladder-products-catalog.md?v=2';
+const PRODUCTS_CATALOG_URL = '/docs/theladder-products-catalog.md?v=3';
 const PRODUCT_CATEGORY_RANGES = [
   { label: 'AI assistants', start: 1, end: 20 },
   { label: 'Workplace + writing', start: 21, end: 35 },
@@ -82,7 +214,17 @@ const PRODUCT_CATEGORY_RANGES = [
   { label: 'Sales + support', start: 167, end: 191 },
   { label: 'Agents + automation', start: 192, end: 210 },
   { label: 'Model APIs + cloud', start: 211, end: 230 },
-  { label: 'Regulated AI', start: 231, end: 250 }
+  { label: 'Regulated AI', start: 231, end: 250 },
+  { label: 'HR + recruiting', start: 251, end: 275 },
+  { label: 'Education + tutoring', start: 276, end: 300 },
+  { label: 'Ecommerce + retail', start: 301, end: 325 },
+  { label: 'Finance + accounting', start: 326, end: 350 },
+  { label: 'AIOps + incidents', start: 351, end: 375 },
+  { label: 'AI governance', start: 376, end: 400 },
+  { label: 'Construction + real estate', start: 401, end: 425 },
+  { label: 'Manufacturing + supply chain', start: 426, end: 450 },
+  { label: 'Science + clinical AI', start: 451, end: 475 },
+  { label: 'Personal productivity', start: 476, end: 500 }
 ];
 function parseProductCatalog(markdown) {
   return markdown.split('\n')
@@ -106,11 +248,14 @@ const FOCUSES = {
       return tiers.map((tier) => ({
         id: tier.id,
         label: `${tier.name}: ${tier.title}`,
+        raw: tier,
         items: (tier.topics || []).map((t) => ({ id: `topic-${t.id}`, label: t.title, raw: t }))
       }));
     },
     placementDescriptor(tiers) { return Concepts.buildConceptsPlacementDescriptor(tiers); },
-    certItemForGroup(group) { return { tier: { id: group.id, name: group.label.split(':')[0], title: (group.label.split(':')[1] || '').trim(), topics: group.items.map((i) => i.raw) } }; },
+    certItemForGroup(group) {
+      return { tier: group.raw || { id: group.id, name: group.label.split(':')[0], title: (group.label.split(':')[1] || '').trim(), topics: group.items.map((i) => i.raw) } };
+    },
     CERT_DEPTHS: Concepts.CERT_DEPTHS,
     depthForLabel: Concepts.depthForLabel,
     buildBlueprint: ({ item, level, depth }) => Concepts.buildConceptsBlueprint({ tier: item.tier, level, depth }),
@@ -184,11 +329,14 @@ const state = {
   groups: [],
   activeGroupId: null,
   activeItemId: null,
+  trainingPedagogy: null,
+  trainingStandards: {},
   placement: null,
   assessMessages: [],
   trainMessages: [],
   certMessages: [],
   activeCert: null,            // { item, level, depth, context, blueprint }
+  lastCertSnapshot: null,
   identityGate: { levelId: null, adultAttested: false, identitySigned: false, proctoringId: 'self' },
   authUser: null,              // source of truth is Firebase onAuthStateChanged
   completed: {}                // itemId -> true (per focus, keyed focusId:itemId)
@@ -217,20 +365,107 @@ function enterToSend(textareaId) {
 async function askModel({ messages, systemPrompt, maxTokens = 800, model }) {
   const body = { messages, system_prompt: systemPrompt, max_tokens: maxTokens };
   if (model) body.model = model;
-  const res = await fetch(PROXY_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-  });
-  const data = await res.json();
+  let res;
+  try {
+    res = await fetch(PROXY_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+  } catch (e) {
+    console.warn('[ladder2] AI proxy request failed', e);
+    return 'The AI service is temporarily unavailable. Please try again in a moment.';
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; }
+  catch (e) {
+    console.warn('[ladder2] AI proxy returned non-JSON', { status: res.status, text: text.slice(0, 240) });
+    return 'The AI service is temporarily unavailable. Please try again in a moment.';
+  }
+  if (!res.ok) {
+    console.warn('[ladder2] AI proxy returned error', { status: res.status, data });
+    return data?.error || 'The AI service is temporarily unavailable. Please try again in a moment.';
+  }
   return data?.content?.[0]?.text || data?.error || 'I hit a snag. Please try again.';
 }
 
-function renderChat(el, messages) {
+function isTransientAiMessage(content) {
+  return /AI service is temporarily unavailable|could not read the training AI response|could not reach the training AI|training AI returned an error|could not get a training response/i.test(content || '');
+}
+
+function renderChat(el, messages, options = {}) {
+  if (!el) return;
   el.innerHTML = messages.map((m) => `
     <div class="l2-msg l2-msg--${m.role === 'user' ? 'user' : 'guide'}">
       <span class="l2-msg__role">${m.role === 'user' ? 'You' : 'Guide'}</span>
       <div class="l2-msg__body">${escapeHtml(m.content).replace(/\n/g, '<br>')}</div>
     </div>`).join('');
+  if (options.scroll === 'latest-assistant') {
+    const assistantMessages = el.querySelectorAll('.l2-msg--guide');
+    const target = assistantMessages[assistantMessages.length - 1];
+    if (target) {
+      const maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
+      const targetTop = target.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop;
+      el.scrollTop = Math.min(maxScroll, Math.max(0, targetTop - 8));
+      return;
+    }
+  }
   el.scrollTop = el.scrollHeight;
+}
+
+function validDraftMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((m) => ['user', 'assistant'].includes(m?.role) && typeof m.content === 'string' && m.content.trim())
+    .map((m) => ({ role: m.role, content: m.content }));
+}
+
+function readAssessmentDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(LS_ASSESSMENT) || 'null');
+    if (!draft || draft.version !== 1) return null;
+    return {
+      focusId: draft.focusId || 'concepts',
+      messages: validDraftMessages(draft.messages),
+      input: typeof draft.input === 'string' ? draft.input : '',
+      savedAt: draft.savedAt || ''
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveAssessmentDraft() {
+  if (state.placement) {
+    localStorage.removeItem(LS_ASSESSMENT);
+    return;
+  }
+  const input = $('l2AssessInput')?.value || '';
+  const messages = validDraftMessages(state.assessMessages);
+  if (!messages.length && !input.trim()) {
+    localStorage.removeItem(LS_ASSESSMENT);
+    return;
+  }
+  localStorage.setItem(LS_ASSESSMENT, JSON.stringify({
+    version: 1,
+    focusId: state.focusId,
+    messages,
+    input,
+    savedAt: new Date().toISOString()
+  }));
+}
+
+function restoreAssessmentDraft() {
+  if (state.assessMessages.length || state.placement) return;
+  const draft = readAssessmentDraft();
+  if (!draft || draft.focusId !== state.focusId) return;
+  state.assessMessages = draft.messages;
+  if ($('l2AssessInput')) $('l2AssessInput').value = draft.input;
+  renderChat($('l2AssessLog'), state.assessMessages);
+  renderPlacementProgress();
+}
+
+function clearAssessmentDraft() {
+  localStorage.removeItem(LS_ASSESSMENT);
 }
 
 // =============================================================================
@@ -252,6 +487,9 @@ async function init() {
   // storedUid() also discards any stale AESOP-#### leftover from the old build.
   const storedId = storedUid();
   initDataLayer(storedId ? { learnerId: storedId } : {}).catch((e) => console.warn('data-layer init failed (local-only)', e));
+  loadTrainingPedagogy()
+    .then((pedagogy) => { state.trainingPedagogy = pedagogy; })
+    .catch((e) => console.warn('training pedagogy load failed (local fallback)', e));
   try {
     const rec = storedId ? await loadLearnerRecord(storedId) : null;
     if (rec) hydrate(rec);
@@ -370,6 +608,7 @@ async function activateFocus(focusId) {
   state.catalog = await focus().loadCatalog();
   state.groups = focus().buildGroups(state.catalog);
   placementEngine = createPlacementEngine(focus().placementDescriptor(state.catalog));
+  restoreAssessmentDraft();
 
   // reset active selection to first group/item
   state.activeGroupId = state.groups[0]?.id || null;
@@ -377,7 +616,6 @@ async function activateFocus(focusId) {
   state.trainMessages = [];
 
   renderRail();
-  renderRungPanel();
   renderActiveItem();
   renderCertConfig();
 }
@@ -387,13 +625,350 @@ async function activateFocus(focusId) {
 // =============================================================================
 function setupTraining() {
   $('l2StartChat')?.addEventListener('click', startTrainingChat);
+  $('l2ResetChat')?.addEventListener('click', resetTrainingChat);
   $('l2ChatForm')?.addEventListener('submit', submitTrainingChat);
+  $('l2RunStandardsEval')?.addEventListener('click', runSelectedStandardsEvaluations);
   enterToSend('l2ChatInput');
+  setupTrainingTextScale();
   $('l2CompleteBtn')?.addEventListener('click', markComplete);
+}
+
+function setTrainingTextScale(value) {
+  const scale = Math.min(1.6, Math.max(1, Number(value) || 1));
+  document.body.style.setProperty('--training-chat-scale', String(scale));
+  if ($('l2TrainingTextSize')) $('l2TrainingTextSize').value = String(scale);
+  try { localStorage.setItem(LS_TRAINING_TEXT_SCALE, String(scale)); } catch {}
+}
+
+function setupTrainingTextScale() {
+  const slider = $('l2TrainingTextSize');
+  const saved = localStorage.getItem(LS_TRAINING_TEXT_SCALE) || '1';
+  setTrainingTextScale(saved);
+  slider?.addEventListener('input', () => setTrainingTextScale(slider.value));
 }
 
 function activeGroup() { return state.groups.find((g) => g.id === state.activeGroupId) || state.groups[0]; }
 function activeItem() { const g = activeGroup(); return g?.items.find((i) => i.id === state.activeItemId) || g?.items[0]; }
+function trainingDescriptionFor(it) {
+  if (!it) return 'Pick a rung to see what the conversation will cover.';
+  const raw = it.raw || {};
+  const description = raw.description || raw.reason || raw.summary || raw.outcome || raw.depth || '';
+  if (description) return description;
+  return `Learn what "${it.label}" means, where it applies, what can go wrong, and how to use it in a practical AI workflow.`;
+}
+
+function listText(items, limit = 18) {
+  const cleaned = (items || []).map((item) => String(item || '').trim()).filter(Boolean);
+  if (!cleaned.length) return 'Not specified in the catalog.';
+  const visible = cleaned.slice(0, limit).join(', ');
+  return cleaned.length > limit ? `${visible}, plus ${cleaned.length - limit} more` : visible;
+}
+
+function groupTopicsFor(group) {
+  const rawTopics = group?.raw?.topics || [];
+  const topics = rawTopics.length ? rawTopics : (group?.items || []).map((item) => item.raw || item.label);
+  return topics.map((topic) => topic?.title || topic?.name || topic).filter(Boolean);
+}
+
+function vocabularyFor(it, group) {
+  const raw = it?.raw || {};
+  const fromGroup = group?.raw?.vocabulary || [];
+  const fromItem = raw.vocabulary || raw.keywords || [];
+  const derived = [raw.type, raw.topic, raw.depth].filter(Boolean);
+  return [...new Set([...fromGroup, ...fromItem, ...derived].map((term) => String(term || '').trim()).filter(Boolean))];
+}
+
+function selectedLevelLabel() {
+  return $('l2CertTierSelect')?.value || EDUCATION_TIERS[0];
+}
+
+function professionalRoleForLabel(label) {
+  return PROFESSIONAL_ROLES.find((role) => role.label === label) || null;
+}
+
+function certificationLevelOptionsHtml(selected = '') {
+  const edu = EDUCATION_TIERS.map((t) => `<option value="${escapeHtml(t)}" ${t === selected ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('');
+  const roles = PROFESSIONAL_ROLES.map((role) => `<option value="${escapeHtml(role.label)}" ${role.label === selected ? 'selected' : ''}>${escapeHtml(role.label)}</option>`).join('');
+  return `<optgroup label="Learner levels">${edu}</optgroup><optgroup label="Professional roles">${roles}</optgroup>`;
+}
+
+function standardIdFor(it, group) {
+  if (focus().id === 'concepts') return `concept:${it?.raw?.id || it?.id || group?.id || 'unknown'}`;
+  if (focus().id === 'products') return `product:${it?.raw?.id || it?.id || 'unknown'}`;
+  if (focus().id === 'use-cases') return `use-case:${it?.raw?.id || it?.id || 'unknown'}`;
+  return `${focus().pathway}:${it?.id || group?.id || 'unknown'}`;
+}
+
+function neighboringTopicsFor(it, group) {
+  const topics = groupTopicsFor(group);
+  const index = topics.findIndex((topic) => topic === it?.label);
+  if (index < 0) return topics.filter((topic) => topic !== it?.label).slice(0, 3);
+  return [topics[index - 1], topics[index + 1]].filter(Boolean);
+}
+
+function criteriaByDepthFor(it, group) {
+  const title = it?.label || 'this rung';
+  const neighbors = neighboringTopicsFor(it, group);
+  const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby rung topics';
+  return {
+    certification: [
+      `Defines "${title}" accurately in plain language.`,
+      `Uses the most relevant tier vocabulary while explaining "${title}".`,
+      `Distinguishes "${title}" from ${neighborText}.`,
+      `Applies "${title}" to one bounded, realistic AI workflow.`,
+      `Identifies one limitation, risk, or human-review checkpoint for "${title}".`
+    ],
+    expert: [
+      `Transfers "${title}" to an unfamiliar or higher-stakes scenario.`,
+      `Compares "${title}" with ${neighborText} and defends when to use each.`,
+      `Handles edge cases, ambiguity, or failure modes related to "${title}".`,
+      `Explains tradeoffs for "${title}" at the selected education or role level.`,
+      `Gives feedback or coaching that would help another learner improve on "${title}".`
+    ],
+    mastery: [
+      `Synthesizes "${title}" with multiple topics in the same certification set.`,
+      `Produces portfolio-quality reasoning, design, or evidence involving "${title}".`,
+      `Maps "${title}" to standards, governance, risk, or organizational impact.`,
+      `Anticipates second-order effects and failure modes around "${title}".`,
+      `Can teach, lead, or review others against the "${title}" standard.`
+    ]
+  };
+}
+
+function defaultRoleCriteria() {
+  const educationCriteria = EDUCATION_TIERS.map((level) => [level, {
+    languageLevel: level,
+    scenarioComplexity: ADULT_TIERS.has(level) ? 'professional or organizational scenario' : 'age-appropriate learning scenario',
+    evidenceExpectation: ADULT_TIERS.has(level)
+      ? 'defensible explanation, practical application, and risk-aware judgment'
+      : 'clear explanation, simple example, and safe-use awareness'
+  }]);
+  const professionalCriteria = PROFESSIONAL_ROLES.map((role) => [role.label, {
+    languageLevel: role.label,
+    scenarioComplexity: `${role.label} workplace scenario`,
+    evidenceExpectation: 'role-relevant explanation, applied judgment, defensible tradeoffs, and transcript-ready evidence',
+    employmentStandards: role.standards,
+    source: role.source,
+    roleDescription: role.description,
+    roleSpec: role.roleSpec
+  }]);
+  return Object.fromEntries([...educationCriteria, ...professionalCriteria]);
+}
+
+function localTrainingStandardFor(it, group) {
+  const id = standardIdFor(it, group);
+  const topics = groupTopicsFor(group);
+  const vocabulary = vocabularyFor(it, group);
+  const depthMap = criteriaByDepthFor(it, group);
+  return {
+    id,
+    version: 'local-fallback-v1',
+    pathway: focus().pathway,
+    focusLabel: focus().label,
+    scope: 'rung',
+    title: it?.label || group?.label || focus().label,
+    certificationSet: group?.label || focus().label,
+    activeRung: it?.label || '',
+    topics,
+    vocabulary,
+    certificationDepths: (focus().CERT_DEPTHS || []).map((depth) => ({
+      id: depth.id,
+      label: depth.label,
+      outcome: depth.outcome,
+      evidence: depth.evidence,
+      passingStandard: depth.passingStandard,
+      criteria: depthMap[depth.id] || depthMap.certification
+    })),
+    criteriaByDepth: depthMap,
+    roleCriteria: defaultRoleCriteria(),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+async function trainingStandardFor(it, group) {
+  const fallback = localTrainingStandardFor(it, group);
+  const id = fallback.id;
+  if (state.trainingStandards[id]) return state.trainingStandards[id];
+  try {
+    const remote = await loadTrainingStandard(id);
+    state.trainingStandards[id] = remote || fallback;
+  } catch {
+    state.trainingStandards[id] = fallback;
+  }
+  return state.trainingStandards[id];
+}
+
+function certificationMapFor(it, group) {
+  const depthLines = (focus().CERT_DEPTHS || []).map((depth) =>
+    `${depth.label}: ${depth.outcome || depth.passingStandard || 'certification depth'}`
+  );
+  try {
+    const certItem = focus().certItemForGroup(group, it);
+    const depth = focus().CERT_DEPTHS[0];
+    const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevelLabel(), depth });
+    return [
+      `Certification item: ${blueprint.itemLabel}`,
+      `Mapped standards: ${blueprint.standards}`,
+      `Education/role level now selected: ${blueprint.educationTierLabel}`,
+      `Available education/role levels: ${CERTIFICATION_LEVELS.join(', ')}`,
+      `Depths tested: ${depthLines.join(' | ')}`
+    ].join('\n');
+  } catch {
+    return [
+      `Certification item: ${it?.label || group?.label || focus().label}`,
+      `Education/role levels: ${CERTIFICATION_LEVELS.join(', ')}`,
+      `Depths tested: ${depthLines.join(' | ')}`
+    ].join('\n');
+  }
+}
+
+function approximateTrainingTimeFor(it) {
+  const raw = it?.raw || {};
+  const explicit = raw.estimatedTime || raw.estimated_time || raw.timeEstimate || raw.duration || raw.timeToComplete;
+  if (explicit) return String(explicit);
+  return 'about 10-15 minutes for the guided lesson, or 20-30 minutes if you pause to practice and revise your answers';
+}
+
+function trainingContextFor(it, group, standard = null) {
+  const raw = it?.raw || {};
+  const groupLabel = group?.label || focus().label;
+  const topics = standard?.topics || groupTopicsFor(group);
+  const vocabulary = standard?.vocabulary || vocabularyFor(it, group);
+  const depthCriteria = standard?.certificationDepths?.length
+    ? standard.certificationDepths.map((depth) => `${depth.label}: ${(depth.criteria || []).join('; ')}`).join('\n')
+    : Object.entries(standard?.criteriaByDepth || criteriaByDepthFor(it, group)).map(([depth, criteria]) => `${depth}: ${criteria.join('; ')}`).join('\n');
+  const roleCriteria = standard?.roleCriteria?.[selectedLevelLabel()] || defaultRoleCriteria()[selectedLevelLabel()];
+  const detailLines = [
+    raw.type ? `Type/product family: ${raw.type}` : '',
+    raw.topic ? `Topic/category: ${raw.topic}` : '',
+    raw.outcome ? `Outcome: ${raw.outcome}` : '',
+    raw.depth ? `Depth: ${raw.depth}` : '',
+    raw.reason ? `Why this matters: ${raw.reason}` : '',
+    raw.summary ? `Summary: ${raw.summary}` : '',
+    raw.description ? `Description: ${raw.description}` : ''
+  ].filter(Boolean);
+
+  return {
+    title: it?.label || 'this rung',
+    groupLabel,
+    description: trainingDescriptionFor(it),
+    topics,
+    vocabulary,
+    standardId: standard?.id || standardIdFor(it, group),
+    depthCriteria,
+    roleCriteria,
+    certificationMap: certificationMapFor(it, group),
+    approximateTime: approximateTrainingTimeFor(it),
+    details: detailLines.length ? detailLines.join('\n') : 'No extended catalog notes are available for this rung; infer a practical beginner-to-capable lesson from the rung title and tier context.'
+  };
+}
+
+function buildTrainingSystemPrompt(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  const pedagogy = state.trainingPedagogy
+    ? `Global pedagogy: ${state.trainingPedagogy.name || 'AESOP guided training pedagogy'}\nPrinciples: ${listText(state.trainingPedagogy.principles || [], 8)}\nLesson arc: ${listText((state.trainingPedagogy.lessonArc || []).map((step) => `${step.id}: ${step.purpose}`), 8)}`
+    : 'Global pedagogy: use the AESOP guided lesson arc below.';
+  return `You are the AESOP AI Academy training guide for a guided lesson, not an examiner and not a generic Q&A assistant.
+
+${pedagogy}
+
+Training focus: ${focus().label}
+Tier/category: ${ctx.groupLabel}
+Rung: ${ctx.title}
+Training standard ID: ${ctx.standardId}
+Rung description: ${ctx.description}
+Required vocabulary for this tier/rung:
+${listText(ctx.vocabulary)}
+Specific topics in this certification set:
+${listText(ctx.topics)}
+Certification map:
+${ctx.certificationMap}
+Depth-specific criteria:
+${ctx.depthCriteria}
+Selected education/role criteria:
+${JSON.stringify(ctx.roleCriteria)}
+Catalog context:
+${ctx.details}
+Approximate completion time:
+${ctx.approximateTime}
+
+Your job is to lead the learner somewhere specific: by the end, they should be able to explain the rung in their own words, recognize when it applies, name at least one limitation or risk, and use it in a practical AI workflow.
+
+Before the lesson begins, follow this readiness sequence:
+1. The first assistant message must only preview the lesson content and required vocabulary, then ask whether the learner is ready to begin.
+2. When the learner says they are ready, show the test criteria they will need to satisfy.
+3. After the criteria, show the approximate time to complete this rung.
+4. Then ask one short readiness question before beginning the lesson.
+5. Begin the actual lesson only after that readiness gate is complete.
+If the conversation already contains "Test criteria:" and "Approximate time to complete this rung:" and the learner says they are ready, do not repeat the criteria; begin the lesson.
+
+Run a short guided lesson with this arc:
+1. Orient: state the destination in plain language after the readiness sequence is complete, and ask one diagnostic question only if needed.
+2. Teach: explain one core idea at a time using a concrete example.
+3. Apply: give the learner a small scenario or task that makes them use the idea.
+4. Check and close: ask them to explain or apply the idea back. Mark complete only after they show usable understanding.
+
+Teaching rules:
+- Do not begin the lesson in the first assistant message.
+- If the learner has not confirmed readiness yet, ask whether they are ready instead of teaching.
+- Lead the learner through the path. Do not wait for them to choose the curriculum.
+- Do not behave like a certification exam. Be instructional, warm, and practical.
+- Do not answer as a one-off Q&A unless the answer moves the lesson forward.
+- Explicitly teach the most relevant vocabulary terms for this rung, and connect the rung back to the broader tier topics that certification will test.
+- Call out when a point matters for Core, Expert, or Mastery depth, especially when the learner is near that level.
+- Adapt examples and expectations to the selected education/role level.
+- Ask one question or give one task per turn.
+- Keep responses concise enough for chat: usually 2-5 short paragraphs.
+- If the learner gives a vague answer, teach the next missing piece and ask a better follow-up.
+- If the learner asks an unrelated question, answer briefly if useful, then bridge back to this rung.
+- Use COURSE_COMPLETE on its own final line only when the learner has demonstrated the target understanding.`;
+}
+
+function trainingOpeningFor(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  return `Let's preview "${ctx.title}" before the lesson begins.
+
+Lesson content:
+${listText(ctx.topics, 6)}
+
+Required vocabulary:
+${listText(ctx.vocabulary, 8)}
+
+When you are ready, I will show the test criteria, the approximate time to complete this rung, and then ask one quick ready-to-begin question before we start the lesson. Are you ready?`;
+}
+
+function isReadyResponse(content) {
+  return /\b(ready|yes|yep|yeah|sure|start|begin|let'?s go|go ahead)\b/i.test(content || '');
+}
+
+function shouldShowPreLessonBriefing(messages, content) {
+  if (!isReadyResponse(content)) return false;
+  const assistantMessages = (messages || []).filter((message) => message.role === 'assistant');
+  if (assistantMessages.length !== 1) return false;
+  const opening = assistantMessages[0]?.content || '';
+  return opening.includes('before the lesson begins') && opening.includes('Are you ready?');
+}
+
+function preLessonBriefingFor(it, group, standard = null) {
+  const ctx = trainingContextFor(it, group, standard);
+  return `Great. Here is what you will be tested against before the lesson begins.
+
+Test criteria:
+${ctx.depthCriteria}
+
+Approximate time to complete this rung:
+${ctx.approximateTime}
+
+When you are ready to begin the lesson, say "ready."`;
+}
+
+function upgradeSavedTrainingMessages(messages, it, group, standard) {
+  const upgraded = (messages || []).slice();
+  if (upgraded[0]?.role === 'assistant' && /where would you like to start\?/i.test(upgraded[0].content || '')) {
+    upgraded[0] = { role: 'assistant', content: trainingOpeningFor(it, group, standard) };
+  }
+  return upgraded;
+}
 
 // =============================================================================
 // COURSE CONVERSATION STORE
@@ -409,6 +984,12 @@ function loadCourses() {
 function saveCourses(map) {
   try { localStorage.setItem(LS_COURSES, JSON.stringify(map)); }
   catch (e) { console.warn('[ladder2] course save failed', e); }
+}
+function deleteActiveChat() {
+  const it = activeItem(); if (!it) return;
+  const map = loadCourses();
+  delete map[courseKey(focus().pathway, it.id)];
+  saveCourses(map);
 }
 // Persist the ACTIVE course's full conversation. status: 'open' | 'completed'.
 function persistActiveChat(status) {
@@ -437,61 +1018,316 @@ function openCourses() {
 // Saved (resumable) conversation for a course, or null.
 function savedChatFor(pathway, itemId) {
   const c = loadCourses()[courseKey(pathway, itemId)];
-  return (c && Array.isArray(c.messages) && c.messages.length && c.status !== 'completed')
-    ? c.messages.slice() : null;
+  if (!c || !Array.isArray(c.messages) || !c.messages.length || c.status === 'completed') return null;
+  const messages = c.messages.filter((m) => !isTransientAiMessage(m.content));
+  return messages.length ? messages : null;
 }
 
-function renderRail() {
-  const rail = $('l2GroupRail');
+function setTrainingEvalStatus(message, isError = false) {
+  const el = $('l2StandardsEvalStatus');
+  if (!el) return;
+  el.textContent = message || '';
+  el.classList.toggle('is-error', Boolean(isError));
+}
+
+async function loadEvaluationSkill(kind) {
+  const skill = EVALUATION_SKILLS[kind];
+  if (!skill) throw new Error('Unknown evaluation skill.');
+  try {
+    const res = await fetch(skill.file, { cache: 'no-store' });
+    if (res.ok) {
+      const text = await res.text();
+      if (text.trim()) return text.trim();
+    }
+  } catch (error) {
+    console.warn('[ladder2] evaluation skill load failed', error);
+  }
+  return `Run an advisory ${skill.label} against the transcript. Use only candidate evidence language. Do not issue credit, certification, grades, or official mastery. Preserve exact learner evidence snippets and identify gaps. Standards families: ${skill.families.join(', ')}.`;
+}
+
+function evaluationTranscriptForModel(messages) {
+  return (messages || [])
+    .filter((message) => ['user', 'assistant'].includes(message?.role) && String(message.content || '').trim())
+    .map((message, index) => ({
+      index,
+      role: message.role === 'user' ? 'learner' : 'guide',
+      content: String(message.content).slice(0, 2400)
+    }));
+}
+
+function loadLocalEvaluations() {
+  try { return JSON.parse(localStorage.getItem(LS_EVALUATIONS) || '[]') || []; }
+  catch { return []; }
+}
+
+function saveLocalEvaluation(record) {
+  try {
+    const records = loadLocalEvaluations();
+    localStorage.setItem(LS_EVALUATIONS, JSON.stringify([record, ...records].slice(0, 100)));
+  } catch (error) {
+    console.warn('[ladder2] local evaluation save failed', error);
+  }
+}
+
+function safeFilePart(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 72) || 'evaluation';
+}
+
+function downloadLocalArtifact(filename, content, type = 'application/json') {
+  try {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.warn('[ladder2] local artifact download failed', error);
+  }
+}
+
+function evaluationStatusFromResult(result) {
+  const text = String(result || '').toLowerCase();
+  if (isTransientAiMessage(text)) return 'failed';
+  if (/\boverall rating:\s*none\b/.test(text) || /\bneeds more learner evidence\b|\bno learner-authored evidence\b/.test(text)) {
+    return 'needs_more_evidence';
+  }
+  return 'completed';
+}
+
+function buildEvaluationMarkdown(record) {
+  return `# ${record.label}
+
+Status: ${record.status}
+Kind: ${record.kind}
+Source: ${record.source}
+Rung: ${record.context.rung}
+Created: ${record.createdAt}
+Completed: ${record.completedAt || ''}
+Skill file: ${record.skillFile}
+
+## Advisory Notice
+
+This is candidate standards evidence only. It is not official credit, certification, verified mastery, hiring readiness, or an official qualification.
+
+## Evaluator Result
+
+${record.result || 'No evaluator result was returned.'}
+`;
+}
+
+async function runTrainingStandardsEvaluation(kind, input) {
+  const skill = EVALUATION_SKILLS[kind];
+  const it = activeItem();
+  if (!skill || !it) {
+    if (input) input.checked = false;
+    return;
+  }
+  const learnerTurns = state.trainMessages.filter((message) => message.role === 'user');
+  if (!learnerTurns.length) {
+    setTrainingEvalStatus('Start the training conversation and collect learner evidence before running an evaluation.', true);
+    input.checked = false;
+    return;
+  }
+
+  const controls = [...document.querySelectorAll('[data-training-eval]')];
+  controls.forEach((control) => { control.disabled = true; });
+  setTrainingEvalStatus(`Running ${skill.label}...`);
+
+  try {
+    const standard = await trainingStandardFor(it, activeGroup());
+    const skillPrompt = await loadEvaluationSkill(kind);
+    const ctx = trainingContextFor(it, activeGroup(), standard);
+    const trainingSystemPrompt = buildTrainingSystemPrompt(it, activeGroup(), standard);
+    const certBlueprint = state.activeCert?.blueprint || state.lastCertSnapshot?.blueprint || null;
+    const certificationSystemPrompt = certBlueprint
+      ? certificationEngine.buildExaminerSystemPrompt(certBlueprint)
+      : '';
+    const transcript = evaluationTranscriptForModel(state.trainMessages);
+    const certificationMessages = state.certMessages.length ? state.certMessages : (state.lastCertSnapshot?.messages || []);
+    const certificationTranscript = evaluationTranscriptForModel(certificationMessages);
+    const source = certificationTranscript.some((message) => message.role === 'learner') ? 'training+certification' : 'training';
+    const createdAt = new Date().toISOString();
+    const evaluationId = `${kind}:${source}:${focus().pathway}:${it.id}:${createdAt}`;
+    const prompt = `${skillPrompt}
+
+Evaluation context:
+- Evaluation kind: ${skill.label}
+- Standards families: ${skill.families.join(', ')}
+- Evaluation source: ${source}
+- Training focus: ${focus().label}
+- Tier/category: ${ctx.groupLabel}
+- Rung: ${ctx.title}
+- Training standard ID: ${ctx.standardId}
+
+Return a concise advisory report with:
+1. Candidate evidence found, with exact learner snippets.
+2. Standards families implicated.
+3. Gaps or follow-up evidence needed.
+4. A clear advisory notice that this is not official credit, certification, or verified mastery.`;
+    const result = await askModel({
+      messages: [{
+        role: 'user',
+        content: JSON.stringify({
+          evaluationId,
+          evaluationKind: kind,
+          source,
+          rung: ctx.title,
+          trainingPrompt: trainingSystemPrompt,
+          certificationPrompt: certificationSystemPrompt,
+          transcript,
+          certificationTranscript
+        }, null, 2)
+      }],
+      systemPrompt: prompt,
+      maxTokens: 900
+    });
+    const completedAt = new Date().toISOString();
+    const status = evaluationStatusFromResult(result);
+    const record = {
+      id: evaluationId,
+      kind,
+      label: skill.label,
+      source,
+      status,
+      advisoryOnly: true,
+      skillFile: skill.file,
+      standardsFamilies: skill.families,
+      createdAt,
+      completedAt,
+      context: {
+        focus: focus().label,
+        pathway: focus().pathway,
+        group: ctx.groupLabel,
+        rung: ctx.title,
+        itemId: it.id,
+        trainingStandardId: ctx.standardId
+      },
+      packet: {
+        trainingPrompt: trainingSystemPrompt,
+        certificationPrompt: certificationSystemPrompt,
+        evaluatorPrompt: prompt,
+        trainingTranscript: transcript,
+        certificationTranscript
+      },
+      result
+    };
+    saveLocalEvaluation(record);
+    const fileBase = `${createdAt.replace(/[:.]/g, '-')}_${source}_${kind}_${safeFilePart(it.label)}`;
+    downloadLocalArtifact(`${fileBase}_packet.json`, JSON.stringify(record, null, 2));
+    downloadLocalArtifact(`${fileBase}_result.md`, buildEvaluationMarkdown(record), 'text/markdown');
+    state.trainMessages.push({ role: 'assistant', content: `${skill.label}\n\n${result}` });
+    renderChat($('l2ChatLog'), state.trainMessages, { scroll: 'latest-assistant' });
+    persistActiveChat('open');
+    setTrainingEvalStatus(status === 'needs_more_evidence'
+      ? `${skill.label} complete: needs more learner evidence.`
+      : `${skill.label} complete: local packet and result downloaded.`);
+  } catch (error) {
+    console.warn('[ladder2] standards evaluation failed', error);
+    input.checked = false;
+    setTrainingEvalStatus(`Could not run ${skill.label}. Please try again.`, true);
+  } finally {
+    controls.forEach((control) => { control.disabled = false; });
+  }
+}
+
+async function runSelectedStandardsEvaluations() {
+  const selected = [...document.querySelectorAll('[data-training-eval]:checked')];
+  if (!selected.length) {
+    setTrainingEvalStatus('Select at least one standards evaluation, then run it.', true);
+    return;
+  }
+
+  const runButton = $('l2RunStandardsEval');
+  if (runButton) runButton.disabled = true;
+  setTrainingEvalStatus(`Running ${selected.length} selected evaluation${selected.length === 1 ? '' : 's'}...`);
+  try {
+    for (const input of selected) {
+      await runTrainingStandardsEvaluation(input.dataset.trainingEval, input);
+    }
+  } finally {
+    if (runButton) runButton.disabled = false;
+  }
+}
+
+function renderRungPicker(ids) {
+  const rail = $(ids.rail);
+  const selectedRungs = $(ids.selectedRungs);
+  if (!rail || !selectedRungs) return;
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
-  $('l2GroupStatus').textContent = `${done} / ${total} rungs in ${focus().label}`;
-  // Clean list of tiers only: number + "Tier N" + title. Rungs live in the right
-  // window (renderRungPanel); the rail no longer expands rungs inline.
-  rail.innerHTML = state.groups.map((g, i) => {
-    const active = g.id === state.activeGroupId;
-    return `<button class="l2-tier-item ${active ? 'is-active' : ''}" type="button" data-group="${g.id}">
+  setText(ids.focusLabel, focus().label);
+  setText(ids.status, `${done}/${total} training rungs completed in ${focus().label}`);
+  const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
+  const active = state.groups[activeIndex];
+  const summary = $(ids.summary);
+  if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : 'Choose a tier';
+  rail.innerHTML = state.groups.map((g, i) =>
+    `<button class="l2-tier-option ${g.id === state.activeGroupId ? 'is-active' : ''}" data-group="${g.id}" type="button">
       <span class="l2-rail-num">${i + 1}</span>
-      <span class="l2-tier-meta"><small>Tier ${i + 1}</small><strong>${escapeHtml(g.label)}</strong></span>
-    </button>`;
-  }).join('');
+      <span class="l2-tier-meta">
+        <small>${g.items.length} rungs</small>
+        <strong>${escapeHtml(g.label)}</strong>
+      </span>
+    </button>`).join('');
   rail.querySelectorAll('[data-group]').forEach((b) => b.addEventListener('click', () => {
     state.activeGroupId = b.dataset.group;
     const g = activeGroup();
     state.activeItemId = g.items[0]?.id || null;
     state.trainMessages = [];
-    renderRail(); renderRungPanel(); renderActiveItem();
+    if ($(ids.dropdown)) $(ids.dropdown).open = false;
+    renderRail(); renderActiveItem();
+  }));
+  selectedRungs.innerHTML = active
+    ? active.items.map((it) =>
+      `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`).join('')
+    : '';
+  selectedRungs.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
+    state.activeItemId = b.dataset.item;
+    state.trainMessages = [];
+    renderRail(); renderActiveItem();
   }));
 }
 
-// Right-hand "blue window with gold text": the selected tier's rungs, clickable.
-function renderRungPanel() {
-  const panel = $('l2RungPanel');
-  if (!panel) return;
-  const g = activeGroup();
-  if (!g) { panel.hidden = true; panel.innerHTML = ''; return; }
-  panel.hidden = false;
-  panel.innerHTML = `
-    <div class="rung-panel-head">
-      <span class="rung-panel-title">${escapeHtml(g.label)}</span>
-      <small>${g.items.length} rungs</small>
-    </div>
-    <div class="rung-panel-list">${g.items.map((it) =>
-      `<button class="rung-pick ${it.id === state.activeItemId ? 'is-active' : ''}" type="button" data-item="${it.id}">${escapeHtml(it.label)}</button>`).join('')}</div>`;
-  panel.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
-    state.activeItemId = b.dataset.item;
-    state.trainMessages = [];
-    renderRungPanel(); renderActiveItem();
-  }));
+function renderRail() {
+  renderRungPicker({
+    rail: 'l2GroupRail',
+    selectedRungs: 'l2SelectedRungs',
+    status: 'l2GroupStatus',
+    focusLabel: 'l2FocusLabel',
+    summary: 'l2SelectedTierSummary',
+    dropdown: 'l2TierDropdown'
+  });
+  renderRungPicker({
+    rail: 'l2CertGroupRail',
+    selectedRungs: 'l2CertSelectedRungs',
+    status: 'l2CertGroupStatus',
+    focusLabel: 'l2CertFocusLabel',
+    summary: 'l2CertSelectedTierSummary',
+    dropdown: 'l2CertTierDropdown'
+  });
 }
 
 function renderActiveItem() {
   const g = activeGroup(); const it = activeItem();
-  $('l2ActiveGroupLabel').textContent = g ? g.label : focus().label;
-  $('l2ActiveItemTitle').textContent = it ? it.label : 'Select a rung';
-  $('l2ChatSummary').textContent = it
-    ? `Learn "${it.label}" through a guided conversation. The guide teaches, challenges, applies, and checks readiness.`
-    : 'Pick a rung from the list to begin.';
+  if ($('l2ActiveGroupLabel')) $('l2ActiveGroupLabel').textContent = g ? g.label : focus().label;
+  if ($('l2ActiveItemTitle')) $('l2ActiveItemTitle').textContent = it ? it.label : 'Select a rung';
+  if ($('l2ChatSummary')) {
+    $('l2ChatSummary').textContent = it
+      ? `Learn "${it.label}" through a guided conversation. The guide teaches, challenges, applies, and checks readiness.`
+      : 'Pick a rung from the list to begin.';
+  }
+  if ($('l2RungDescription')) $('l2RungDescription').textContent = trainingDescriptionFor(it);
+  if ($('l2CertRungDescription')) $('l2CertRungDescription').textContent = it
+    ? `Certification will examine this rung: ${trainingDescriptionFor(it)}`
+    : 'Pick a rung to see what the exam will cover.';
   renderChat($('l2ChatLog'), state.trainMessages);
   renderCertTarget();
 }
@@ -501,32 +1337,71 @@ async function startTrainingChat() {
   if (!it) return;
   // resume the saved conversation for this course if one exists, else open fresh
   const saved = savedChatFor(focus().pathway, it.id);
-  state.trainMessages = saved || [{ role: 'assistant', content: `Let's work through "${it.label}". What do you already know about it, and where would you like to start?` }];
+  const standard = await trainingStandardFor(it, activeGroup());
+  state.trainMessages = saved
+    ? upgradeSavedTrainingMessages(saved, it, activeGroup(), standard)
+    : [{ role: 'assistant', content: trainingOpeningFor(it, activeGroup(), standard) }];
   renderChat($('l2ChatLog'), state.trainMessages);
   persistActiveChat('open');   // course is now open (appears in Profile → Open courses)
+  renderProfile();
+}
+
+function resetTrainingChat() {
+  const it = activeItem();
+  if (!it) return;
+  deleteActiveChat();
+  state.trainMessages = [];
+  delete state.completed[`${focus().pathway}:${it.id}`];
+  if ($('l2ChatInput')) $('l2ChatInput').value = '';
+  renderChat($('l2ChatLog'), state.trainMessages);
+  renderRail();
+  renderMarketing();
   renderProfile();
 }
 
 async function submitTrainingChat(e) {
   e.preventDefault();
   const input = $('l2ChatInput');
+  if (!input) return;
   const content = input.value.trim();
   if (!content) return;
   const it = activeItem();
   if (!state.trainMessages.length) await startTrainingChat();
   state.trainMessages.push({ role: 'user', content });
+  const standard = await trainingStandardFor(it, activeGroup());
+  if (shouldShowPreLessonBriefing(state.trainMessages, content)) {
+    state.trainMessages.push({ role: 'assistant', content: preLessonBriefingFor(it, activeGroup(), standard) });
+    input.value = '';
+    renderChat($('l2ChatLog'), state.trainMessages, { scroll: 'latest-assistant' });
+    persistActiveChat('open');
+    return;
+  }
+  const messagesForModel = state.trainMessages.slice();
+  state.trainMessages.push({ role: 'assistant', content: 'Thinking...' });
   input.value = '';
   renderChat($('l2ChatLog'), state.trainMessages);
-  const raw = await askModel({
-    messages: state.trainMessages,
-    systemPrompt: `You are a training guide for "${it.label}" in the ${focus().label} ladder of the AESOP AI Academy. Teach through guided conversation — ask, give examples, apply, and surface limitations. Engage until the learner demonstrates sufficient understanding. When ready to end, write "COURSE_COMPLETE" on its own final line.`,
-    maxTokens: 700
-  });
-  const isDone = raw.includes('COURSE_COMPLETE');
-  const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim();
-  state.trainMessages.push({ role: 'assistant', content: visible });
-  renderChat($('l2ChatLog'), state.trainMessages);
-  persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
+  let isDone = false;
+  let transientFailure = false;
+  try {
+    const raw = await askModel({
+      messages: messagesForModel,
+      systemPrompt: buildTrainingSystemPrompt(it, activeGroup(), standard),
+      maxTokens: 900
+    });
+    isDone = raw.includes('COURSE_COMPLETE');
+    const visible = raw.replace(/COURSE_COMPLETE\s*$/gm, '').replace(/<!--[\s\S]*?-->/g, '').trim() || 'I hit a snag. Please try again.';
+    transientFailure = isTransientAiMessage(visible);
+    state.trainMessages[state.trainMessages.length - 1] = { role: 'assistant', content: visible };
+  } catch (err) {
+    console.warn('[ladder2] training chat failed', err);
+    transientFailure = true;
+    state.trainMessages[state.trainMessages.length - 1] = {
+      role: 'assistant',
+      content: 'The AI service is temporarily unavailable. Please try again in a moment.'
+    };
+  }
+  renderChat($('l2ChatLog'), state.trainMessages, { scroll: 'latest-assistant' });
+  if (!transientFailure) persistActiveChat(isDone ? 'completed' : 'open');   // keep the full conversation on disk
   if (isDone) markComplete();
 }
 
@@ -551,12 +1426,15 @@ function setupAssessment() {
   $('l2StartPlacement')?.addEventListener('click', startPlacement);
   $('l2ResetPlacement')?.addEventListener('click', () => {
     state.assessMessages = []; state.placement = null;
+    clearAssessmentDraft();
     document.body.classList.remove('placement-complete');
     $('l2PlacementStatus').textContent = 'Not placed yet';
+    if ($('l2AssessInput')) $('l2AssessInput').value = '';
     renderChat($('l2AssessLog'), state.assessMessages);
     renderPlacementProgress();
   });
   $('l2AssessForm')?.addEventListener('submit', submitAssessment);
+  $('l2AssessInput')?.addEventListener('input', saveAssessmentDraft);
   enterToSend('l2AssessInput');
 }
 
@@ -566,6 +1444,7 @@ function startPlacement() {
   renderChat($('l2AssessLog'), state.assessMessages);
   $('l2AssessInput')?.focus();
   renderPlacementProgress();
+  saveAssessmentDraft();
 }
 
 function learnerTurns() { return state.assessMessages.filter((m) => m.role === 'user').length; }
@@ -581,6 +1460,7 @@ async function submitAssessment(e) {
   input.value = '';
   renderChat($('l2AssessLog'), state.assessMessages);
   renderPlacementProgress();
+  saveAssessmentDraft();
   const raw = await askModel({
     messages: state.assessMessages,
     systemPrompt: placementEngine.buildSystemPrompt({ languageLabel: 'English' }),
@@ -588,8 +1468,9 @@ async function submitAssessment(e) {
   });
   const { placement, visibleText } = placementEngine.parsePlacementResponse(raw);
   state.assessMessages.push({ role: 'assistant', content: visibleText });
-  renderChat($('l2AssessLog'), state.assessMessages);
+  renderChat($('l2AssessLog'), state.assessMessages, { scroll: 'latest-assistant' });
   renderPlacementProgress();
+  saveAssessmentDraft();
   if (placementEngine.shouldApplyPlacement(placement, learnerTurns())) applyPlacement(placement);
 }
 
@@ -598,6 +1479,7 @@ function applyPlacement(placement) {
   $('l2PlacementStatus').textContent = 'Placement complete';
   $('l2PlacementSummary').textContent = placement.reasoning || 'Your placed-out tiers and assigned rungs are saved.';
   document.body.classList.add('placement-complete');
+  clearAssessmentDraft();
   saveLearnerProgress(focus().pathway, {
     version: 'v1',
     placement: { ...placement }
@@ -637,9 +1519,10 @@ function setupCertification() {
 
 function renderCertConfig() {
   const tierSel = $('l2CertTierSelect');
-  if (tierSel && !tierSel.dataset.filled) {
-    tierSel.innerHTML = EDUCATION_TIERS.map((t) => `<option value="${t}">${t}</option>`).join('');
-    tierSel.dataset.filled = '1';
+  if (tierSel) {
+    const current = CERTIFICATION_LEVELS.includes(tierSel.value) ? tierSel.value : EDUCATION_TIERS[0];
+    tierSel.innerHTML = certificationLevelOptionsHtml(current);
+    tierSel.value = current;
   }
   const depthSel = $('l2CertDepthSelect');
   depthSel.innerHTML = focus().CERT_DEPTHS.map((d) => `<option value="${d.label}">${d.label}</option>`).join('');
@@ -660,12 +1543,21 @@ function renderCertConfig() {
 function selectedDepth() { return focus().depthForLabel($('l2CertDepthSelect').value); }
 function selectedLevel() { return $('l2CertTierSelect').value || EDUCATION_TIERS[0]; }
 
-function renderCertTarget() {
+function renderCertTargetLegacy() {
   const it = activeItem();
   const depth = selectedDepth();
   $('l2CertTarget').textContent = it
     ? `${it.label} — ${selectedLevel()}, ${depth ? depth.label : ''}`
     : 'Choose a rung in Training, then set your level here.';
+}
+
+function renderCertTarget() {
+  const it = activeItem();
+  const depth = selectedDepth();
+  const role = professionalRoleForLabel(selectedLevel());
+  $('l2CertTarget').textContent = it
+    ? `${it.label} - ${selectedLevel()}, ${depth ? depth.label : ''}${role ? ` (${role.standards})` : ''}`
+    : 'Choose a rung, then set the learner level or professional role for the exam.';
 }
 
 function renderIdentityGate() {
@@ -700,15 +1592,15 @@ function renderAuthGates() {
   const acctForm = $('l2AccountForm');
   const status = $('l2AccountStatus');
   const msg = $('l2AccountMsg');
-  if (acctGate) acctGate.hidden = false;
-  if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Adult account required' : 'Account optional';
+  if (acctGate) acctGate.hidden = signedIn;
+  if (status) status.textContent = signedIn ? `Signed in: ${state.authUser.email}` : adultTier ? 'Account required' : 'Account optional';
   if (msg) msg.textContent = signedIn
-    ? 'Your certifications and transcript events are saved to this account.'
-    : adultTier ? 'Adult education tiers require a verified account before certifying.'
+    ? 'Your certification attempt and transcript evidence will be saved to this account.'
+    : adultTier ? 'This certification path requires a signed-in account before certifying.'
       : 'Sign in to save certifications to your transcript (optional for non-adult tiers).';
   if (acctForm) acctForm.hidden = signedIn;
   $('l2AccountSignOut').hidden = !signedIn;
-  $('l2AdultAttestLabel').hidden = !adultTier;
+  $('l2AdultAttestLabel').hidden = !adultTier || signedIn;
 }
 
 // --- real Firebase auth: email-link sign-up + password sign-in --------------
@@ -824,10 +1716,37 @@ async function startCertification() {
   if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth' }); return; }
 
   const depth = selectedDepth();
+  const selectedRole = professionalRoleForLabel(selectedLevel());
   const certItem = focus().certItemForGroup(activeGroup(), it);
   const blueprint = focus().buildBlueprint({ item: certItem, level: selectedLevel(), depth });
+  const standard = await trainingStandardFor(it, activeGroup());
   blueprint.languageLabel = 'English';
+  blueprint.depthId = depth.id;
+  blueprint.trainingStandardId = standard.id;
+  blueprint.requiredVocabulary = standard.vocabulary || [];
+  blueprint.specificTopics = standard.topics || [];
+  blueprint.criteriaByDepth = standard.criteriaByDepth || {};
+  blueprint.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
+  blueprint.professionalRole = selectedRole;
+  if (selectedRole) {
+    blueprint.roleCriteria = { ...defaultRoleCriteria()[selectedRole.label], ...(blueprint.roleCriteria || {}) };
+    blueprint.employmentStandards = selectedRole.standards;
+    blueprint.professionalRoleSpec = selectedRole.roleSpec;
+  }
+  blueprint.activeRung = it.label;
+  blueprint.certificationSet = standard.certificationSet || activeGroup()?.label || focus().label;
   const context = focus().buildCertContext({ item: certItem, depth, learnerId: state.authUser?.uid || '' });
+  context.trainingStandardId = standard.id;
+  context.requiredVocabulary = standard.vocabulary || [];
+  context.specificTopics = standard.topics || [];
+  context.criteriaByDepth = standard.criteriaByDepth || {};
+  context.roleCriteria = standard.roleCriteria?.[selectedLevel()] || null;
+  context.professionalRole = selectedRole;
+  if (selectedRole) {
+    context.roleCriteria = { ...defaultRoleCriteria()[selectedRole.label], ...(context.roleCriteria || {}) };
+    context.employmentStandards = selectedRole.standards;
+    context.professionalRoleSpec = selectedRole.roleSpec;
+  }
   context.identityAssurance = focus().buildIdentityAssurance(new Date().toISOString(), { ...state.identityGate, account: state.authUser });
   context.proctoringMode = state.identityGate.proctoringId;
 
@@ -848,7 +1767,7 @@ async function callExaminer() {
   });
   const { certificationResult, rubricDimensions, visibleText } = certificationEngine.parseExaminerResponse(raw);
   state.certMessages.push({ role: 'assistant', content: visibleText });
-  renderChat($('l2CertLog'), state.certMessages.filter((m) => m.content));
+  renderChat($('l2CertLog'), state.certMessages.filter((m) => m.content), { scroll: 'latest-assistant' });
   state._pendingResult = certificationResult;
   state._pendingRubric = rubricDimensions;
   if (certificationResult) finalizeCertification(false);
@@ -914,6 +1833,15 @@ function appendSystemNote(text) {
 }
 
 function endCertification() {
+  if (state.activeCert || state.certMessages.length) {
+    state.lastCertSnapshot = {
+      activeCert: state.activeCert,
+      blueprint: state.activeCert?.blueprint || null,
+      context: state.activeCert?.context || null,
+      messages: state.certMessages.slice(),
+      endedAt: new Date().toISOString()
+    };
+  }
   state.activeCert = null; state.certMessages = []; state._pendingResult = null;
   $('l2CertModeBar').hidden = true;
   $('l2CertExamSummary').textContent = 'Start a certification above to begin the examined conversation.';

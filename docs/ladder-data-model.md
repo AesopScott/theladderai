@@ -7,7 +7,7 @@
 > worktree lines up. Collection list and advisory statuses follow doc
 > `15-The-Ladder-Architecture.md`.
 
-Database of record: **Firestore** (project `playagame-f733d`, config in
+Database of record: **Firestore** (project `theladderai`, config in
 `ai-academy/js/firebase-config.js`). localStorage is an offline cache that syncs
 up (see ADR 0001). All learner-scoped writes use `setDoc(..., { merge: true })`.
 
@@ -323,7 +323,130 @@ A denormalized summary is mirrored into
 
 ---
 
-## 8. Transcript events (embedded array, doc-16 event list)
+## 8. `trainingPedagogy/{docId}` and `trainingStandards/{standardId}` - guided rung source of truth
+
+Training standards are admin-authored, read-public records in Firestore. They are the source of truth for what a guided lesson should teach and what later evaluation must check.
+
+`trainingPedagogy/default` stores the global lesson doctrine:
+
+```jsonc
+{
+  "name": "AESOP guided training pedagogy",
+  "principles": ["guided lesson, not Q&A", "teach before testing"],
+  "lessonArc": [
+    { "id": "orient", "purpose": "name the destination and diagnose starting point" },
+    { "id": "teach", "purpose": "teach one concept at a time" },
+    { "id": "apply", "purpose": "give a small task or scenario" },
+    { "id": "check", "purpose": "confirm learner-owned understanding" }
+  ],
+  "version": "string"
+}
+```
+
+Each `trainingStandards/{standardId}` document is scoped to one rung:
+
+```jsonc
+{
+  "id": "concept:T01-L01",
+  "pathway": "concept | product | use-case",
+  "scope": "rung",
+  "title": "What artificial intelligence is and is not",
+  "certificationSet": "General AI Literacy: AI Orientation",
+  "activeRung": "What artificial intelligence is and is not",
+  "topics": ["string"],
+  "vocabulary": ["string"],
+  "certificationDepths": [
+    {
+      "id": "certification",
+      "label": "Core",
+      "criteria": ["string"]
+    },
+    {
+      "id": "expert",
+      "label": "Expert",
+      "criteria": ["string"]
+    },
+    {
+      "id": "mastery",
+      "label": "Mastery",
+      "criteria": ["string"]
+    }
+  ],
+  "criteriaByDepth": {
+    "certification": ["string"],
+    "expert": ["string"],
+    "mastery": ["string"]
+  },
+  "roleCriteria": {
+    "High School": {
+      "languageLevel": "High School",
+      "scenarioComplexity": "age-appropriate learning scenario",
+      "evidenceExpectation": "clear explanation, simple example, and safe-use awareness"
+    }
+  },
+  "standardsRefs": [
+    {
+      "family": "AI4K12 | CSTA | ISTE | UNESCO-AI-Competency | NIST-AI-RMF | EU-AI-Act | O*NET | WEF-Skills",
+      "id": "string",
+      "label": "string",
+      "depth": "certification | expert | mastery",
+      "roleLevels": ["string"]
+    }
+  ],
+  "version": "string",
+  "updatedAt": "ISO-8601"
+}
+```
+
+The current seed writes a specialized standard for every Concepts, Products, and Use Cases rung. The next standards pass should replace generic or derived mappings with curated education/workforce standards references per rung.
+
+---
+
+## 9. `rungEvaluationRuns/{runId}` - completed training transcript evaluation
+
+A completed guided training conversation should be evaluated after the fact. The evaluator loads the `trainingStandards/{standardId}` document and scores the saved transcript. The guide prompt may contain standards, but that does not prove the learner met them; only learner transcript evidence counts.
+
+```jsonc
+{
+  "runId": "string (doc id)",
+  "learnerId": "string",
+  "accountUid": "firebase uid when present | ''",
+  "standardId": "concept:T01-L01",
+  "pathway": "concept | product | use-case",
+  "itemId": "string",
+  "roleLevel": "High School | Workforce | Leadership | ...",
+  "depthTarget": "certification | expert | mastery",
+  "transcript": [
+    { "role": "assistant | user", "content": "string", "at": "ISO-8601" }
+  ],
+  "transcriptHash": "string",
+  "standardsAssessed": ["string"],
+  "standardsSatisfied": ["string"],
+  "standardsNeedingEvidence": ["string"],
+  "criteriaResults": {
+    "certification": {
+      "status": "met | partial | insufficient",
+      "rationale": "string",
+      "evidenceRefs": ["standardsEvidenceId"]
+    }
+  },
+  "evidenceRefs": ["standardsEvidenceId"],
+  "result": "ready | more_practice_needed | human_review_recommended",
+  "model": {
+    "provider": "string",
+    "name": "string",
+    "promptVersion": "training-transcript-evaluator-v1",
+    "standardsVersion": "string"
+  },
+  "createdAt": "ISO-8601"
+}
+```
+
+`rungEvaluationRuns` should write exact evidence spans into `standardsEvidence` as `candidate` records. Certification remains separate: a ready result can recommend certification, but it must not award a credential by itself.
+
+---
+
+## 10. Transcript events (embedded array, doc-16 event list)
 
 Stored under `ladderProgress.transcriptEvents` (Concepts) and mirrored per
 pathway. Event `type` is one of:
@@ -349,13 +472,16 @@ retake_required, credential_awarded
 
 ---
 
-## 9. Resource & mapping collections (doc-15 "Integrations To Build" list)
+## 11. Resource & mapping collections (doc-15 "Integrations To Build" list)
 
 These hold the database-backed resource/mapping layer. Read-mostly, admin-write.
 
 | Collection | Doc shape (key fields) |
 |---|---|
 | `rungs/{rungId}` | `ladderTier`, `order`, `title`, `description`, `learningObjectives[]`, `standardsRefs[]` |
+| `trainingPedagogy/{docId}` | global guided-lesson principles, lesson arc, prompt doctrine, version |
+| `trainingStandards/{standardId}` | per-rung topics, vocabulary, depth criteria, role criteria, standardsRefs[], version |
+| `rungEvaluationRuns/{runId}` | completed transcript evaluation against the rung standard, evidenceRefs[], result |
 | `resources/{resourceId}` | `rungId`, `type`, `title`, `url`, `provider`, `freshnessCheckedAt`, `researchRunId` |
 | `videos/{videoId}` | `rungId`, `title`, `youtubeId`, `channel`, `durationSec`, `freshnessCheckedAt` |
 | `courses/{courseId}` | `title`, `provider` (aesop/skilljar), `externalId`, `rungRefs[]`, `level` |
@@ -367,7 +493,7 @@ These hold the database-backed resource/mapping layer. Read-mostly, admin-write.
 
 ---
 
-## 10. Request queues (already in production — keep as-is)
+## 12. Request queues (already in production - keep as-is)
 
 Public-create, admin-read. Written today by the page apps with `addDoc`.
 

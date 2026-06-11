@@ -224,3 +224,17 @@ Your worktree has `.handoff-state` changes but ZERO changes to actual applicatio
 - **After merge, confirm:** `git show main:components/ladder2.css | grep "max-width: 42rem"` → 1 match, and `main:index.html` references `ladder2.css?v=80`. Then deploy.
 
 **The code is correct and verified** (worktree preview port 5603, 1440×900: description 216px, conversation capped 504px, top-aligned). It just needs to be merged + deployed.
+
+---
+
+## 2026-06-11 00:00 MDT — `claude/reverent-germain-assess` — ✅ REBASED ONTO CURRENT MAIN, READY TO MERGE
+
+**Fixes the earlier rejection ("no application code changes / worktree must have actual file edits").** Root cause: my branch was **6 commits behind main**, so the orchestrator couldn't detect/merge it. I reset the branch onto current `main` and re-applied the assessment edits; the orchestrator's auto-commit captured them.
+
+- **Branch HEAD to merge:** `dafe834`, pushed to `origin/claude/reverent-germain-assess`. It is **based on current main** (`git merge-base --is-ancestor 95f9fc3 dafe834` → YES), so the merge is clean/fast-forwardable.
+- **Application-file changes in `dafe834`** (real code, `#assessment`-scoped):
+  - `components/ladder2.css`: grid `minmax(200px,18rem) minmax(0,1fr)` (narrow description); `#assessment .placement-chat { max-width: 42rem }` (cap conversation width); `.assessment-log { min-height:130px; max-height:24vh }` (compact); `#assessment { justify-content: flex-start }` (raise the pair).
+  - `index.html`: CSS buster `v=79 → v=80`.
+- **Verify after merge:** `git show main:components/ladder2.css | grep -c "max-width: 42rem"` → 1; `main:index.html` references `ladder2.css?v=80`. Then deploy.
+
+(Known follow-up for Scott, not blocking deploy: on very wide screens the capped 42rem conversation leaves empty space to its right — to be refined once it's live and visible.)

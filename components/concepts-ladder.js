@@ -162,8 +162,8 @@ export function buildConceptsPlacementDescriptor(tiers = LADDER_TIERS) {
 export const CERT_DEPTHS = [
   {
     id: 'certification',
-    label: 'Certification',
-    certificationTierLabel: 'Concepts Certification',
+    label: 'Core',
+    certificationTierLabel: 'Concepts Core',
     outcome: 'Competent, defensible understanding of the tier for everyday AI work.',
     evidence: 'A guided assignment plus explanations of core concepts, fit, and one limitation.',
     passingStandard: 'Demonstrates correct core-concept understanding, safe defaults, and accurate explanation.',
@@ -171,8 +171,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'expert',
-    label: 'Expert certification',
-    certificationTierLabel: 'Concepts Expert Certification',
+    label: 'Expert',
+    certificationTierLabel: 'Concepts Expert',
     outcome: 'Chooses the right approach, troubleshoots limits, compares alternatives, and can teach another learner.',
     evidence: 'A non-trivial scenario solved with a justified approach, plus a comparison against an alternative concept or technique.',
     passingStandard: 'Transfers understanding to a new context, handles edge cases, and defends the approach.',
@@ -180,8 +180,8 @@ export const CERT_DEPTHS = [
   },
   {
     id: 'master',
-    label: 'Master certification',
-    certificationTierLabel: 'Concepts Master Certification',
+    label: 'Mastery',
+    certificationTierLabel: 'Concepts Mastery',
     outcome: 'Designs a production-grade solution, evaluates risk, documents evidence, and defends every choice.',
     evidence: 'Portfolio-quality artifact: a production-ready design with risk controls and evidence.',
     passingStandard: 'Original synthesis, standards mapping, risk governance, and leadership-level defense.',

@@ -87,6 +87,9 @@ service cloud.firestore {
     match /useCases/{useCaseId}         { allow read: if true; allow write: if isAdmin(); }
     match /assignmentLabs/{labId}       { allow read: if true; allow write: if isAdmin(); }
     match /standardsDefinitions/{stdId} { allow read: if true; allow write: if isAdmin(); }
+    match /trainingPedagogy/{docId}     { allow read: if true; allow write: if isAdmin(); }
+    match /trainingStandards/{stdId}    { allow read: if true; allow write: if isAdmin(); }
+    match /certificationCriteria/{id}   { allow read: if true; allow write: if isAdmin(); }
     match /resourceResearchRuns/{runId} { allow read: if isAdmin(); allow write: if isAdmin(); }
 
     // public-create, admin-read request queues
