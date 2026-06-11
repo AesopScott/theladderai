@@ -463,10 +463,31 @@ h3 {
   color: var(--muted);
 }
 
-.how,
 .pathways,
 .faq {
   background: var(--mist);
+}
+
+.how {
+  background: var(--navy);
+  color: #fff;
+}
+
+.how h2,
+.how h3 {
+  color: #fff;
+}
+
+.how .problem-grid article,
+.how .steps article {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.how .problem-grid p,
+.how .steps p {
+  color: #f1ece2;
 }
 
 .steps {
