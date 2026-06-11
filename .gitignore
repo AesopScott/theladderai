@@ -10,3 +10,6 @@ node_modules/
 # editor / agent scratch
 .claude/
 *.log
+
+# proxy.php holds the live API key - uploaded manually via FTP, never commit/deploy it
+aesop-api/proxy.php
