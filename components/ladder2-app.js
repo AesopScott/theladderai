@@ -1404,12 +1404,21 @@ function endCertification() {
 // =============================================================================
 function totalCompleted() { return Object.keys(state.completed).length; }
 function certCount() { return (state._record?.ladderCertifications || []).length; }
+function completedConceptTierIds() {
+  const completed = new Set();
+  (state.placement?.grantedTierIds || []).forEach((id) => completed.add(id));
+  LADDER_TIERS.forEach((tier) => {
+    const items = (tier.topics || []).map((topic) => `concept:topic-${topic.id}`);
+    if (items.length && items.every((key) => state.completed[key])) completed.add(tier.id);
+  });
+  return completed;
+}
 
 function renderMarketing() {
   // Marketing hero stats/ribbons were removed; these setters are no-ops if the
   // elements are absent. Kept guarded so the live progress shows if re-added.
-  const total = state.groups.reduce((n, g) => n + g.items.length, 0);
-  setText('l2StatCourses', `${Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length} / ${total}`);
+  const completedTiers = completedConceptTierIds();
+  setText('l2StatCourses', `${completedTiers.size} / ${LADDER_TIERS.length}`);
   setText('l2StatTiers', String(state.placement?.grantedTierIds?.length || 0));
   const certs = state._record?.ladderCertifications || [];
   // Bucket each cert by depth. Prefer the explicit depth field (depthId/depthLabel);
