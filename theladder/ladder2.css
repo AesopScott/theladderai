@@ -196,7 +196,7 @@ body.l2 .l2-navlink::after {
    instead of :hover — :hover is geometric and re-fires when a sticky nav word
    lands under a resting cursor on scroll. See setupNavActions in ladder2-app.js. */
 body.l2 .l2-navlink.is-navhover { color: var(--l2-ink); }
-body.l2 .l2-navlink.is-navhover::after, body.l2 .l2-navlink.is-active::after { width: 100%; }
+body.l2 .l2-navlink.is-navhover::after { width: 100%; }
 body.l2 .ladder-top-actions { gap: clamp(2.4rem, 5.5vw, 5rem); }   /* match the center nav-links gap */
 /* actions match the center nav links' font + size */
 body.l2 .ladder-top-actions #l2Lang,
@@ -761,6 +761,21 @@ body.l2 .placement-toolbar, body.l2 .workspace {
 }
 body.l2 .placement-summary { padding-right: 2rem; }
 body.l2 #l2PlacementStatus { font-family: var(--l2-display); font-weight: 800; }
+/* ladder.css styled .placement-toolbar as a dark navy box with white/pale text; ladder2
+   makes the toolbar transparent, so re-tint its text to the page ink palette (theme-aware
+   vars keep dark mode correct — ink/ink-2 flip to light there). Without this the heading
+   was white-on-white in light mode. */
+body.l2 .placement-toolbar h2, body.l2 .placement-toolbar strong { color: var(--l2-ink); }
+body.l2 .placement-toolbar p, body.l2 .placement-toolbar small { color: var(--l2-ink-2); }
+/* Assessment layout: top-align the two columns so the conversation sits at the same
+   level as the description (instead of the description cell stretching to match the tall
+   chat box), and keep the conversation compact so the section's centered content leaves
+   whitespace at the bottom rather than the chat box reaching the page edge. */
+body.l2 .placement-toolbar { align-items: start; }
+/* ladder.css pins .placement-chat at min-height:480px (legacy fixed panel); drop that floor
+   so the conversation column sizes to its content and rides up with the centered section. */
+body.l2 #assessment .placement-chat { min-height: 0; }
+body.l2 #assessment .assessment-log { min-height: 150px; max-height: 30vh; }
 body.l2 .l2-assessment-done {
   display: none; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid var(--l2-line);

@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="/academy-theme.css?v=2">
   <link rel="stylesheet" href="/academy-dark-mode.css?v=2">
   <link rel="stylesheet" href="/theladder/ladder.css?v=51">
-  <link rel="stylesheet" href="/theladder/ladder2.css?v=68">
+  <link rel="stylesheet" href="/theladder/ladder2.css?v=71">
 </head>
 <body class="l2">
 
@@ -480,23 +480,12 @@
       setTimeout(reveal, 2600);
     })();
 
-    // Active-section highlight in the nav as you scroll.
-    (function () {
-      const links = Array.from(document.querySelectorAll('.l2-navlink'));
-      const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            links.forEach((l) => l.classList.remove('is-active'));
-            map.get(e.target.id)?.classList.add('is-active');
-          }
-        });
-      }, { rootMargin: '-45% 0px -50% 0px' });
-      ['profile', 'assessment', 'training', 'certification'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) obs.observe(el);
-      });
-    })();
+    // Nav underline is a hover-only affordance (see setupNavActions in ladder2-app.js).
+    // A scroll-position scroll-spy used to live here, toggling `.is-active` on nav links
+    // via IntersectionObserver. Its band only *cleared* a link when another observed
+    // section entered it — so scrolling up into the (unobserved) hero left the last
+    // section (Profile) permanently underlined. Removed: the underline now follows the
+    // pointer only and nothing pins it on scroll.
   </script>
   <script type="module" src="/theladder/ladder2-app.js?v=8"></script>
 </body>
