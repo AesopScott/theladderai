@@ -14,7 +14,8 @@ and public credentials — in a single Fensea-inspired page (AESOP navy/gold on 
 
 ## Layout
 
-- `theladder/` — the ladder2 page + skin (`ladder2.css`), orchestrator (`ladder2-app.js`),
+- `site.css` — the single consolidated website stylesheet.
+- `theladder/` — the ladder2 page, orchestrator (`ladder2-app.js`),
   tier data (`ladder-data.js`), Concepts provider, hero images.
 - `theladder-shared/` — catalog-agnostic engines: placement, certification (AI examiner +
   independent second-model validator, 7-dimension rubric), and the data layer
@@ -34,7 +35,10 @@ need to be rebuilt for The Ladder AI rather than ported from Aesop's legacy `ai-
 
 ## Deploy
 
-`.github/workflows/deploy.yml` (FTP to Mocahost) is a copy from Aesop and is **not yet
-finalized** for theladderai — `server-dir` still points at the Aesop site and the predeploy
-guard is Aesop-specific (so it currently fails before FTP). See backlog task #4 before
-enabling auto-deploy.
+Production deploys from the new GitHub repo, `AesopScott/theladderai`, not the legacy
+Aesop repo. Pushing to `main` runs `.github/workflows/deploy.yml`, which deploys the
+repo contents to Mocahost by FTPS at `/public_html/theladderai/`.
+
+Sensitive server files are not deployed from Git. Keep local `.env`, `secrets.php`,
+`secrets.local.php`, and `config.local.php` out of the repo; provision production
+secrets directly on the server.
