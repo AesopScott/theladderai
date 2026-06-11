@@ -38,6 +38,7 @@ const LS_AUTH = 'aesop-ladder2-auth';
 const LS_EMAIL = 'aesop-ladder2-emailForSignIn';
 const LS_ID = 'aesop-learner-id';
 const LS_COURSES = 'aesop-ladder2-courses';   // full course conversations, kept on the learner's machine
+const LS_ASSESSMENT = 'aesop-ladder2-assessment-draft';
 
 // Learner ID model: the Firebase Auth UID is the canonical learner id (Scott's
 // decision — "use the new UIDs"). On sign-in the uid becomes the record key
@@ -233,6 +234,62 @@ function renderChat(el, messages) {
   el.scrollTop = el.scrollHeight;
 }
 
+function validDraftMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((m) => ['user', 'assistant'].includes(m?.role) && typeof m.content === 'string' && m.content.trim())
+    .map((m) => ({ role: m.role, content: m.content }));
+}
+
+function readAssessmentDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(LS_ASSESSMENT) || 'null');
+    if (!draft || draft.version !== 1) return null;
+    return {
+      focusId: draft.focusId || 'concepts',
+      messages: validDraftMessages(draft.messages),
+      input: typeof draft.input === 'string' ? draft.input : '',
+      savedAt: draft.savedAt || ''
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveAssessmentDraft() {
+  if (state.placement) {
+    localStorage.removeItem(LS_ASSESSMENT);
+    return;
+  }
+  const input = $('l2AssessInput')?.value || '';
+  const messages = validDraftMessages(state.assessMessages);
+  if (!messages.length && !input.trim()) {
+    localStorage.removeItem(LS_ASSESSMENT);
+    return;
+  }
+  localStorage.setItem(LS_ASSESSMENT, JSON.stringify({
+    version: 1,
+    focusId: state.focusId,
+    messages,
+    input,
+    savedAt: new Date().toISOString()
+  }));
+}
+
+function restoreAssessmentDraft() {
+  if (state.assessMessages.length || state.placement) return;
+  const draft = readAssessmentDraft();
+  if (!draft || draft.focusId !== state.focusId) return;
+  state.assessMessages = draft.messages;
+  if ($('l2AssessInput')) $('l2AssessInput').value = draft.input;
+  renderChat($('l2AssessLog'), state.assessMessages);
+  renderPlacementProgress();
+}
+
+function clearAssessmentDraft() {
+  localStorage.removeItem(LS_ASSESSMENT);
+}
+
 // =============================================================================
 // BOOT
 // =============================================================================
@@ -370,6 +427,7 @@ async function activateFocus(focusId) {
   state.catalog = await focus().loadCatalog();
   state.groups = focus().buildGroups(state.catalog);
   placementEngine = createPlacementEngine(focus().placementDescriptor(state.catalog));
+  restoreAssessmentDraft();
 
   // reset active selection to first group/item
   state.activeGroupId = state.groups[0]?.id || null;
@@ -536,12 +594,15 @@ function setupAssessment() {
   $('l2StartPlacement')?.addEventListener('click', startPlacement);
   $('l2ResetPlacement')?.addEventListener('click', () => {
     state.assessMessages = []; state.placement = null;
+    clearAssessmentDraft();
     document.body.classList.remove('placement-complete');
     $('l2PlacementStatus').textContent = 'Not placed yet';
+    if ($('l2AssessInput')) $('l2AssessInput').value = '';
     renderChat($('l2AssessLog'), state.assessMessages);
     renderPlacementProgress();
   });
   $('l2AssessForm')?.addEventListener('submit', submitAssessment);
+  $('l2AssessInput')?.addEventListener('input', saveAssessmentDraft);
   enterToSend('l2AssessInput');
 }
 
@@ -551,6 +612,7 @@ function startPlacement() {
   renderChat($('l2AssessLog'), state.assessMessages);
   $('l2AssessInput')?.focus();
   renderPlacementProgress();
+  saveAssessmentDraft();
 }
 
 function learnerTurns() { return state.assessMessages.filter((m) => m.role === 'user').length; }
@@ -566,6 +628,7 @@ async function submitAssessment(e) {
   input.value = '';
   renderChat($('l2AssessLog'), state.assessMessages);
   renderPlacementProgress();
+  saveAssessmentDraft();
   const raw = await askModel({
     messages: state.assessMessages,
     systemPrompt: placementEngine.buildSystemPrompt({ languageLabel: 'English' }),
@@ -575,6 +638,7 @@ async function submitAssessment(e) {
   state.assessMessages.push({ role: 'assistant', content: visibleText });
   renderChat($('l2AssessLog'), state.assessMessages);
   renderPlacementProgress();
+  saveAssessmentDraft();
   if (placementEngine.shouldApplyPlacement(placement, learnerTurns())) applyPlacement(placement);
 }
 
@@ -583,6 +647,7 @@ function applyPlacement(placement) {
   $('l2PlacementStatus').textContent = 'Placement complete';
   $('l2PlacementSummary').textContent = placement.reasoning || 'Your placed-out tiers and assigned rungs are saved.';
   document.body.classList.add('placement-complete');
+  clearAssessmentDraft();
   saveLearnerProgress(focus().pathway, {
     version: 'v1',
     placement: { ...placement }
