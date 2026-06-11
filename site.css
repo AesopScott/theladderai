@@ -7258,7 +7258,7 @@ body.l2 .training-selected-rungs {
 }
 body.l2 .training-selected-rungs .l2-rail-item {
   padding: 0.38rem 0 0.38rem 0.85rem;
-  font-size: 0.72rem;
+  font-size: 0.864rem;
   line-height: 1.25;
 }
 body.l2 .training-selected-rungs .l2-rail-item::after {
@@ -7269,7 +7269,7 @@ body.l2 .training-rung-description {
   padding-top: 1rem;
   border-top: 1px solid var(--l2-line);
   color: var(--l2-gold-deep);
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 1.55;
 }
 body.l2 .training-chat-panel {
