@@ -1,0 +1,50 @@
+{
+  "project": "The Ladder AI",
+  "repo": "AesopScott/theladderai",
+  "updated": "2026-06-10",
+  "notes": "Migrated from the Aesop repo (ladder2 branch) on 2026-06-10. theladder/ladder2.html and its runtime dependencies are live. The pages below were brought over ONLY as skeleton placeholders (for nav/link continuity) and must be rebuilt for The Ladder AI — do not migrate the heavy legacy versions from Aesop's ai-academy/.",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Rebuild the Student Hub",
+      "status": "backlog",
+      "priority": "high",
+      "skeleton": "ai-academy/students.html",
+      "linkedFrom": "theladder/ladder2.html (nav: Student Hub)",
+      "detail": "Rebuild the learner Student Hub for The Ladder AI: certifications earned, tier progress, active/begun courses, links to Transcript and credentials. Build lean against the ladder2 learner record (theladder-shared/data-layer.js / the ai-academy/js/learner-record.js pattern in Aesop) — do NOT migrate Aesop's 1700-file ai-academy wholesale."
+    },
+    {
+      "id": 2,
+      "title": "Rebuild the Transcript page",
+      "status": "backlog",
+      "priority": "high",
+      "skeleton": "student-transcript-live.html",
+      "linkedFrom": "theladder/ladder2.html (nav: Transcript)",
+      "detail": "Rebuild the durable learner transcript: completed / placed_out / verified / self_reported evidence, tier certifications, standards coverage, export + print. Source from theladder-shared/data-layer.js + the Firestore learner record."
+    },
+    {
+      "id": 3,
+      "title": "Rebuild the Certifications support page",
+      "status": "backlog",
+      "priority": "medium",
+      "skeleton": "ladder-certifications.html",
+      "linkedFrom": "theladder/ladder2.html (Certifications link)",
+      "detail": "Public-facing certification records / credential-meaning explanation. Support page per the 3-page vision (ladder2, transcript, student hub)."
+    },
+    {
+      "id": 4,
+      "title": "Finalize deploy.yml for theladderai",
+      "status": "backlog",
+      "priority": "high",
+      "target": ".github/workflows/deploy.yml",
+      "detail": "The deploy workflow on main is a verbatim Aesop copy. Before enabling auto-deploy: (1) set server-dir to theladderai's FTP path — it is currently /public_html/aesop-academy/, which would deploy ONTO the live Aesop site; (2) remove the Aesop-specific 'Pre-deploy truncation guard' (.github/scripts/predeploy_check.py — not in this repo, so every run currently fails there before FTP) + the 'commit repairs back to main' step + the AESOP_PAT token; (3) confirm the FTP host/user (Mocahost 65.181.111.131 / hivetec1 — same or different for theladderai?). The server also needs secrets.php at the repo root (or an ANTHROPIC_API_KEY env var) for aesop-api/proxy.php."
+    },
+    {
+      "id": 5,
+      "title": "Prune / consolidate the migrated Ladder surface",
+      "status": "backlog",
+      "priority": "low",
+      "detail": "The import brought all of theladder/ (including the legacy /theladder/ index.html, authenticate.html, ladder-app.js) plus the products/use-cases admin pages. Decide what to keep vs. fold into the unified ladder2 experience (vision: collapse to 3 pages — ladder2, transcript, student hub)."
+    }
+  ]
+}

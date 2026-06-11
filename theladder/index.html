@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<!-- theladder-v0.1.0 | 2026-06-08 -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/favicon_512.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ladder AI - AESOP AI Academy</title>
+  <meta name="description" content="A guided AI learning ladder with conversations, resources, progress tracking, certification, and transcript evidence.">
+  <meta property="og:title" content="The Ladder AI - AESOP AI Academy">
+  <meta property="og:description" content="A guided AI learning path with placement, conversations, certification, resources, and transcript evidence.">
+  <meta property="og:url" content="https://aesopacademy.org/theladder/">
+  <meta property="og:site_name" content="AESOP AI Academy">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://aesopacademy.org/theladder/og-theladder.png">
+  <meta property="og:image:secure_url" content="https://aesopacademy.org/theladder/og-theladder.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Ladder AI from AESOP AI Academy, a guided AI learning path with placement, certification, and transcript evidence.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@aesopacademy">
+  <meta name="twitter:title" content="The Ladder AI - AESOP AI Academy">
+  <meta name="twitter:description" content="A guided AI learning path with placement, conversations, certification, resources, and transcript evidence.">
+  <meta name="twitter:image" content="https://aesopacademy.org/theladder/og-theladder.png">
+  <meta name="twitter:image:alt" content="The Ladder AI from AESOP AI Academy, a guided AI learning path with placement, certification, and transcript evidence.">
+  <script>
+    if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
+  <link rel="stylesheet" href="/academy-theme.css?v=2">
+  <link rel="stylesheet" href="/academy-dark-mode.css?v=2">
+  <style>
+    :root {
+      --ladder-bg: #f5f1e8;
+      --ladder-panel: #ffffff;
+      --ladder-line: #ded4c5;
+      --ladder-soft: #f0e8dc;
+      --ladder-ink: #18283a;
+      --ladder-muted: #62717f;
+      --ladder-good: #735f9e;
+      --ladder-focus: #c9a05a;
+    }
+
+    [data-theme="dark"] {
+      --ladder-bg: #0f1923;
+      --ladder-panel: #172331;
+      --ladder-line: #304252;
+      --ladder-soft: #203242;
+      --ladder-ink: #e8e3db;
+      --ladder-muted: #b7c0c8;
+      --ladder-good: #bda7ff;
+      --ladder-focus: #dbb87a;
+    }
+
+    body {
+      background: #ffffff;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--navy);
+      border-radius: 7px;
+      background: var(--navy);
+      color: var(--gold-light);
+      cursor: pointer;
+      font-weight: 700;
+      padding: 0.55rem 0.8rem;
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--navy);
+    }
+
+    .dark-mode-toggle {
+      border: 1px solid var(--ladder-line);
+      background: transparent;
+      color: var(--ladder-ink);
+      min-height: 40px;
+    }
+
+    .ladder-app {
+      box-sizing: border-box;
+      width: min(calc(100% - 2rem), 1800px);
+      margin: 0 auto;
+      padding: 0 0 3rem;
+    }
+
+    .ladder-hero,
+    .ladder-toolbar,
+    .workspace {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .ladder-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(600px, 760px);
+      align-items: end;
+      padding: 48px 0 30px;
+    }
+
+    .hero-panels {
+      display: grid;
+      gap: 1rem;
+      align-items: stretch;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ladder-hero h1 {
+      margin: 0.35rem 0 0;
+      color: var(--navy);
+      font-size: clamp(2.6rem, 6vw, 5.9rem);
+      line-height: 0.9;
+    }
+
+    .hero-title-row {
+      align-items: start;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .hero-kicker-row {
+      align-items: start;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .education-focus-control {
+      background: rgba(7, 17, 29, 0.82);
+      border: 1px solid rgba(219, 184, 122, 0.48);
+      border-radius: 8px;
+      display: grid;
+      flex: 0 0 min(240px, 100%);
+      gap: 0.35rem;
+      padding: 0.65rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .education-focus-control span {
+      color: var(--gold-light);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .education-focus-control select {
+      background: #07111d;
+      border: 1px solid rgba(219, 184, 122, 0.5);
+      border-radius: 7px;
+      color: #ffffff;
+      min-height: 42px;
+      padding: 0.45rem 0.6rem;
+      width: 100%;
+    }
+
+    .hero-text,
+    .placement-summary p {
+      color: var(--ladder-ink);
+      font-size: 1.12rem;
+      line-height: 1.55;
+    }
+
+    .learner-panel,
+    .ladder-toolbar,
+    .ladder-content,
+    .tier-rail {
+      border: 1px solid var(--ladder-line);
+      border-radius: 8px;
+      background: var(--ladder-panel);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .learner-panel {
+      background: #f7fbfa;
+      border-color: rgba(115, 95, 158, 0.24);
+    }
+
+    .ladder-toolbar {
+      background: #fffdf8;
+      border-color: rgba(201, 160, 90, 0.32);
+    }
+
+    .ladder-content {
+      background: #ffffff;
+    }
+
+    .learner-panel,
+    .ladder-toolbar,
+    .ladder-content {
+      padding: 1rem;
+    }
+
+    .topic-search-panel,
+    .evaluation-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      min-height: 250px;
+    }
+
+    .topic-search-panel {
+      height: 100%;
+    }
+
+    .topic-search-input {
+      width: 100%;
+    }
+
+    .topic-search-results {
+      display: grid;
+      gap: 0.45rem;
+      flex: 1;
+      align-content: start;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .evaluation-actions {
+      margin-top: auto;
+    }
+
+    .topic-search-result {
+      border: 1px solid var(--ladder-line);
+      background: var(--ladder-soft);
+      color: var(--ladder-ink);
+      display: grid;
+      gap: 0.2rem;
+      padding: 0.55rem;
+      text-align: left;
+      width: 100%;
+    }
+
+    .topic-search-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.25rem;
+    }
+
+    .ladder-toolbar {
+      grid-template-columns: minmax(280px, 0.7fr) minmax(520px, 1.55fr);
+      margin-bottom: 1.3rem;
+    }
+
+    .placement-toolbar.is-collapsed {
+      align-items: center;
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 76px;
+      padding: 0.75rem 1rem;
+    }
+
+    .placement-toolbar.is-collapsed .placement-summary {
+      align-items: center;
+      display: grid;
+      gap: 0.35rem 1rem;
+      grid-template-columns: minmax(0, 1fr) auto;
+      width: 100%;
+    }
+
+    .placement-toolbar.is-collapsed .placement-summary h2,
+    .placement-toolbar.is-collapsed .placement-summary p {
+      grid-column: 1;
+      margin: 0;
+    }
+
+    .placement-toolbar.is-collapsed .placement-actions {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      justify-content: flex-end;
+      margin: 0;
+    }
+
+    .placement-toolbar.is-collapsed .placement-chat,
+    .placement-toolbar.is-collapsed .placement-progress {
+      display: none;
+    }
+
+    .placement-chat {
+      display: flex;
+      flex-direction: column;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      min-height: 460px;
+    }
+
+    .placement-progress {
+      align-self: end;
+    }
+
+    .placement-profile-prompt {
+      align-items: center;
+      background: #fff9ea;
+      border: 1px solid rgba(201, 160, 90, 0.55);
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.65rem;
+      grid-column: 1 / -1;
+      margin-top: 0.7rem;
+      padding: 0.65rem;
+    }
+
+    .assessment-chat-head {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .assessment-nav {
+      display: flex;
+      gap: 0.45rem;
+    }
+
+    .assessment-log {
+      min-height: 340px;
+      max-height: min(56vh, 520px);
+      overflow: auto;
+      padding: 0.85rem;
+    }
+
+    .assessment-form {
+      background: #ffffff;
+      border: 1px solid #d7c8ad;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(16, 34, 53, 0.08);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+      padding: 0.65rem;
+    }
+
+    .assessment-form textarea {
+      background: #ffffff;
+      border: 2px solid #c7b89f;
+      border-radius: 8px;
+      color: #102235;
+      min-height: 92px;
+      padding: 0.75rem;
+      resize: vertical;
+    }
+
+    .assessment-form textarea:focus,
+    .chat-form input:focus,
+    .vocab-prompt-form input:focus {
+      border-color: var(--ladder-focus);
+      box-shadow: 0 0 0 3px rgba(219, 184, 122, 0.22);
+      outline: none;
+    }
+
+    .workspace {
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .tier-rail {
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+      padding: 0;
+    }
+
+    .rail-head {
+      box-sizing: border-box;
+    }
+
+    .tier-list {
+      display: grid;
+      gap: 0.55rem;
+      max-height: none;
+      overflow: visible;
+    }
+
+    .tier-button {
+      align-items: start;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      grid-template-areas:
+        "number meta"
+        "number progress";
+      gap: 0.28rem 0.65rem;
+      justify-items: stretch;
+      border-color: var(--ladder-line);
+      background: var(--ladder-soft);
+      color: var(--ladder-ink);
+      text-align: left;
+    }
+
+    .tier-meta,
+    .tier-meta strong,
+    .tier-meta small {
+      display: block;
+    }
+
+    .tier-meta {
+      grid-area: meta;
+      min-width: 0;
+    }
+
+    .tier-meta small {
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    .tier-progress {
+      grid-area: progress;
+      justify-self: start;
+      min-width: 0;
+    }
+
+    .topic-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: 100%;
+      overflow: visible;
+      padding: 0.55rem 0.75rem;
+      background: #142437;
+      border: 1px solid #26384a;
+      border-top: 0;
+    }
+
+    .topic-strip button {
+      align-items: center;
+      background: #1a2d43;
+      border-color: rgba(219, 184, 122, 0.6);
+      box-sizing: border-box;
+      color: var(--gold-light);
+      display: inline-flex;
+      flex: 0 0 42px;
+      font-size: 0.95rem;
+      height: 42px;
+      justify-content: center;
+      line-height: 1;
+      min-width: 42px;
+      padding: 0;
+      transform: none;
+      width: 42px;
+    }
+
+    .topic-strip button:hover {
+      background: #213952;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .vocab-definition-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .vocab-definition-box {
+      border: 1px solid var(--ladder-line);
+      background: #fbfaf6;
+      flex: 1;
+      min-height: 132px;
+      overflow: auto;
+      padding: 0.75rem;
+    }
+
+    .vocab-prompt-form {
+      background: #ffffff;
+      border: 1px solid #d7c8ad;
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.4rem;
+      margin-top: 0.45rem;
+      padding: 0.45rem;
+    }
+
+    .vocab-prompt-form input {
+      background: #ffffff;
+      border: 2px solid #c7b89f;
+      border-radius: 7px;
+      color: #102235;
+      min-height: 34px;
+      padding: 0.35rem 0.5rem;
+    }
+
+    .chat-form {
+      background: #ffffff;
+      border: 1px solid #d7c8ad;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(16, 34, 53, 0.08);
+      display: grid;
+      gap: 0.55rem;
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: 0.65rem;
+    }
+
+    .chat-form input {
+      background: #ffffff;
+      border: 2px solid #c7b89f;
+      border-radius: 7px;
+      color: #102235;
+      min-height: 42px;
+      padding: 0.55rem 0.7rem;
+    }
+
+    .assessment-form textarea::placeholder,
+    .chat-form input::placeholder,
+    .vocab-prompt-form input::placeholder {
+      color: #53667a;
+    }
+
+    .vocab-pill:hover,
+    .vocab-pill:focus-visible,
+    .vocab-pill.active {
+      background: var(--navy-mid);
+      border-color: var(--navy-mid);
+      color: #fff;
+    }
+
+    .tier-button.active {
+      border-color: var(--ladder-focus);
+      background: var(--navy);
+      color: var(--gold-light);
+    }
+
+    .tier-button.placed-out {
+      background: rgba(115, 95, 158, 0.18);
+      border: 1px solid rgba(115, 95, 158, 0.42);
+      color: var(--ladder-ink);
+    }
+
+    .tier-button.placed-out .tier-number {
+      background: var(--ladder-good);
+    }
+
+    .tier-button.placed-out .tier-progress {
+      color: #5b477e;
+    }
+
+    .tier-button.has-assigned {
+      background: #fff9ea;
+    }
+
+    .tier-number {
+      grid-area: number;
+      margin-top: 0.1rem;
+    }
+
+    .assigned-rungs-panel {
+      background: #fff;
+      border: 1px solid var(--ladder-line);
+      border-radius: 8px;
+      flex-basis: 100%;
+      margin-top: 0.25rem;
+      max-height: 360px;
+      overflow: auto;
+    }
+
+    .assigned-rungs-panel summary {
+      color: var(--navy);
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0.65rem 0.75rem;
+    }
+
+    .guide-log,
+    .additional-lessons-log,
+    .transcript-log {
+      border: 1px solid var(--ladder-line);
+      border-radius: 8px;
+      background: #fbf8f1;
+    }
+
+    .vocab-card,
+    .rung-card {
+      border: 1px solid var(--ladder-line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    @media (max-width: 900px) {
+      .ladder-hero,
+      .ladder-toolbar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panels {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .hero-kicker-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .education-focus-control {
+        flex-basis: auto;
+        max-width: 360px;
+      }
+
+      .tier-rail {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .topic-strip {
+        overscroll-behavior-x: contain;
+      }
+
+      .tier-list {
+        overflow: visible;
+        max-height: none;
+        padding: 0.75rem;
+      }
+
+      .tier-item {
+        border-bottom: 0;
+      }
+
+      .tier-button {
+        align-items: center;
+        border: 1px solid var(--ladder-line);
+        border-radius: 8px;
+        grid-template-columns: 42px minmax(0, 1fr);
+        grid-template-areas:
+          "number meta"
+          "number progress";
+        gap: 0.25rem 0.8rem;
+        padding: 1rem;
+      }
+
+      .tier-button.placed-out {
+        border: 1px solid rgba(115, 95, 158, 0.42);
+      }
+
+      .tier-number {
+        grid-area: number;
+        height: 42px;
+        width: 42px;
+      }
+
+      .tier-meta {
+        grid-area: meta;
+      }
+
+      .tier-progress {
+        grid-area: progress;
+      }
+
+      .placement-chat {
+        grid-column: auto;
+        grid-row: auto;
+        min-height: 0;
+      }
+
+      .placement-toolbar.is-collapsed .placement-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .placement-toolbar.is-collapsed .placement-actions {
+        grid-column: 1;
+        grid-row: auto;
+        justify-content: stretch;
+      }
+
+      .assessment-chat-head,
+      .chat-form,
+      .vocab-prompt-form,
+      .assessment-form {
+        align-items: stretch;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+      }
+
+      .assessment-log {
+        min-height: 300px;
+        max-height: 55vh;
+      }
+    }
+
+    @media (min-width: 1181px) {
+      .rail-head,
+      .topic-head {
+        min-height: 222px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/theladder/ladder.css?v=51">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner ladder-nav">
+      <a class="nav-brand-group" href="/ai-academy/">
+        <span class="nav-brand-primary">AESOP AI Academy</span>
+      </a>
+      <span class="nav-divider nav-pathway-divider" aria-hidden="true"></span>
+      <div class="nav-pathway-links">
+        <a href="/theladder-products/" class="nav-pathway-link">Products</a>
+        <a href="/theladder-use-cases/" class="nav-pathway-link">Use Cases</a>
+      </div>
+      <div class="nav-links ladder-top-actions">
+        <select id="languageSelect" class="ladder-select" aria-label="Language"></select>
+        <button class="theme-toggle" id="darkToggle" type="button">Dark mode</button>
+        <a class="nav-btn nav-btn--secondary" href="/ai-academy/students.html">Student Hub</a>
+        <a class="nav-btn nav-btn--secondary" href="/ai-academy/transcript.html">Transcript</a>
+        <a class="nav-btn" href="/ai-academy/admin/ladder-admin.html">Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="ladder-app">
+    <section class="ladder-hero">
+      <div class="ladder-hero-copy">
+        <div class="hero-kicker-row">
+          <p class="eyebrow" data-i18n="howHighCanYouClimb">How high can you climb?</p>
+          <label class="education-focus-control" for="educationFocusSelect">
+            <span>Education Focus</span>
+            <select id="educationFocusSelect" aria-label="Education Focus">
+              <option value="/theladder/" selected>AI Concepts</option>
+              <option value="/theladder-products/">Products</option>
+              <option value="/theladder-use-cases/">Use Cases</option>
+            </select>
+          </label>
+        </div>
+        <div class="hero-certifications-row">
+          <span class="hero-cert-label">The Ladder AI Certifications</span>
+          <span id="heroCertCount" class="hero-cert-count">0</span>
+        </div>
+        <div class="hero-title-row">
+          <h1>The Ladder AI</h1>
+        </div>
+        <p class="hero-text">A structured AI learning path where every rung becomes a guided conversation, additional lessons and links, certification options, and a transcript event.</p>
+        <div class="ladder-hero-stats" aria-label="Ladder progress summary">
+          <div class="ladder-hero-stat ladder-hero-stat--primary">
+            <strong id="heroCoursesComplete">0 / 0</strong>
+            <span>courses completed</span>
+          </div>
+          <div class="ladder-hero-stat">
+            <strong id="heroTiersComplete">0 / 15</strong>
+            <span>tiers completed</span>
+          </div>
+          <div class="ladder-hero-stat">
+            <strong id="heroTiersCertified">0</strong>
+            <span>certifications</span>
+          </div>
+          <div class="ladder-hero-stat">
+            <strong id="heroTiersExpert">0</strong>
+            <span>expertise</span>
+          </div>
+          <div class="ladder-hero-stat">
+            <strong id="heroTiersMastered">0</strong>
+            <span>mastery</span>
+          </div>
+        </div>
+        <div class="hero-ribbon-section">
+          <span class="hero-ribbon-label" data-i18n="tierCertificationRibbons">Tier Certification Ribbons</span>
+          <div id="heroRibbonTrack" class="hero-ribbon-track" aria-label="Highest certification ribbon by Ladder tier"></div>
+        </div>
+      </div>
+      <div class="hero-panels">
+        <div class="learner-panel topic-search-panel" id="topicSearchPanel">
+          <span class="panel-label" data-i18n="findARung">Find a Rung</span>
+          <strong data-i18n="searchTopicsOrCourses">Search topics or courses</strong>
+          <input id="topicSearchInput" class="topic-search-input" type="search" placeholder="Agents, ethics, image generation..." aria-label="Search Ladder topics and courses" autocomplete="off">
+          <div id="topicSearchResults" class="topic-search-results" aria-live="polite"></div>
+        </div>
+        <div class="learner-panel evaluation-panel" id="evaluationPanel">
+          <span class="panel-label" data-i18n="certification">Certification</span>
+          <strong data-i18n="certification">Certify this tier</strong>
+          <p id="activeEvaluationTarget">Current certification target</p>
+          <p id="evaluationCooldownNotice" class="evaluation-cooldown" hidden></p>
+          <div class="evaluation-controls">
+            <label class="evaluation-field" for="certificationTierSelect">
+              <span>Education Tier/Role</span>
+              <select id="certificationTierSelect" class="evaluation-select" aria-label="Education Tier or Professional Role"></select>
+            </label>
+            <label class="evaluation-field" for="testDepthSelect">
+              <span>Mastery level</span>
+              <select id="testDepthSelect" class="evaluation-select" aria-label="Mastery level"></select>
+            </label>
+          <div class="evaluation-actions">
+            <button id="startEvaluationBtn" type="button" data-i18n="startCertification">Start certification</button>
+            <a class="credential-demo-link" href="/ladder-credential.html?learner=AESOP-YAPT&amp;tier=Agent%20Builder&amp;level=Mastery%20Challenge&amp;education=Workforce&amp;earned=2026-06-09" target="_blank" data-i18n="ladderCredentialExample">Ladder Credential Example</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ladder-toolbar placement-toolbar" id="placementSection">
+      <div class="placement-summary">
+        <span class="panel-label">Placement Assessment</span>
+        <h2 id="placementStatus">Not placed yet</h2>
+        <p id="placementSummary">Take the Ladder assessment to test out of tiers and receive assigned rungs based on both capability and interest.</p>
+        <div class="placement-actions">
+          <button id="startPlacementBtn" type="button">Start assessment</button>
+          <button id="togglePlacementBtn" class="secondary" type="button" hidden>View results</button>
+          <button id="resetPlacementBtn" class="secondary" type="button">Reset</button>
+        </div>
+        <div id="placementProfilePrompt" class="placement-profile-prompt" hidden>
+          <strong>Update your profile with these results?</strong>
+          <span>This saves your placed-out tiers, assigned rungs, and interests to your learner profile.</span>
+          <div>
+            <button id="applyPlacementProfileBtn" type="button">Update profile</button>
+            <button id="dismissProfilePromptBtn" class="secondary" type="button">Not now</button>
+          </div>
+        </div>
+      </div>
+      <div class="placement-chat">
+        <div class="assessment-chat-head">
+          <div>
+            <span class="panel-label">Assessment Conversation</span>
+            <strong id="assessmentTurnCount">0 responses</strong>
+          </div>
+          <div class="assessment-nav" aria-label="Assessment navigation">
+            <button id="assessmentTopBtn" class="secondary" type="button">Top</button>
+            <button id="assessmentLatestBtn" class="secondary" type="button">Latest</button>
+          </div>
+        </div>
+        <div id="assessmentLog" class="assessment-log" aria-live="polite" tabindex="0" aria-label="Placement assessment conversation"></div>
+        <form id="assessmentForm" class="assessment-form">
+          <textarea id="assessmentInput" rows="4" placeholder="Answer the placement guide" autocomplete="off"></textarea>
+          <button id="assessmentSend" type="submit">Send</button>
+        </form>
+      </div>
+      <div class="placement-progress">
+        <span class="panel-label">Progress</span>
+        <div class="progress-meter"><span id="progressBar"></span></div>
+        <small id="progressText">0 of 270 rungs completed</small>
+        <div id="placementMetrics" class="placement-metrics"></div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <aside class="tier-rail" aria-label="Ladder tiers">
+        <div class="rail-head">
+          <span class="rail-product-label">AESOP pathway</span>
+          <strong class="rail-product-title">The Ladder AI</strong>
+          <span class="rail-tier-status" id="tierCompletionStatus">0 / 15 tiers completed</span>
+        </div>
+        <div id="tierList" class="tier-list"></div>
+      </aside>
+
+      <section class="topic-column">
+        <div class="topic-head">
+          <div>
+            <span class="panel-label" id="activeTierLabel">Beginner</span>
+            <h2 id="activeTopicTitle">What artificial intelligence is and is not</h2>
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <label for="educationTierSelect" style="font-size: 0.9rem; color: #666;">Teach at:</label>
+              <select id="educationTierSelect" style="padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+                <option value="">Loading...</option>
+              </select>
+            </div>
+          </div>
+          <button id="completeTopicBtn" type="button">Mark self-reported</button>
+        </div>
+
+        <section class="topic-panel certification-workspace-panel" aria-label="Certification">
+          <div>
+            <span class="panel-label">Certification</span>
+            <strong>Certify this rung</strong>
+            <p id="certificationWorkspaceTarget">Current certification target</p>
+            <p id="certificationWorkspaceCooldown" class="evaluation-cooldown" hidden></p>
+          </div>
+          <div class="certification-workspace-actions">
+            <button id="startWorkspaceCertificationBtn" type="button">Start certification</button>
+            <button class="secondary architecture-link" type="button" data-open-architecture aria-label="How certification works">How it works</button>
+            <a id="ladderCertificationsLink" href="/ladder-certifications.html">Certification record</a>
+            <a id="studentTranscriptLink" href="/student-transcript-live.html">Student transcript</a>
+          </div>
+        </section>
+
+        <div class="topic-grid">
+          <section class="topic-panel">
+            <div class="panel-heading">
+              <h3>Vocabulary</h3>
+              <span id="vocabCount">0 terms</span>
+            </div>
+            <div id="vocabList" class="vocab-list"></div>
+          </section>
+
+          <section class="topic-panel vocab-definition-panel">
+            <div class="panel-heading">
+              <h3>Vocabulary Definition</h3>
+              <span id="vocabDefinitionTerm">Select a term</span>
+            </div>
+            <div id="vocabDefinitionBox" class="vocab-definition-box">
+              <strong>Choose a vocabulary word</strong>
+              <p>Click a term to see its definition and start an AI conversation about it.</p>
+            </div>
+            <form id="vocabPromptForm" class="vocab-prompt-form">
+              <input id="vocabPromptInput" type="text" placeholder="Ask about this term" autocomplete="off">
+              <button type="submit">Ask</button>
+            </form>
+          </section>
+        </div>
+
+        <!-- Exam in progress banner -->
+        <div id="examInProgressBanner" style="display: none; padding: 1rem; background: #fff9e6; border: 2px solid #c9a05a; border-radius: 6px; margin-bottom: 1rem; text-align: center;">
+          <p style="margin: 0; color: #102235; font-weight: 600;">Exam in progress — scroll down to continue</p>
+        </div>
+
+        <section class="conversation-panel">
+          <div class="panel-heading">
+            <div>
+              <h3 id="conversationTitle">Guided Conversation</h3>
+              <p id="conversationSummary">The AI asks, challenges, applies, and checks readiness for this rung.</p>
+            </div>
+            <button id="startConversationBtn" type="button">Start conversation</button>
+          </div>
+          <div id="certificationModeBar" class="certification-mode-bar" hidden>
+            <span class="panel-label">Certification exam in progress</span>
+            <strong id="certificationModeTitle">Certification</strong>
+            <p id="certificationModeDetail">The AI is examining evidence in this same conversation window.</p>
+            <div class="certification-mode-actions">
+              <button id="finalizeCertificationBtn" type="button">Finalize my determination</button>
+              <button id="endCertificationBtn" class="secondary" type="button">Return to training</button>
+            </div>
+          </div>
+          <div id="chatLog" class="chat-log" aria-live="polite"></div>
+          <form id="chatForm" class="chat-form">
+            <textarea id="chatInput" placeholder="Answer the guide or ask for the next challenge" autocomplete="off" rows="1" style="resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: inherit;"></textarea>
+            <button type="submit">Send</button>
+          </form>
+        </section>
+
+        <section class="topic-panel resource-panel">
+          <div class="panel-heading">
+            <h3>Additional Lessons & Links</h3>
+            <button id="researchBtn" type="button">Find more videos</button>
+          </div>
+          <div id="resourceList" class="resource-list"></div>
+        </section>
+
+        <section class="transcript-panel">
+          <div class="panel-heading">
+            <h3>Transcript</h3>
+            <div class="transcript-actions">
+              <a id="transcriptPageLink" href="/student-transcript-live.html">Full transcript</a>
+              <button id="exportTranscriptBtn" type="button">Export</button>
+            </div>
+          </div>
+          <div id="transcriptList" class="transcript-list"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <footer class="ladder-legal">
+    <span>&copy; 2026 AESOP AI Academy - All Rights Reserved</span>
+    <span>The Ladder AI / AESOP Engine - Patent Pending - U.S. Provisional Patent Application No. 64/085,986</span>
+  </footer>
+
+  <dialog id="architectureDialog" aria-labelledby="architectureDialogTitle" style="max-width:min(980px, calc(100vw - 2rem)); max-height:calc(100vh - 2rem); overflow:auto;">
+    <section class="topic-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="panel-label">Certification guide</span>
+          <h3 id="architectureDialogTitle">How Ladder Certification Works</h3>
+        </div>
+        <form method="dialog">
+          <button class="secondary" type="submit">Close</button>
+        </form>
+      </div>
+      <div id="architectureDialogContent" class="architecture-dialog-content" tabindex="0" style="max-height:70vh; overflow:auto;">
+        <p>Loading certification guide...</p>
+      </div>
+    </section>
+  </dialog>
+
+  <script>
+    function updateNavCertCount() {
+      const certCountEl = document.getElementById('navCertCount');
+      const certifiedEl = document.getElementById('heroTiersCertified');
+      const expertEl = document.getElementById('heroTiersExpert');
+      const masteredEl = document.getElementById('heroTiersMastered');
+
+      if (certCountEl && certifiedEl && expertEl && masteredEl) {
+        const certifiedText = certifiedEl.textContent || '0';
+        const expertText = expertEl.textContent || '0';
+        const masteredText = masteredEl.textContent || '0';
+
+        const certified = parseInt(certifiedText.match(/\d+/)?.[0] || 0);
+        const expert = parseInt(expertText.match(/\d+/)?.[0] || 0);
+        const mastered = parseInt(masteredText.match(/\d+/)?.[0] || 0);
+
+        const total = certified + expert + mastered;
+        certCountEl.textContent = total;
+      }
+    }
+
+    function setupEducationFocusSelect() {
+      const select = document.getElementById('educationFocusSelect');
+      if (!select) return;
+      select.addEventListener('change', (event) => {
+        const target = event.target.value;
+        if (target && target !== window.location.pathname) {
+          window.location.href = target;
+        }
+      });
+    }
+
+    // Update on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavCertCount();
+      setupEducationFocusSelect();
+    });
+
+    // Update every hour
+    setInterval(updateNavCertCount, 3600000);
+  </script>
+
+  <script type="module" src="/theladder/ladder-app.js?v=50"></script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<!-- theladder-v0.2.0 | 2026-06-08 | accessibility fixes, dark mode contrast, UX improvements -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/favicon_512.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ladder Authentication - AESOP AI Academy</title>
+  <meta name="description" content="Complete authentication and identity verification for advanced Ladder certification tiers.">
+  <script>
+    if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
+  <link rel="stylesheet" href="/academy-theme.css?v=2">
+  <link rel="stylesheet" href="/academy-dark-mode.css?v=2">
+  <link rel="stylesheet" href="/theladder/ladder.css?v=0.2.0">
+  <style>
+    body {
+      background: #ffffff;
+    }
+    .auth-container {
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .auth-panel {
+      background: var(--ladder-panel);
+      border: 1px solid var(--ladder-line);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .auth-header {
+      margin-bottom: 2rem;
+    }
+    .auth-header h1 {
+      color: var(--ladder-ink, #102235);
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin: 0.5rem 0 0.5rem;
+    }
+    .auth-header p {
+      color: var(--ladder-muted, #34495d);
+      font-size: 1.02rem;
+      line-height: 1.5;
+      margin: 0.5rem 0 0;
+    }
+    .auth-section {
+      margin-bottom: 1.5rem;
+    }
+    .auth-section h2 {
+      color: var(--ladder-ink, #102235);
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+    }
+    .auth-section p {
+      color: var(--ladder-muted, #34495d);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .evaluation-field {
+      display: grid;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    .evaluation-field span {
+      color: var(--ladder-good, #5b477e);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .evaluation-select {
+      border: 1px solid var(--ladder-line);
+      background: var(--white);
+      color: #102235;
+      min-height: 40px;
+      padding: 0.45rem 0.65rem;
+      border-radius: 7px;
+      font-size: 0.95rem;
+    }
+    .account-form {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .account-actions {
+      display: grid;
+      gap: 0.55rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 1rem;
+    }
+    .account-actions button {
+      min-height: 40px;
+    }
+    .identity-attestation {
+      align-items: start;
+      color: #34495d;
+      display: grid;
+      font-size: 0.95rem;
+      gap: 0.5rem;
+      grid-template-columns: auto minmax(0, 1fr);
+      line-height: 1.45;
+      margin: 1rem 0;
+    }
+    .identity-attestation input {
+      accent-color: #735f9e;
+      margin-top: 0.25rem;
+      min-height: auto;
+      min-width: 0;
+      width: auto;
+    }
+    .auth-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 2rem;
+    }
+    .auth-actions button,
+    .auth-actions a {
+      align-items: center;
+      border: 1px solid #102235;
+      border-radius: 7px;
+      display: inline-flex;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 800;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0.55rem 0.8rem;
+      text-decoration: none;
+    }
+    .auth-actions button {
+      background: #102235;
+      color: #ffe7a8;
+      cursor: pointer;
+    }
+    .auth-actions button:hover {
+      background: #1b3248;
+    }
+    .auth-actions a {
+      background: transparent;
+      color: #102235;
+    }
+    .auth-actions a:hover {
+      background: #f0e8dc;
+    }
+    .field-description {
+      color: #5b7c99;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: #f8f6f2;
+      border-radius: 6px;
+      display: none;
+    }
+    .field-description.visible {
+      display: block;
+    }
+    .required-indicator {
+      color: #d32f2f;
+    }
+    .form-section-help {
+      color: #5b7c99;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      background: #f8f6f2;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1.25rem;
+    }
+    .progress-steps {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #34495d;
+    }
+    .progress-step.active {
+      color: #102235;
+      font-weight: 600;
+    }
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: #e8dcc8;
+      border-radius: 50%;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .progress-step.active .step-number {
+      background: #735f9e;
+      color: #ffe7a8;
+    }
+    [data-theme="dark"] .auth-header h1 {
+      color: #e8e3db;
+    }
+    [data-theme="dark"] .auth-header p {
+      color: #a8bcc8;
+    }
+    [data-theme="dark"] .auth-section h2 {
+      color: #e8e3db;
+    }
+    [data-theme="dark"] .auth-section p {
+      color: #a8bcc8;
+    }
+    [data-theme="dark"] .progress-step {
+      color: #a8bcc8;
+    }
+    [data-theme="dark"] .progress-step.active {
+      color: #e8e3db;
+    }
+    [data-theme="dark"] .step-number {
+      color: #102235;
+    }
+    [data-theme="dark"] .evaluation-field span {
+      color: #c9a8d8;
+    }
+    [data-theme="dark"] .field-description {
+      color: #a8bcc8;
+      background: rgba(23, 35, 49, 0.6);
+    }
+    [data-theme="dark"] .form-section-help {
+      color: #a8bcc8;
+      background: rgba(23, 35, 49, 0.6);
+    }
+    [data-theme="dark"] .evaluation-select:focus,
+    [data-theme="dark"] .evaluation-select:focus-visible {
+      outline: 3px solid #dbb87a;
+      outline-offset: 2px;
+    }
+    [data-theme="dark"] .identity-attestation input:focus,
+    [data-theme="dark"] .identity-attestation input:focus-visible {
+      outline: 3px solid #dbb87a;
+      outline-offset: 2px;
+    }
+    [data-theme="dark"] .auth-actions button:focus,
+    [data-theme="dark"] .auth-actions button:focus-visible {
+      outline: 3px solid #dbb87a;
+      outline-offset: 2px;
+    }
+    /* Ensure account action buttons are visible */
+    #authSignInBtn,
+    #authCreateBtn {
+      display: inline-block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner ladder-nav">
+      <a class="nav-brand-group" href="/ai-academy/">
+        <span class="nav-brand-primary">AESOP AI Academy</span>
+        <span class="nav-divider"></span>
+        <span class="nav-brand-secondary">The Ladder AI</span>
+      </a>
+      <div class="nav-links ladder-top-actions">
+        <button class="dark-mode-toggle" id="darkToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+          <span class="dark-mode-toggle__icon">Light</span>
+          <span class="dark-mode-toggle__track"><span class="dark-mode-toggle__thumb"></span></span>
+          <span class="dark-mode-toggle__icon">Dark</span>
+        </button>
+        <a class="nav-btn nav-btn--secondary" href="/ai-academy/students.html">Student Hub</a>
+        <a class="nav-btn nav-btn--secondary" href="/ai-academy/transcript.html">Transcript</a>
+        <a class="nav-btn nav-btn--primary" href="/theladder/">Back to Certification</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="auth-container">
+    <div class="auth-panel">
+      <div class="auth-header">
+        <h1 data-i18n="completeYourAuthentication">Complete Your Authentication</h1>
+        <p data-i18n="verifyIdentityAndSetup">Verify your identity and set up your certification authentication before proceeding with advanced Ladder tiers.</p>
+      </div>
+
+      <div class="progress-steps">
+        <div class="progress-step active">
+          <div class="step-number">1</div>
+          <span data-i18n="accountSetup">Account Setup</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-number">2</div>
+          <span data-i18n="identityAssurance">Identity Assurance</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-number">3</div>
+          <span data-i18n="confirmation">Confirmation</span>
+        </div>
+      </div>
+
+      <div class="auth-section">
+        <h2 data-i18n="accountSetup">Account Setup</h2>
+        <div class="form-section-help" data-i18n="adultTiersRequireAccount">Adult education tiers (Young Adult, College, Workforce, Leadership) require a verified account. Sign in to an existing account or create a new one.</div>
+        <form id="authAccountForm" class="account-form">
+          <label class="evaluation-field">
+            <span data-i18n="emailUsername">Email</span>
+            <input id="authEmailInput" type="email" class="evaluation-select" data-i18n-placeholder="emailPlaceholder" placeholder="name@example.com" autocomplete="username" required>
+          </label>
+          <label class="evaluation-field">
+            <span data-i18n="password">Password</span>
+            <input id="authPasswordInput" type="password" class="evaluation-select" data-i18n-placeholder="passwordPlaceholder" placeholder="Password" autocomplete="current-password" required>
+          </label>
+          <div class="account-actions">
+            <button id="authSignInBtn" type="button" data-i18n="signIn">Sign in</button>
+            <button id="authCreateBtn" type="button" class="secondary" data-i18n="createAccount">Create account</button>
+          </div>
+        </form>
+        <div id="authError" class="evaluation-cooldown" hidden role="alert" aria-live="polite" aria-atomic="true"></div>
+      </div>
+
+      <!-- Logout section (shown when logged in) -->
+      <div id="loggedInSection" hidden style="margin: 1.5rem 2rem 0; padding: 1rem; background: #f0f8f5; border-radius: 6px; border-left: 3px solid #4caf82;">
+        <p id="loggedInEmail" style="margin: 0 0 0.75rem; color: #102235; font-weight: 600;"></p>
+        <button id="logoutBtn" type="button" style="padding: 0.6rem 1.2rem; background: #e05c5c; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Log out</button>
+      </div>
+
+      <!-- Create Account Modal -->
+      <div id="createAccountModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+          <h3 style="margin: 0 0 1.5rem; font-size: 1.3rem; color: #102235;">Create Account</h3>
+          <form id="createAccountForm" style="display: grid; gap: 1rem;">
+            <label style="display: grid; gap: 0.3rem;">
+              <span style="font-weight: 600; color: #102235; font-size: 0.9rem;">Email</span>
+              <input id="createEmailInput" type="email" placeholder="name@example.com" required style="padding: 0.6rem; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 0.95rem;">
+            </label>
+            <label style="display: grid; gap: 0.3rem;">
+              <span style="font-weight: 600; color: #102235; font-size: 0.9rem;">Password</span>
+              <input id="createPasswordInput" type="password" placeholder="Password" required style="padding: 0.6rem; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 0.95rem;">
+            </label>
+            <div id="createAccountError" style="color: #e05c5c; font-size: 0.9rem; display: none;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem;">
+              <button type="button" id="closeCreateModal" style="padding: 0.6rem; border: 1px solid #d0d0d0; background: white; color: #102235; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+              <button type="button" id="submitCreateAccount" style="padding: 0.6rem; border: none; background: #102235; color: #ffe7a8; border-radius: 6px; font-weight: 600; cursor: pointer;">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="auth-section">
+        <h2 data-i18n="identityAssurance">Identity Assurance</h2>
+        <div class="form-section-help" data-i18n="selectVerificationLevel">Select how you want to verify your identity for this certification attempt. Different levels provide different assurance that the credential represents your work.</div>
+        <label class="evaluation-field">
+          <span data-i18n="identityAssuranceLevel">Identity Assurance Level <span class="required-indicator">*</span></span>
+          <select id="authIdentityAssuranceSelect" class="evaluation-select" aria-label="Select your identity verification level" aria-required="true" required>
+            <option value="" data-i18n="chooseVerificationLevel">Choose verification level...</option>
+          </select>
+        </label>
+        <div id="authIdentityAssuranceDescription" class="field-description"></div>
+        <div id="authProctoringModeField" hidden>
+          <label class="evaluation-field">
+            <span data-i18n="proctoringMode">Proctoring Mode <span class="required-indicator">*</span></span>
+            <select id="authProctoringModeSelect" class="evaluation-select" aria-label="Select your proctoring method" aria-required="true" required>
+              <option value="" data-i18n="chooseProctoringMethod">Choose proctoring method...</option>
+            </select>
+          </label>
+          <div id="authProctoringModeDescription" class="field-description"></div>
+        </div>
+      </div>
+
+      <div class="auth-section">
+        <h2 data-i18n="confirmation">Confirmation</h2>
+        <div class="form-section-help" data-i18n="confirmIdentity">By proceeding, you confirm that you will take this certification attempt yourself and that any credential issued will represent your knowledge and skills.</div>
+        <label class="identity-attestation">
+          <input id="authIdentityAttestationCheck" type="checkbox" required>
+          <span data-i18n="confirmAttestion">I confirm that I am the person taking this certification attempt and that any credential issued will represent my work and knowledge.</span>
+        </label>
+      </div>
+
+      <div class="auth-actions">
+        <button id="authProceedBtn" type="button" data-i18n="returnToCertification">Return to Certification</button>
+        <a href="/theladder/" data-i18n="cancel">Cancel</a>
+      </div>
+    </div>
+  </main>
+
+  <footer style="text-align: center; padding: 2rem 1rem; color: #888; font-size: 0.85rem;">
+    The Ladder AI v0.2.0
+  </footer>
+
+  <script type="module">
+    import { LADDER_UI_TRANSLATIONS } from './ladder-data.js?v=2';
+
+    const userLanguage = localStorage.getItem('aesop-language') || 'en';
+
+    function t(key) {
+      const translations = LADDER_UI_TRANSLATIONS[userLanguage] || LADDER_UI_TRANSLATIONS['en'];
+      return translations[key] || LADDER_UI_TRANSLATIONS['en'][key] || key;
+    }
+
+    function updatePageTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = t(key);
+      });
+    }
+
+    updatePageTranslations();
+    window.updatePageTranslations = updatePageTranslations;
+    window.t = t;
+  </script>
+  <script type="module" src="/theladder/ladder-auth.js?v=0.2.0"></script>
+</body>
+</html>

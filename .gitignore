@@ -1,0 +1,12 @@
+# secrets — aesop-api/proxy.php loads ../secrets.php (Anthropic API key). NEVER commit it.
+/secrets.php
+**/secrets.local.php
+**/config.local.php
+
+# deps / build
+node_modules/
+.DS_Store
+
+# editor / agent scratch
+.claude/
+*.log
