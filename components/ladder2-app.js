@@ -461,7 +461,7 @@ function setupNavActions() {
     const target = document.getElementById('certification');
     if (!target) return;
     const navHeight = document.querySelector('.nav')?.getBoundingClientRect().height || 48;
-    const raisePx = 144 - (navHeight / 2);
+    const raisePx = 96 - (navHeight / 2);
     const targetTop = target.getBoundingClientRect().top + window.scrollY + raisePx;
     window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
   };
