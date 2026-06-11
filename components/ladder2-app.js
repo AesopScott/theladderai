@@ -588,6 +588,39 @@ function listText(items, limit = 18) {
   return cleaned.length > limit ? `${visible}, plus ${cleaned.length - limit} more` : visible;
 }
 
+function criteriaListText(items) {
+  const cleaned = (items || []).map((item) => String(item || '').trim()).filter(Boolean);
+  if (!cleaned.length) return '- Not specified in the catalog.';
+  return cleaned.map((item) => `- ${item.replace(/[.;]\s*$/, '')}`).join('\n');
+}
+
+function criteriaDepthLabel(depth) {
+  const raw = String(depth || '').trim();
+  if (!raw || raw === 'certification') return 'Core';
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+function criteriaDepthTextFromMap(criteriaByDepth) {
+  const source = criteriaByDepth || {};
+  const entries = [
+    ['Core', source.certification || source.core || source.Core],
+    ['Expert', source.expert || source.Expert],
+    ['Mastery', source.mastery || source.Mastery]
+  ].filter(([, criteria]) => Array.isArray(criteria) && criteria.length);
+  const fallback = Object.entries(source)
+    .filter(([depth]) => !['certification', 'core', 'Core', 'expert', 'Expert', 'mastery', 'Mastery'].includes(depth))
+    .map(([depth, criteria]) => [criteriaDepthLabel(depth), criteria]);
+  return [...entries, ...fallback]
+    .map(([label, criteria]) => `${label}:\n${criteriaListText(criteria)}`)
+    .join('\n\n');
+}
+
+function criteriaDepthTextFromStandards(depths) {
+  return (depths || [])
+    .map((depth) => `${criteriaDepthLabel(depth.label)}:\n${criteriaListText(depth.criteria || [])}`)
+    .join('\n\n');
+}
+
 function groupTopicsFor(group) {
   const rawTopics = group?.raw?.topics || [];
   const topics = rawTopics.length ? rawTopics : (group?.items || []).map((item) => item.raw || item.label);
@@ -759,8 +792,8 @@ function trainingContextFor(it, group, standard = null) {
   const topics = standard?.topics || groupTopicsFor(group);
   const vocabulary = standard?.vocabulary || vocabularyFor(it, group);
   const depthCriteria = standard?.certificationDepths?.length
-    ? standard.certificationDepths.map((depth) => `${depth.label}: ${(depth.criteria || []).join('; ')}`).join('\n')
-    : Object.entries(standard?.criteriaByDepth || criteriaByDepthFor(it, group)).map(([depth, criteria]) => `${depth}: ${criteria.join('; ')}`).join('\n');
+    ? criteriaDepthTextFromStandards(standard.certificationDepths)
+    : criteriaDepthTextFromMap(standard?.criteriaByDepth || criteriaByDepthFor(it, group));
   const roleCriteria = standard?.roleCriteria?.[selectedLevelLabel()] || defaultRoleCriteria()[selectedLevelLabel()];
   const detailLines = [
     raw.type ? `Type/product family: ${raw.type}` : '',
@@ -820,7 +853,7 @@ Your job is to lead the learner somewhere specific: by the end, they should be a
 
 Before the lesson begins, follow this readiness sequence:
 1. The first assistant message must only preview the lesson content and required vocabulary, then ask whether the learner is ready to begin.
-2. When the learner says they are ready, show the test criteria they will need to satisfy.
+2. When the learner says they are ready, show the test criteria they will need to satisfy as readable bullet lists grouped under Core, Expert, and Mastery.
 3. After the criteria, show the approximate time to complete this rung.
 4. Then ask one short readiness question before beginning the lesson.
 5. Begin the actual lesson only after that readiness gate is complete.
@@ -835,6 +868,7 @@ Run a short guided lesson with this arc:
 Teaching rules:
 - Do not begin the lesson in the first assistant message.
 - If the learner has not confirmed readiness yet, ask whether they are ready instead of teaching.
+- Never present test criteria as a single semicolon-separated paragraph; use one criterion per line.
 - Lead the learner through the path. Do not wait for them to choose the curriculum.
 - Do not behave like a certification exam. Be instructional, warm, and practical.
 - Do not answer as a one-off Q&A unless the answer moves the lesson forward.
@@ -890,6 +924,14 @@ function upgradeSavedTrainingMessages(messages, it, group, standard) {
   const upgraded = (messages || []).slice();
   if (upgraded[0]?.role === 'assistant' && /where would you like to start\?/i.test(upgraded[0].content || '')) {
     upgraded[0] = { role: 'assistant', content: trainingOpeningFor(it, group, standard) };
+  }
+  const oldCriteriaIndex = upgraded.findIndex((message) =>
+    message.role === 'assistant'
+    && /Great\. Here is what you will be tested against before the lesson begins\./.test(message.content || '')
+    && /;\s+\w/.test(message.content || '')
+  );
+  if (oldCriteriaIndex >= 0) {
+    upgraded[oldCriteriaIndex] = { role: 'assistant', content: preLessonBriefingFor(it, group, standard) };
   }
   return upgraded;
 }
