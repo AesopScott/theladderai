@@ -377,6 +377,7 @@ async function activateFocus(focusId) {
   state.trainMessages = [];
 
   renderRail();
+  renderRungPanel();
   renderActiveItem();
   renderCertConfig();
 }
@@ -445,28 +446,42 @@ function renderRail() {
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
   $('l2GroupStatus').textContent = `${done} / ${total} rungs in ${focus().label}`;
+  // Clean list of tiers only: number + "Tier N" + title. Rungs live in the right
+  // window (renderRungPanel); the rail no longer expands rungs inline.
   rail.innerHTML = state.groups.map((g, i) => {
-    const open = g.id === state.activeGroupId;
-    return `<div class="l2-rail-group ${open ? 'is-open' : ''}">
-      <button class="l2-rail-grouphead" data-group="${g.id}">
-        <span class="l2-rail-num">${i + 1}</span>
-        <span class="l2-rail-meta"><strong>${escapeHtml(g.label)}</strong><small>${g.items.length} rungs</small></span>
-      </button>
-      ${open ? `<div class="l2-rail-items">${g.items.map((it) =>
-        `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}">${escapeHtml(it.label)}</button>`).join('')}</div>` : ''}
-    </div>`;
+    const active = g.id === state.activeGroupId;
+    return `<button class="l2-tier-item ${active ? 'is-active' : ''}" type="button" data-group="${g.id}">
+      <span class="l2-rail-num">${i + 1}</span>
+      <span class="l2-tier-meta"><small>Tier ${i + 1}</small><strong>${escapeHtml(g.label)}</strong></span>
+    </button>`;
   }).join('');
   rail.querySelectorAll('[data-group]').forEach((b) => b.addEventListener('click', () => {
     state.activeGroupId = b.dataset.group;
     const g = activeGroup();
     state.activeItemId = g.items[0]?.id || null;
     state.trainMessages = [];
-    renderRail(); renderActiveItem();
+    renderRail(); renderRungPanel(); renderActiveItem();
   }));
-  rail.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
+}
+
+// Right-hand "blue window with gold text": the selected tier's rungs, clickable.
+function renderRungPanel() {
+  const panel = $('l2RungPanel');
+  if (!panel) return;
+  const g = activeGroup();
+  if (!g) { panel.hidden = true; panel.innerHTML = ''; return; }
+  panel.hidden = false;
+  panel.innerHTML = `
+    <div class="rung-panel-head">
+      <span class="rung-panel-title">${escapeHtml(g.label)}</span>
+      <small>${g.items.length} rungs</small>
+    </div>
+    <div class="rung-panel-list">${g.items.map((it) =>
+      `<button class="rung-pick ${it.id === state.activeItemId ? 'is-active' : ''}" type="button" data-item="${it.id}">${escapeHtml(it.label)}</button>`).join('')}</div>`;
+  panel.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
     state.activeItemId = b.dataset.item;
     state.trainMessages = [];
-    renderRail(); renderActiveItem();
+    renderRungPanel(); renderActiveItem();
   }));
 }
 
