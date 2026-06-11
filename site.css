@@ -7330,7 +7330,7 @@ body.l2 .training-chat-actions #l2StartChat {
   margin-left: auto;
 }
 body.l2 .training-chat-panel .chat-log {
-  min-height: clamp(34rem, 62vh, 44rem);
+  min-height: clamp(28rem, calc(62vh - 8rem), 36rem);
 }
 
 [data-theme="dark"] body.l2 .training-tier-dropdown summary,
