@@ -7213,8 +7213,17 @@ body.l2 .placement-toolbar {
 }
 /* ladder.css pins .placement-chat at min-height:480px (legacy fixed panel); drop that floor
    so the conversation column sizes to its content and rides up with the centered section. */
-body.l2 #assessment .placement-chat { min-height: 0; max-width: none; }
-body.l2 #assessment .assessment-log { min-height: 130px; max-height: 24vh; }
+body.l2 #assessment .placement-chat {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+  min-height: 0;
+  max-width: none;
+}
+body.l2 #assessment .assessment-log {
+  min-height: clamp(24rem, calc(62vh - 12rem), 32rem);
+  max-height: 52vh;
+}
 /* Pull the Assessment content to the top of the section so the compact description +
    conversation pair rides up the page. The shared .l2-section centers content vertically;
    override for #assessment only. */
