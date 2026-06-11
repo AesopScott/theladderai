@@ -828,13 +828,16 @@ body.l2 .placement-toolbar p, body.l2 .placement-toolbar small { color: var(--l2
 body.l2 .placement-toolbar {
   align-items: start;
   /* narrow the description column (cap its right edge) so the conversation window pulls
-     left and sits right next to it; the conversation takes the remaining width. */
-  grid-template-columns: minmax(240px, 22rem) minmax(0, 1fr);
+     left and sits right next to it. */
+  grid-template-columns: minmax(200px, 18rem) minmax(0, 1fr);
 }
 /* ladder.css pins .placement-chat at min-height:480px (legacy fixed panel); drop that floor
    so the conversation column sizes to its content and rides up with the centered section. */
-body.l2 #assessment .placement-chat { min-height: 0; }
-body.l2 #assessment .assessment-log { min-height: 150px; max-height: 30vh; }
+body.l2 #assessment .placement-chat { min-height: 0; max-width: 42rem; }
+body.l2 #assessment .assessment-log { min-height: 130px; max-height: 24vh; }
+/* Pull the Assessment content to the top of the section so the compact description +
+   conversation pair rides up the page (overrides .l2-section vertical-center). */
+body.l2 #assessment { justify-content: flex-start; }
 /* Enlarge Assessment-section body text for readability (scoped to #assessment so the
    Training/Certification screens, which share these components, are unaffected). The
    section title and the Start-assessment button are intentionally left at their base size. */
