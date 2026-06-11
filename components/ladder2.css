@@ -906,6 +906,40 @@ body.l2 .l2-rail-item {
 body.l2 .l2-rail-item:hover { color: var(--l2-ink); }
 body.l2 .l2-rail-item.is-active { color: var(--l2-gold-deep); border-left-color: var(--l2-gold); font-weight: 700; }
 
+/* Clean tier list — number + "Tier N" + title; rungs open in the right window. */
+body.l2 .l2-tier-item {
+  width: 100%; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 0.7rem;
+  align-items: center; text-align: left; background: none; border: none; border-radius: 0;
+  border-bottom: 1px solid var(--l2-line); padding: 0.8rem 0; cursor: pointer; line-height: 1.3;
+}
+body.l2 .l2-tier-item::after { display: none; }
+body.l2 .l2-tier-meta { min-width: 0; }
+body.l2 .l2-tier-meta small { display: block; color: var(--l2-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+body.l2 .l2-tier-meta strong { display: block; font-family: var(--l2-display); font-weight: 700; font-size: 0.95rem; color: var(--l2-ink); }
+body.l2 .l2-tier-item:hover .l2-tier-meta strong,
+body.l2 .l2-tier-item.is-active .l2-tier-meta strong,
+body.l2 .l2-tier-item:hover .l2-rail-num,
+body.l2 .l2-tier-item.is-active .l2-rail-num { color: var(--l2-gold-deep); }
+
+/* Right-hand "blue window with gold text": the selected tier's rungs (navy in both themes). */
+body.l2 .rung-panel {
+  background: #11203a; border: 1px solid rgba(201, 160, 90, 0.28); border-radius: 8px;
+  padding: 1.1rem 1.3rem; margin-bottom: 1.5rem;
+}
+body.l2 .rung-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.7rem; }
+body.l2 .rung-panel-title { font-family: var(--l2-display); font-weight: 800; font-size: 1.05rem; color: var(--l2-gold); }
+body.l2 .rung-panel-head small { color: rgba(255, 255, 255, 0.55); font-size: 0.72rem; white-space: nowrap; }
+body.l2 .rung-panel-list { display: grid; gap: 0; }
+body.l2 .rung-pick {
+  width: 100%; text-align: left; background: none; border: none; border-radius: 0;
+  padding: 0.6rem 0; color: var(--l2-gold); font-family: var(--l2-display); font-weight: 600;
+  font-size: 0.9rem; cursor: pointer; border-bottom: 1px solid rgba(255, 255, 255, 0.08); line-height: 1.35;
+}
+body.l2 .rung-pick:last-child { border-bottom: none; }
+body.l2 .rung-pick::after { display: none; }
+body.l2 .rung-pick:hover { color: #fff; }
+body.l2 .rung-pick.is-active { color: #fff; font-weight: 800; }
+
 body.l2 .topic-head { border-bottom: 1px solid var(--l2-line); padding-bottom: 1rem; margin-bottom: 1.5rem; }
 body.l2 .topic-head h2 { font-family: var(--l2-display); font-weight: 800; font-size: 1.7rem; color: var(--l2-ink); margin: 0.3rem 0 0; }
 body.l2 .conversation-panel { background: none; border: none; }
