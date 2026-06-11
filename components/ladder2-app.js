@@ -500,32 +500,41 @@ function savedChatFor(pathway, itemId) {
 
 function renderRail() {
   const rail = $('l2GroupRail');
+  const selectedRungs = $('l2SelectedRungs');
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
   $('l2GroupStatus').textContent = `${done} / ${total} rungs in ${focus().label}`;
-  rail.innerHTML = state.groups.map((g, i) => {
-    const open = g.id === state.activeGroupId;
-    return `<div class="l2-rail-group ${open ? 'is-open' : ''}">
-      <button class="l2-rail-grouphead" data-group="${g.id}">
-        <span class="l2-rail-num">${i + 1}</span>
-        <span class="l2-rail-meta"><strong>${escapeHtml(g.label)}</strong><small>${g.items.length} rungs</small></span>
-      </button>
-      ${open ? `<div class="l2-rail-items">${g.items.map((it) =>
-        `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}">${escapeHtml(it.label)}</button>`).join('')}</div>` : ''}
-    </div>`;
-  }).join('');
+  const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
+  const active = state.groups[activeIndex];
+  const summary = $('l2SelectedTierSummary');
+  if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : 'Choose a tier';
+  rail.innerHTML = state.groups.map((g, i) =>
+    `<button class="l2-tier-option ${g.id === state.activeGroupId ? 'is-active' : ''}" data-group="${g.id}" type="button">
+      <span class="l2-rail-num">${i + 1}</span>
+      <span class="l2-tier-meta">
+        <small>${g.items.length} rungs</small>
+        <strong>${escapeHtml(g.label)}</strong>
+      </span>
+    </button>`).join('');
   rail.querySelectorAll('[data-group]').forEach((b) => b.addEventListener('click', () => {
     state.activeGroupId = b.dataset.group;
     const g = activeGroup();
     state.activeItemId = g.items[0]?.id || null;
     state.trainMessages = [];
+    if ($('l2TierDropdown')) $('l2TierDropdown').open = false;
     renderRail(); renderActiveItem();
   }));
-  rail.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
-    state.activeItemId = b.dataset.item;
-    state.trainMessages = [];
-    renderRail(); renderActiveItem();
-  }));
+  if (selectedRungs) {
+    selectedRungs.innerHTML = active
+      ? active.items.map((it) =>
+        `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`).join('')
+      : '';
+    selectedRungs.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
+      state.activeItemId = b.dataset.item;
+      state.trainMessages = [];
+      renderRail(); renderActiveItem();
+    }));
+  }
 }
 
 function renderActiveItem() {

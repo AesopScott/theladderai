@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=5">
+  <link rel="stylesheet" href="/site.css?v=6">
 </head>
 <body class="l2">
 
@@ -265,16 +265,19 @@
         <a class="l2-btn" href="#certification">Sign in below</a>
       </div>
 
-      <div class="workspace" id="l2Workspace">
-        <aside class="tier-rail" aria-label="Ladder rungs">
-          <div class="rail-head">
-            <span class="rail-product-label" id="l2FocusLabel">AI Concepts</span>
-            <strong class="rail-product-title">The Ladder AI</strong>
-            <span class="rail-tier-status" id="l2GroupStatus">Loading rungs…</span>
-          </div>
-          <div id="l2GroupRail" class="tier-list"></div>
-        </aside>
+      <div class="training-tier-picker" aria-label="Training tier selection">
+        <span class="rail-product-label" id="l2FocusLabel">AI Concepts</span>
+        <span class="rail-tier-status" id="l2GroupStatus">Loading rungs…</span>
+        <details class="training-tier-dropdown" id="l2TierDropdown">
+          <summary>
+            <span class="training-tier-current" id="l2SelectedTierSummary">Choose a tier</span>
+          </summary>
+          <div id="l2GroupRail" class="tier-list training-tier-menu"></div>
+        </details>
+        <div id="l2SelectedRungs" class="l2-rail-items training-selected-rungs"></div>
+      </div>
 
+      <div class="workspace" id="l2Workspace">
         <section class="topic-column">
           <div class="topic-head">
             <div>
@@ -283,8 +286,6 @@
             </div>
             <button id="l2CompleteBtn" type="button">Mark complete</button>
           </div>
-
-          <div id="l2RungPanel" class="rung-panel"></div>
 
           <section class="conversation-panel">
             <div class="panel-heading">
@@ -477,6 +478,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=14"></script>
+  <script type="module" src="/components/ladder2-app.js?v=15"></script>
 </body>
 </html>
