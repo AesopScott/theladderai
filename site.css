@@ -6322,7 +6322,13 @@ body.l2::before {
   60%  { opacity: 1; filter: blur(0); }
   100% { opacity: 1; transform: scale(1); }
 }
-body.l2-loaded .l2-preloader { opacity: 0; visibility: hidden; }
+body.l2-loaded .l2-preloader { opacity: 0; visibility: hidden; pointer-events: none; }
+body.l2.l2-loaded #l2Preloader {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 @media (prefers-reduced-motion: reduce) {
   .l2-preloader::before, .l2-preloader::after { animation: none; opacity: 0.28; transform: translate(-50%, -50%) scale(1.05); }
   .l2-preloader__img { animation: none; }
@@ -7306,7 +7312,8 @@ body.l2 #training .l2-section-head {
   align-items: flex-start;
 }
 body.l2 #training { justify-content: flex-start; }
-body.l2 #training .workspace {
+body.l2 #training .workspace,
+body.l2 #certification .workspace {
   grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
   gap: 1.25rem;
   align-items: start;
@@ -7497,61 +7504,6 @@ body.l2 .training-chat-panel .chat-form {
   margin-top: 0;
   padding-top: 0.9rem;
 }
-body.l2 .training-standards-eval {
-  display: grid;
-  gap: 0.55rem;
-  padding-top: 0.2rem;
-}
-body.l2 .training-eval-check {
-  align-items: center;
-  border: 1px solid rgba(201, 160, 90, 0.44);
-  color: var(--l2-ink);
-  cursor: pointer;
-  display: flex;
-  gap: 0.65rem;
-  min-height: 42px;
-  padding: 0.55rem 0.7rem;
-}
-body.l2 .training-eval-check input {
-  accent-color: var(--l2-gold);
-  flex: 0 0 auto;
-}
-body.l2 .training-eval-check span,
-body.l2 .training-eval-run {
-  font-family: var(--l2-display);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-body.l2 .training-eval-check:has(input:checked) {
-  background: rgba(201, 160, 90, 0.12);
-  border-color: var(--l2-gold);
-}
-body.l2 .training-eval-check:has(input:disabled),
-body.l2 .training-eval-run:disabled {
-  cursor: wait;
-  opacity: 0.68;
-}
-body.l2 .training-eval-run {
-  border: 1px solid var(--l2-gold);
-  background: var(--l2-navy);
-  color: #ffe7a8;
-  cursor: pointer;
-  min-height: 42px;
-  padding: 0.65rem 0.8rem;
-}
-body.l2 .training-eval-status {
-  color: var(--l2-muted);
-  font-size: 0.84rem;
-  line-height: 1.4;
-  margin: 0;
-  min-height: 1.2em;
-}
-body.l2 .training-eval-status.is-error {
-  color: #8a1f1f;
-  font-weight: 800;
-}
 body.l2 .training-text-size {
   display: flex;
   align-items: center;
@@ -7568,6 +7520,51 @@ body.l2 .training-text-size input {
   flex: 1 1 auto;
   min-width: 0;
   accent-color: var(--l2-gold);
+}
+body.l2 .training-standards-eval {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--l2-line);
+}
+body.l2 .training-eval-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--l2-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+body.l2 .training-eval-check input {
+  inline-size: 1rem;
+  block-size: 1rem;
+  accent-color: var(--l2-gold);
+}
+body.l2 .training-eval-run {
+  justify-self: start;
+  min-height: 2.35rem;
+  border: 1px solid var(--l2-line);
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  background: var(--l2-ink);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+body.l2 .training-eval-run:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+body.l2 .training-eval-status {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--l2-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+body.l2 .training-eval-status.is-error {
+  color: #9f3412;
 }
 body.l2 .training-account-gate {
   flex: 0 1 34rem;
@@ -7708,7 +7705,39 @@ body.l2 .certification-mode-bar {
   background: none; border: none; border-top: 1px solid var(--l2-gold);
   border-bottom: 1px solid var(--l2-gold); border-radius: 0; padding: 1rem 0; margin-bottom: 1.5rem;
 }
-body.l2 .l2-cert-grid { border-top: 0; }
+body.l2 .l2-cert-grid {
+  border-top: 0;
+  margin-top: 0;
+}
+body.l2 .certification-left-column {
+  display: grid;
+  gap: 1.25rem;
+}
+body.l2 .certification-nav-panel {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--l2-line);
+}
+body.l2 .certification-tier-picker .training-rung-description {
+  margin-bottom: 0;
+}
+body.l2 .certification-focus-toggle {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  margin: 0 0 0.35rem;
+}
+body.l2 .certification-focus-toggle .l2-focus-btn {
+  font-size: 0.92rem;
+  padding: 0.45rem 0;
+}
+body.l2 .certification-chat-panel .panel-heading {
+  border-bottom: 1px solid var(--l2-line);
+  padding-bottom: 0.8rem;
+}
+body.l2 .certification-chat-panel .chat-log,
+body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
+  min-height: clamp(16.125rem, calc(62vh - 14.875rem), 28rem);
+}
 
 /* ============================================================
    CHAT — open, no bubbles

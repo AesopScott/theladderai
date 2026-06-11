@@ -51,7 +51,7 @@ const EVALUATION_SKILLS = {
   employment: {
     label: 'Employment Standards Evaluation',
     file: '/skills/EMPLOY_eval.md?v=1',
-    families: ['O*NET', 'World Economic Forum Future of Jobs']
+    families: ['O*NET', 'World Economic Forum Skills']
   }
 };
 
@@ -76,118 +76,20 @@ const EDUCATION_TIERS = [
   'Young Adult', 'College', 'Workforce', 'Leadership'
 ];
 const PROFESSIONAL_ROLES = [
-  {
-    id: 'ai-developer',
-    label: 'AI Developer',
-    source: 'O*NET 15-1255+',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Develop AI applications, write code for AI systems, and implement models.',
-    roleSpec: 'Evaluate programming fluency, AI/ML framework awareness, implementation judgment, testing habits, documentation, and the ability to turn requirements into working AI solutions.'
-  },
-  {
-    id: 'machine-learning-engineer',
-    label: 'Machine Learning Engineer',
-    source: 'O*NET 15-1255+',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Design, train, validate, optimize, and deploy machine learning systems.',
-    roleSpec: 'Evaluate model design, data preprocessing, feature engineering, evaluation metrics, validation, production ML lifecycle, scalability, and deployment tradeoffs.'
-  },
-  {
-    id: 'data-scientist',
-    label: 'Data Scientist',
-    source: 'O*NET 15-2051.00',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Analyze data, develop predictive models, and communicate usable insights.',
-    roleSpec: 'Evaluate statistical reasoning, data cleaning, modeling, visualization, business translation, bias awareness, and communication to non-technical stakeholders.'
-  },
-  {
-    id: 'ai-operations-engineer',
-    label: 'AI Operations Engineer',
-    source: 'WEF Future of Jobs 2025',
-    standards: 'WEF, NIST AI RMF, ISO/IEC 42001',
-    description: 'Deploy, monitor, maintain, and troubleshoot production AI systems.',
-    roleSpec: 'Evaluate MLOps, monitoring, incident response, model drift, versioning, cloud/container operations, reliability, and operational risk management.'
-  },
-  {
-    id: 'ai-product-manager',
-    label: 'AI Product Manager',
-    source: 'WEF Future of Jobs 2025',
-    standards: 'WEF, O*NET Product Management',
-    description: 'Define AI product strategy, prioritize features, and manage roadmaps.',
-    roleSpec: 'Evaluate AI product judgment, use-case feasibility, roadmap decisions, stakeholder communication, user research, responsible AI implications, and outcome metrics.'
-  },
-  {
-    id: 'ai-educator',
-    label: 'AI Educator',
-    source: 'O*NET 25-1021.00',
-    standards: 'O*NET, UNESCO, ISTE',
-    description: 'Teach AI concepts, design curriculum, and train learners.',
-    roleSpec: 'Evaluate conceptual accuracy, explanation across levels, curriculum design, assessment design, facilitation, feedback, responsible AI, and learner support.'
-  },
-  {
-    id: 'ai-security-specialist',
-    label: 'AI Security Specialist',
-    source: 'O*NET 15-3121.00',
-    standards: 'O*NET, NIST AI RMF, OWASP',
-    description: 'Secure AI systems through threat modeling, testing, and mitigation.',
-    roleSpec: 'Evaluate AI threat knowledge, prompt-injection awareness, data poisoning, model theft, privacy, red teaming, secure architecture, and mitigation strategy.'
-  },
-  {
-    id: 'ai-governance-officer',
-    label: 'AI Governance Officer',
-    source: 'WEF Future of Jobs 2025',
-    standards: 'WEF, NIST AI RMF, EU AI Act',
-    description: 'Lead AI policy, compliance, ethics, risk, and governance frameworks.',
-    roleSpec: 'Evaluate governance design, risk assessment, bias and transparency controls, policy implementation, audit trails, regulatory awareness, and stakeholder decision-making.'
-  },
-  {
-    id: 'ai-consultant',
-    label: 'AI Consultant',
-    source: 'O*NET 13-1111.00',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Advise organizations on AI readiness, strategy, and implementation.',
-    roleSpec: 'Evaluate AI strategy, readiness assessment, roadmap planning, change management, use-case selection, risk framing, and executive communication.'
-  },
-  {
-    id: 'executive-leadership',
-    label: 'Executive Leadership',
-    source: 'WEF, NIST AI RMF',
-    standards: 'WEF, NIST AI RMF, EU AI Act',
-    description: 'Set AI vision, transformation strategy, governance, and investment direction.',
-    roleSpec: 'Evaluate strategic AI literacy, business impact, governance accountability, risk ownership, team leadership, ROI judgment, and responsible transformation.'
-  },
-  {
-    id: 'data-analyst',
-    label: 'Data Analyst',
-    source: 'O*NET 15-2051.01',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Analyze business data, produce reports, and identify trends.',
-    roleSpec: 'Evaluate SQL/data manipulation, cleaning, dashboards, trend analysis, business question framing, reporting accuracy, and practical AI-assisted analysis.'
-  },
-  {
-    id: 'ai-solutions-architect',
-    label: 'AI Solutions Architect',
-    source: 'O*NET 15-1299.08',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Design enterprise AI systems and integration patterns.',
-    roleSpec: 'Evaluate architecture tradeoffs, cloud AI patterns, data pipelines, security, scalability, integration, cost, reliability, and business-to-technical translation.'
-  },
-  {
-    id: 'prompt-engineer',
-    label: 'Prompt Engineer',
-    source: 'WEF 2025 (Emerging)',
-    standards: 'WEF Future of Jobs 2025',
-    description: 'Design, test, optimize, and document prompts for AI systems.',
-    roleSpec: 'Evaluate prompt design, model behavior awareness, iterative testing, prompt injection risk, template versioning, task decomposition, and performance measurement.'
-  },
-  {
-    id: 'business-analyst-ai',
-    label: 'Business Analyst (AI)',
-    source: 'O*NET 13-1161.00',
-    standards: 'O*NET, WEF, NIST AI RMF',
-    description: 'Identify AI use cases, assess business impact, and drive adoption.',
-    roleSpec: 'Evaluate workflow mapping, requirements gathering, use-case scoping, feasibility, ROI, stakeholder translation, change management, and KPI design.'
-  }
+  { id: 'ai-developer', label: 'AI Developer', source: 'O*NET 15-1255+', standards: 'O*NET, WEF, NIST AI RMF', description: 'Develop AI applications, write code for AI systems, and implement models.', roleSpec: 'Evaluate programming fluency, AI/ML framework awareness, implementation judgment, testing habits, documentation, and the ability to turn requirements into working AI solutions.' },
+  { id: 'machine-learning-engineer', label: 'Machine Learning Engineer', source: 'O*NET 15-1255+', standards: 'O*NET, WEF, NIST AI RMF', description: 'Design, train, validate, optimize, and deploy machine learning systems.', roleSpec: 'Evaluate model design, data preprocessing, feature engineering, evaluation metrics, validation, production ML lifecycle, scalability, and deployment tradeoffs.' },
+  { id: 'data-scientist', label: 'Data Scientist', source: 'O*NET 15-2051.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Analyze data, develop predictive models, and communicate usable insights.', roleSpec: 'Evaluate statistical reasoning, data cleaning, modeling, visualization, business translation, bias awareness, and communication to non-technical stakeholders.' },
+  { id: 'ai-operations-engineer', label: 'AI Operations Engineer', source: 'WEF Future of Jobs 2025', standards: 'WEF, NIST AI RMF, ISO/IEC 42001', description: 'Deploy, monitor, maintain, and troubleshoot production AI systems.', roleSpec: 'Evaluate MLOps, monitoring, incident response, model drift, versioning, cloud/container operations, reliability, and operational risk management.' },
+  { id: 'ai-product-manager', label: 'AI Product Manager', source: 'WEF Future of Jobs 2025', standards: 'WEF, O*NET Product Management', description: 'Define AI product strategy, prioritize features, and manage roadmaps.', roleSpec: 'Evaluate AI product judgment, use-case feasibility, roadmap decisions, stakeholder communication, user research, responsible AI implications, and outcome metrics.' },
+  { id: 'ai-educator', label: 'AI Educator', source: 'O*NET 25-1021.00', standards: 'O*NET, UNESCO, ISTE', description: 'Teach AI concepts, design curriculum, and train learners.', roleSpec: 'Evaluate conceptual accuracy, explanation across levels, curriculum design, assessment design, facilitation, feedback, responsible AI, and learner support.' },
+  { id: 'ai-security-specialist', label: 'AI Security Specialist', source: 'O*NET 15-3121.00', standards: 'O*NET, NIST AI RMF, OWASP', description: 'Secure AI systems through threat modeling, testing, and mitigation.', roleSpec: 'Evaluate AI threat knowledge, prompt-injection awareness, data poisoning, model theft, privacy, red teaming, secure architecture, and mitigation strategy.' },
+  { id: 'ai-governance-officer', label: 'AI Governance Officer', source: 'WEF Future of Jobs 2025', standards: 'WEF, NIST AI RMF, EU AI Act', description: 'Lead AI policy, compliance, ethics, risk, and governance frameworks.', roleSpec: 'Evaluate governance design, risk assessment, bias and transparency controls, policy implementation, audit trails, regulatory awareness, and stakeholder decision-making.' },
+  { id: 'ai-consultant', label: 'AI Consultant', source: 'O*NET 13-1111.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Advise organizations on AI readiness, strategy, and implementation.', roleSpec: 'Evaluate AI strategy, readiness assessment, roadmap planning, change management, use-case selection, risk framing, and executive communication.' },
+  { id: 'executive-leadership', label: 'Executive Leadership', source: 'WEF, NIST AI RMF', standards: 'WEF, NIST AI RMF, EU AI Act', description: 'Set AI vision, transformation strategy, governance, and investment direction.', roleSpec: 'Evaluate strategic AI literacy, business impact, governance accountability, risk ownership, team leadership, ROI judgment, and responsible transformation.' },
+  { id: 'data-analyst', label: 'Data Analyst', source: 'O*NET 15-2051.01', standards: 'O*NET, WEF, NIST AI RMF', description: 'Analyze business data, produce reports, and identify trends.', roleSpec: 'Evaluate SQL/data manipulation, cleaning, dashboards, trend analysis, business question framing, reporting accuracy, and practical AI-assisted analysis.' },
+  { id: 'ai-solutions-architect', label: 'AI Solutions Architect', source: 'O*NET 15-1299.08', standards: 'O*NET, WEF, NIST AI RMF', description: 'Design enterprise AI systems and integration patterns.', roleSpec: 'Evaluate architecture tradeoffs, cloud AI patterns, data pipelines, security, scalability, integration, cost, reliability, and business-to-technical translation.' },
+  { id: 'prompt-engineer', label: 'Prompt Engineer', source: 'WEF 2025 (Emerging)', standards: 'WEF Future of Jobs 2025', description: 'Design, test, optimize, and document prompts for AI systems.', roleSpec: 'Evaluate prompt design, model behavior awareness, iterative testing, prompt injection risk, template versioning, task decomposition, and performance measurement.' },
+  { id: 'business-analyst-ai', label: 'Business Analyst (AI)', source: 'O*NET 13-1161.00', standards: 'O*NET, WEF, NIST AI RMF', description: 'Identify AI use cases, assess business impact, and drive adoption.', roleSpec: 'Evaluate workflow mapping, requirements gathering, use-case scoping, feasibility, ROI, stakeholder translation, change management, and KPI design.' }
 ];
 const PROFESSIONAL_ROLE_LABELS = new Set(PROFESSIONAL_ROLES.map((role) => role.label));
 const CERTIFICATION_LEVELS = [...EDUCATION_TIERS, ...PROFESSIONAL_ROLES.map((role) => role.label)];
@@ -589,7 +491,7 @@ function setupNavActions() {
 // FOCUS TOGGLE
 // =============================================================================
 function setupFocusToggle() {
-  $('l2FocusToggle')?.querySelectorAll('.l2-focus-btn').forEach((btn) => {
+  document.querySelectorAll('#l2FocusToggle .l2-focus-btn, #l2CertFocusToggle .l2-focus-btn').forEach((btn) => {
     btn.addEventListener('click', () => activateFocus(btn.dataset.focus));
   });
 }
@@ -600,9 +502,10 @@ async function activateFocus(focusId) {
   localStorage.setItem(LS_FOCUS, focusId);
 
   // toggle active button
-  $('l2FocusToggle')?.querySelectorAll('.l2-focus-btn').forEach((b) =>
+  document.querySelectorAll('#l2FocusToggle .l2-focus-btn, #l2CertFocusToggle .l2-focus-btn').forEach((b) =>
     b.classList.toggle('is-active', b.dataset.focus === focusId));
-  $('l2FocusLabel').textContent = focus().label;
+  setText('l2FocusLabel', focus().label);
+  setText('l2CertFocusLabel', focus().label);
 
   $('l2GroupStatus').textContent = 'Loading rungs…';
   state.catalog = await focus().loadCatalog();
@@ -627,9 +530,9 @@ function setupTraining() {
   $('l2StartChat')?.addEventListener('click', startTrainingChat);
   $('l2ResetChat')?.addEventListener('click', resetTrainingChat);
   $('l2ChatForm')?.addEventListener('submit', submitTrainingChat);
-  $('l2RunStandardsEval')?.addEventListener('click', runSelectedStandardsEvaluations);
   enterToSend('l2ChatInput');
   setupTrainingTextScale();
+  $('l2RunStandardsEval')?.addEventListener('click', runSelectedStandardsEvaluations);
   $('l2CompleteBtn')?.addEventListener('click', markComplete);
 }
 
@@ -1853,12 +1756,21 @@ function endCertification() {
 // =============================================================================
 function totalCompleted() { return Object.keys(state.completed).length; }
 function certCount() { return (state._record?.ladderCertifications || []).length; }
+function completedConceptTierIds() {
+  const completed = new Set();
+  (state.placement?.grantedTierIds || []).forEach((id) => completed.add(id));
+  LADDER_TIERS.forEach((tier) => {
+    const items = (tier.topics || []).map((topic) => `concept:topic-${topic.id}`);
+    if (items.length && items.every((key) => state.completed[key])) completed.add(tier.id);
+  });
+  return completed;
+}
 
 function renderMarketing() {
   // Marketing hero stats/ribbons were removed; these setters are no-ops if the
   // elements are absent. Kept guarded so the live progress shows if re-added.
-  const total = state.groups.reduce((n, g) => n + g.items.length, 0);
-  setText('l2StatCourses', `${Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length} / ${total}`);
+  const completedTiers = completedConceptTierIds();
+  setText('l2StatCourses', `${completedTiers.size} / ${LADDER_TIERS.length}`);
   setText('l2StatTiers', String(state.placement?.grantedTierIds?.length || 0));
   const certs = state._record?.ladderCertifications || [];
   // Bucket each cert by depth. Prefer the explicit depth field (depthId/depthLabel);
