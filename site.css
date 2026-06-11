@@ -7789,9 +7789,21 @@ body.l2 .certification-setup-panel .account-attestation {
   margin: 0.25rem 0;
 }
 body.l2 .certification-account-gate {
+  grid-column: 1 / 2 !important;
+  justify-self: start;
+  width: 320px;
+  max-width: 100%;
   margin: 0.3rem 0 0;
   padding: 1rem 0 0;
   border-top: 1px solid var(--l2-line);
+}
+body.l2 .certification-account-gate .account-form,
+body.l2 .certification-account-gate .account-actions {
+  width: 100%;
+}
+body.l2 .certification-account-gate #l2AccountSignOut {
+  width: 100%;
+  text-align: center;
 }
 body.l2 .certification-start-btn {
   width: 100%;
