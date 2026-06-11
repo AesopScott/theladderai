@@ -72,7 +72,7 @@ const PROCTORING_MODES = [
 ];
 
 // --- Products catalog config (kept local so the live Products files are untouched) ---
-const PRODUCTS_CATALOG_URL = '/docs/theladder-products-catalog.md?v=2';
+const PRODUCTS_CATALOG_URL = '/docs/theladder-products-catalog.md?v=3';
 const PRODUCT_CATEGORY_RANGES = [
   { label: 'AI assistants', start: 1, end: 20 },
   { label: 'Workplace + writing', start: 21, end: 35 },
@@ -85,7 +85,17 @@ const PRODUCT_CATEGORY_RANGES = [
   { label: 'Sales + support', start: 167, end: 191 },
   { label: 'Agents + automation', start: 192, end: 210 },
   { label: 'Model APIs + cloud', start: 211, end: 230 },
-  { label: 'Regulated AI', start: 231, end: 250 }
+  { label: 'Regulated AI', start: 231, end: 250 },
+  { label: 'HR + recruiting', start: 251, end: 275 },
+  { label: 'Education + tutoring', start: 276, end: 300 },
+  { label: 'Ecommerce + retail', start: 301, end: 325 },
+  { label: 'Finance + accounting', start: 326, end: 350 },
+  { label: 'AIOps + incidents', start: 351, end: 375 },
+  { label: 'AI governance', start: 376, end: 400 },
+  { label: 'Construction + real estate', start: 401, end: 425 },
+  { label: 'Manufacturing + supply chain', start: 426, end: 450 },
+  { label: 'Science + clinical AI', start: 451, end: 475 },
+  { label: 'Personal productivity', start: 476, end: 500 }
 ];
 function parseProductCatalog(markdown) {
   return markdown.split('\n')
