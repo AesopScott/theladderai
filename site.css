@@ -6899,6 +6899,38 @@ body.l2 .hero-cascade-final {
 @media (prefers-reduced-motion: reduce) {
   body.l2 .hero-cascade-final { animation: none; }
 }
+body.l2 .l2-hero-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.6rem;
+  padding: 1rem 1.8rem;
+  min-height: 3.35rem;
+  border-radius: 8px;
+  background: var(--l2-gold);
+  color: #0d1b2a;
+  box-shadow: 0 14px 32px rgba(201, 160, 90, 0.32);
+  font-family: var(--l2-display);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
+}
+body.l2 .l2-hero-primary-cta:hover,
+body.l2 .l2-hero-primary-cta:focus-visible {
+  background: var(--l2-gold-deep);
+  color: #0d1b2a;
+  box-shadow: 0 18px 40px rgba(201, 160, 90, 0.45);
+  transform: translateY(-1px);
+}
+body.l2 .l2-hero-primary-cta:focus-visible {
+  outline: 3px solid rgba(13, 27, 42, 0.35);
+  outline-offset: 3px;
+}
 body.l2 .hero-certifications-row { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1.6rem; }
 body.l2 .hero-cert-count { font-family: var(--l2-display); font-weight: 800; font-size: 1.4rem; color: var(--l2-ink); }
 body.l2 .ladder-hero-stats {
