@@ -6470,6 +6470,10 @@ body.l2 .hero-navlabel-group {
   width: clamp(220px, 24vw, 380px);     /* == .hero-ornament width */
   height: 1.7rem;
 }
+body.l2 .hero-navlabel-group--support {
+  width: auto;
+  min-width: 5.7rem;
+}
 body.l2 .hero-navlabel {
   position: absolute;
   top: 0;
@@ -6479,6 +6483,7 @@ body.l2 .hero-navlabel {
 }
 body.l2 .hero-navlabel--l { left: 20.7%; }   /* left line-segment center (91/440) */
 body.l2 .hero-navlabel--r { left: 79.3%; }   /* right line-segment center (349/440) */
+body.l2 .hero-navlabel--support { position: static; display: inline-block; transform: none; }
 body.l2 .hero-navlabel::after { left: 50%; transform: translateX(-50%); }  /* center the hover underline */
 
 /* sun/moon stacked above the language word — upper-right corner */
@@ -7682,7 +7687,7 @@ body.l2 .l2-footer-col a { display: block; color: var(--l2-ink-2); text-decorati
 body.l2 .l2-footer-col a:hover { color: var(--l2-gold-deep); }
 body.l2 .l2-footer-legal { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--l2-line); color: var(--l2-muted); font-size: 0.82rem; line-height: 1.6; }
 /* Support & feedback, relocated to the bottom of the page (just above the footer nav) */
-body.l2 .l2-footer-support { width: min(560px, 100%); margin: 0 0 3rem; }
+body.l2 .l2-footer-support { width: min(560px, 100%); margin: 0 0 3rem; scroll-margin-top: 6rem; }
 body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800; font-size: 1.4rem; color: var(--l2-ink); margin: 0.35rem 0 1rem; }
 
 /* ============================================================

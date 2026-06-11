@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=23">
+  <link rel="stylesheet" href="/site.css?v=24">
 </head>
 <body class="l2">
 
@@ -43,7 +43,7 @@
       <a class="nav-brand-group" href="#marketing" aria-label="The Ladder AI — home">
         <span class="nav-brand-logo" aria-hidden="true"></span>
       </a>
-      <!-- six nav words, each centered over its ornament line segment below.
+      <!-- five nav words, each centered over its ornament line segment below.
            The wrap spans main's 80% column so the row centers / left-anchors
            exactly like .hero-ornaments at every width. -->
       <div class="hero-navlabels-wrap">
@@ -55,6 +55,9 @@
           <div class="hero-navlabel-group">
             <a class="l2-navlink hero-navlabel hero-navlabel--l" href="#training">Training</a>
             <a class="l2-navlink hero-navlabel hero-navlabel--r" href="#certification">Certification</a>
+          </div>
+          <div class="hero-navlabel-group hero-navlabel-group--support">
+            <a class="l2-navlink hero-navlabel hero-navlabel--support" href="#support">Support</a>
           </div>
         </div>
       </div>
@@ -403,7 +406,7 @@
   <!-- ============ FOOTER ============ -->
   <footer class="l2-footer">
     <h2 class="l2-footer-cta">Still climbing? <a href="#assessment">Let's place you.</a></h2>
-    <section class="l2-footer-support" aria-label="Support and feedback">
+    <section class="l2-footer-support" id="support" aria-label="Support and feedback">
       <span class="panel-label">Support &amp; feedback</span>
       <h3>How can we help?</h3>
       <form class="l2-feedback-form" id="l2FeedbackForm">
@@ -438,6 +441,7 @@
         <a href="#assessment">Placement</a>
         <a href="#training">Training</a>
         <a href="#certification">Certification</a>
+        <a href="#support">Support</a>
         <a href="#profile">Profile</a>
       </div>
       <div class="l2-footer-col">
