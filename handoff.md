@@ -22,32 +22,89 @@ Your worktrees show ZERO changes to index.html, /components/, CSS files, or any 
 
 **THIS IS WRONG. YOU MUST EDIT ACTUAL APPLICATION FILES.**
 
-### The Correct Workflow:
+### EXACT COMMANDS YOU MUST RUN (Copy-paste these. No interpretation.)
 
-**STEP 1: WRITE CODE**
-- Edit `/index.html` 
-- Edit files in `/components/` directory
-- Edit `/academy-theme.css` or `/academy-dark-mode.css`
-- Edit `/aesop-api/` files if needed
-- Edit `/ai-academy/` files if needed
-- **DO NOT edit `/theladder/`, `/theladder-products/`, or `/theladder-use-cases/`**
+**STEP 1: Verify you are in the correct worktree**
 
-**STEP 2: TEST LOCALLY**
-- Run a local server (port 3000, 5601, or your test port)
-- Verify your changes work in the browser
+```bash
+pwd
+git branch
+git status
+```
 
-**STEP 3: COMMIT YOUR CHANGES**
-- `git add -A` (this stages your actual code changes, not .handoff-state)
-- `git commit -m "your message"`
-- `git push origin your-branch-name`
+All three outputs must match your assignment (see top of this file). If NOT, STOP.
 
-**STEP 4: APPEND TO HANDOFF**
-- Only after steps 1-3 are complete
-- Write an entry below the delimiter with what you changed
+---
 
-**STEP 5: ORCHESTRATOR DEPLOYS**
-- Orchestrator detects your entry (every 60 seconds)
-- Orchestrator commits, pushes, merges, and deploys
+**STEP 2: Edit application files**
+
+Edit ONE or more of these files ONLY:
+- `/index.html`
+- `/components/` files (any file in this directory)
+- `/academy-theme.css`
+- `/academy-dark-mode.css`
+- `/aesop-api/` files
+- `/ai-academy/` files
+
+**DO NOT EDIT:** `/theladder/`, `/theladder-products/`, `/theladder-use-cases/`, or any file outside the above list.
+
+---
+
+**STEP 3: Test your changes locally**
+
+Open a browser and verify your changes work. Take a screenshot.
+
+---
+
+**STEP 4: Stage and commit your changes**
+
+Run these exact commands in your worktree:
+
+```bash
+git add -A
+git commit -m "feat: describe your changes here"
+git push origin $(git rev-parse --abbrev-ref HEAD)
+```
+
+After push, verify your branch is on GitHub:
+```bash
+git log origin/$(git rev-parse --abbrev-ref HEAD) --oneline -1
+```
+
+---
+
+**STEP 5: Append to handoff.md**
+
+This file. At the very end, before the final line, add this entry:
+
+```
+## YYYY-MM-DD HH:MM MDT — `your-branch-name`
+
+**Worktree:** /c/Users/scott/Code/theladderai/.claude/worktrees/YOUR-WORKTREE-NAME/
+
+**Summary:** One sentence: what did you change?
+
+**Files changed:**
+- /path/to/file.ext
+
+**How verified:** Browser screenshot shows [your change] working
+```
+
+Replace YYYY-MM-DD HH:MM with today's date and time.
+Replace your-branch-name with your actual branch.
+Replace the summary, files, and verification.
+
+---
+
+**STEP 6: Orchestrator deploys**
+
+The orchestrator runs every 60 seconds. It will:
+1. Detect your handoff entry
+2. Validate that your worktree has actual code changes (not just .handoff-state)
+3. Merge your branch to main
+4. Deploy to production
+
+**If orchestrator rejects your entry:** Check the error. You likely forgot to edit actual application files.
 
 ### What's Currently Happening:
 - You're appending to handoff.md ✓ (correct)
