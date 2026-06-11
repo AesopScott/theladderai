@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/favicon_512.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ladder AI marketing shell</title>
+  <meta name="description" content="A non-destructive shell page linking the new The Ladder AI marketing and workspace structure.">
+  <style>
+    :root {
+      --navy: #0d1b2a;
+      --gold: #c9a05a;
+      --cream: #faf8f4;
+      --ink: #33414f;
+      font-family: "Hanken Grotesk", "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+      background:
+        radial-gradient(circle at 70% 18%, rgba(201, 160, 90, 0.18), transparent 34%),
+        radial-gradient(circle at 18% 82%, rgba(92, 120, 153, 0.14), transparent 32%),
+        var(--cream);
+      color: var(--navy);
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(760px, 100%);
+      padding: clamp(1.5rem, 5vw, 3rem);
+      border: 1px solid rgba(13, 27, 42, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 24px 80px rgba(13, 27, 42, 0.12);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 0.8rem;
+      font-size: clamp(2.4rem, 7vw, 4.8rem);
+      line-height: 0.95;
+    }
+
+    p {
+      margin: 0 auto 1.5rem;
+      max-width: 58ch;
+      color: var(--ink);
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0.7rem 1rem;
+      border-radius: 7px;
+      color: var(--navy);
+      font-weight: 800;
+      text-decoration: none;
+      border: 1px solid rgba(13, 27, 42, 0.16);
+      background: #fff;
+    }
+
+    a.primary {
+      color: #fff;
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+
+    a:hover { border-color: var(--gold); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>The Ladder AI marketing shell</h1>
+    <p>This page is a non-destructive index for the new marketing/workspace structure. The existing root app remains available at `/` until the final cutover is approved.</p>
+    <div class="links">
+      <a class="primary" href="/marketing/">Marketing landing page</a>
+      <a href="/workspace/">Workspace app copy</a>
+      <a href="/archive/index-legacy-app-2026-06-11.html">Archived root app</a>
+      <a href="/ladder-certifications.html">Certification framework</a>
+    </div>
+  </main>
+</body>
+</html>
