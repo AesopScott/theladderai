@@ -196,7 +196,7 @@ body.l2 .l2-navlink::after {
    instead of :hover — :hover is geometric and re-fires when a sticky nav word
    lands under a resting cursor on scroll. See setupNavActions in ladder2-app.js. */
 body.l2 .l2-navlink.is-navhover { color: var(--l2-ink); }
-body.l2 .l2-navlink.is-navhover::after, body.l2 .l2-navlink.is-active::after { width: 100%; }
+body.l2 .l2-navlink.is-navhover::after { width: 100%; }
 body.l2 .ladder-top-actions { gap: clamp(2.4rem, 5.5vw, 5rem); }   /* match the center nav-links gap */
 /* actions match the center nav links' font + size */
 body.l2 .ladder-top-actions #l2Lang,
@@ -810,6 +810,39 @@ body.l2 #l2PlacementStatus { font-family: var(--l2-display); font-weight: 800; }
    ladder.css already makes .assessment-chat-head flex/space-between but align-items:center,
    which vertically centers the enlarged button; override to flex-start so it sits at the top. */
 body.l2 .assessment-chat-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+/* ladder.css styled .placement-toolbar as a dark navy box with white/pale text; ladder2
+   makes the toolbar transparent, so re-tint its text to the page ink palette (theme-aware
+   vars keep dark mode correct — ink/ink-2 flip to light there). Without this the heading
+   was white-on-white in light mode. */
+body.l2 .placement-toolbar h2, body.l2 .placement-toolbar strong { color: var(--l2-ink); }
+body.l2 .placement-toolbar p, body.l2 .placement-toolbar small { color: var(--l2-ink-2); }
+/* Assessment layout: top-align the two columns so the conversation sits at the same
+   level as the description (instead of the description cell stretching to match the tall
+   chat box), and keep the conversation compact so the section's centered content leaves
+   whitespace at the bottom rather than the chat box reaching the page edge. */
+body.l2 .placement-toolbar {
+  align-items: start;
+  /* narrow the description column (cap its right edge) so the conversation window pulls
+     left and sits right next to it; the conversation takes the remaining width. */
+  grid-template-columns: minmax(240px, 22rem) minmax(0, 1fr);
+}
+/* ladder.css pins .placement-chat at min-height:480px (legacy fixed panel); drop that floor
+   so the conversation column sizes to its content and rides up with the centered section. */
+body.l2 #assessment .placement-chat { min-height: 0; }
+body.l2 #assessment .assessment-log { min-height: 150px; max-height: 30vh; }
+/* Enlarge Assessment-section body text for readability (scoped to #assessment so the
+   Training/Certification screens, which share these components, are unaffected). The
+   section title and the Start-assessment button are intentionally left at their base size. */
+body.l2 #assessment .l2-section-lead { font-size: 1.5rem; }
+body.l2 #assessment .panel-label { font-size: 0.92rem; }
+body.l2 #assessment #l2PlacementStatus { font-size: 2rem; }
+body.l2 #assessment .placement-summary p { font-size: 1.25rem; }
+body.l2 #assessment .assessment-chat-head strong { font-size: 1.1rem; }
+body.l2 #assessment .l2-msg__role { font-size: 0.78rem; }
+body.l2 #assessment .l2-msg__body { font-size: 1.2rem; }
+body.l2 #assessment .assessment-form textarea { font-size: 1.15rem; }
+body.l2 #assessment .placement-actions button,
+body.l2 #assessment .assessment-form button { font-size: 1.05rem; }
 body.l2 .l2-assessment-done {
   display: none; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid var(--l2-line);
@@ -818,20 +851,6 @@ body.l2.placement-complete #assessment .l2-section-lead,
 body.l2.placement-complete #assessment .ladder-toolbar { display: none; }
 body.l2.placement-complete .l2-assessment-done { display: flex; }
 body.l2 .l2-assessment-done strong { font-family: var(--l2-display); font-weight: 800; font-size: 1.5rem; color: var(--l2-ink); display: block; }
-
-/* Assessment body copy sized up ~1.5x for readability. The section title and
-   the Start assessment button are intentionally left alone (handled separately). */
-body.l2 #assessment .l2-section-lead { font-size: 1.6rem; line-height: 1.6; }
-body.l2 #assessment .panel-label { font-size: 1.05rem; }
-body.l2 #assessment .placement-summary p,
-body.l2 #assessment #l2PlacementSummary { font-size: 1.35rem; line-height: 1.6; }
-body.l2 #assessment #l2PlacementStatus { font-size: 2.1rem; }
-body.l2 #assessment .assessment-chat-head strong { font-size: 1.15rem; }
-body.l2 #assessment .l2-msg__role { font-size: 0.85rem; }
-body.l2 #assessment .l2-msg__body { font-size: 1.35rem; line-height: 1.65; }
-body.l2 #assessment .assessment-form textarea { font-size: 1.35rem; }
-body.l2 #assessment #l2ResetPlacement,
-body.l2 #assessment #l2AssessSend { font-size: 1.15rem; }
 
 /* ============================================================
    4 · TRAINING — text-tab focus toggle + open rail
