@@ -402,6 +402,7 @@ function clearAssessmentDraft() {
 async function init() {
   setupTheme();
   setupWorkspaceLanguage();
+  setupSectionWheelLock();
   setupNavActions();
   setupFocusToggle();
   setupAssessment();
@@ -449,6 +450,49 @@ function hydrate(rec) {
 // =============================================================================
 // THEME / NAV
 // =============================================================================
+function canWheelScrollInside(target, deltaY) {
+  let node = target instanceof Element ? target : target?.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const style = getComputedStyle(node);
+    const scrollableY = /(auto|scroll)/.test(style.overflowY);
+    if (scrollableY && node.scrollHeight > node.clientHeight + 1) {
+      const atTop = node.scrollTop <= 0;
+      const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
+      if ((deltaY < 0 && !atTop) || (deltaY > 0 && !atBottom)) return true;
+    }
+    node = node.parentElement;
+  }
+  return false;
+}
+
+function sectionInView() {
+  const viewportMid = window.innerHeight / 2;
+  return [...document.querySelectorAll('body.l2 .l2-section, body.l2 .l2-footer')]
+    .find((section) => {
+      const rect = section.getBoundingClientRect();
+      return rect.top <= viewportMid && rect.bottom >= viewportMid;
+    });
+}
+
+function setupSectionWheelLock() {
+  window.addEventListener('wheel', (event) => {
+    if (event.ctrlKey || event.metaKey || !event.deltaY) return;
+    if (canWheelScrollInside(event.target, event.deltaY)) return;
+
+    const section = event.target.closest?.('.l2-section, .l2-footer') || sectionInView();
+    if (!section) return;
+
+    const sectionTop = section.offsetTop;
+    const sectionBottom = sectionTop + section.offsetHeight;
+    const pageTop = window.scrollY;
+    const pageBottom = pageTop + window.innerHeight;
+    const buffer = 2;
+
+    if (event.deltaY > 0 && pageBottom >= sectionBottom - buffer) event.preventDefault();
+    if (event.deltaY < 0 && pageTop <= sectionTop + buffer) event.preventDefault();
+  }, { passive: false });
+}
+
 function setupTheme() {
   const btn = $('l2DarkToggle');
   const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/><line x1="17.8" y1="17.8" x2="19.6" y2="19.6"/><line x1="4.4" y1="19.6" x2="6.2" y2="17.8"/><line x1="17.8" y1="6.2" x2="19.6" y2="4.4"/></svg>';
