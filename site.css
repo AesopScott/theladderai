@@ -7329,8 +7329,21 @@ body.l2 #training .l2-section-head {
   padding-right: calc(48% + 1.25rem);
   min-height: 8.6rem;
 }
+body.l2 #certification .l2-section-head {
+  align-items: flex-start;
+  position: relative;
+  padding-right: calc(48% + 1.25rem);
+  min-height: 8.6rem;
+}
 body.l2 #training { justify-content: flex-start; }
 body.l2 #training .l2-section-head > .training-chat-column {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(48%, 52rem);
+  min-width: min(100%, 360px);
+}
+body.l2 #certification .l2-section-head > .training-chat-column {
   position: absolute;
   top: 0;
   right: 0;
@@ -7998,7 +8011,16 @@ body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800
     padding-right: 0;
     min-height: 0;
   }
+  body.l2 #certification .l2-section-head {
+    padding-right: 0;
+    min-height: 0;
+  }
   body.l2 #training .l2-section-head > .training-chat-column {
+    position: static;
+    width: 100%;
+    min-width: 0;
+  }
+  body.l2 #certification .l2-section-head > .training-chat-column {
     position: static;
     width: 100%;
     min-width: 0;

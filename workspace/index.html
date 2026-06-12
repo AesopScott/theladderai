@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=44">
+  <link rel="stylesheet" href="/site.css?v=45">
 </head>
 <body class="l2">
 
@@ -329,29 +329,6 @@
           <span class="l2-eyebrow">Prove it</span>
           <h2 class="l2-section-title">Certification</h2>
         </div>
-      </div>
-      <div class="l2-cert-grid workspace training-body-grid">
-
-        <!-- left: configure + gates -->
-        <div class="training-left-column certification-left-column">
-          <p class="l2-section-lead">Choose the rung you want to certify, then begin an adaptive oral exam. An independent second model must confirm the result before any credential is recorded.</p>
-
-          <aside class="training-nav-panel certification-nav-panel" aria-label="Certification rung navigation">
-            <div class="training-tier-picker certification-tier-picker" aria-label="Certification rung selection">
-              <span class="rail-product-label training-focus-label" id="l2CertFocusLabel">AI Concepts</span>
-              <span class="rail-tier-status" id="l2CertGroupStatus">Loading rungs...</span>
-              <details class="training-tier-dropdown" id="l2CertTierDropdown">
-                <summary>
-                  <span class="training-tier-current" id="l2CertSelectedTierSummary">Choose a tier</span>
-                </summary>
-                <div id="l2CertGroupRail" class="tier-list training-tier-menu"></div>
-              </details>
-              <div id="l2CertSelectedRungs" class="l2-rail-items training-selected-rungs"></div>
-              <p id="l2CertRungDescription" class="training-rung-description">Pick a rung to see what the exam will cover.</p>
-            </div>
-          </aside>
-        </div>
-
         <!-- right: examiner conversation -->
         <section class="topic-column training-chat-column">
         <section class="conversation-panel training-chat-panel certification-chat-panel">
@@ -440,6 +417,29 @@
           </div>
         </section>
         </section>
+      </div>
+      <div class="l2-cert-grid workspace training-body-grid">
+
+        <!-- left: configure + gates -->
+        <div class="training-left-column certification-left-column">
+          <p class="l2-section-lead">Choose the rung you want to certify, then begin an adaptive oral exam. An independent second model must confirm the result before any credential is recorded.</p>
+
+          <aside class="training-nav-panel certification-nav-panel" aria-label="Certification rung navigation">
+            <div class="training-tier-picker certification-tier-picker" aria-label="Certification rung selection">
+              <span class="rail-product-label training-focus-label" id="l2CertFocusLabel">AI Concepts</span>
+              <span class="rail-tier-status" id="l2CertGroupStatus">Loading rungs...</span>
+              <details class="training-tier-dropdown" id="l2CertTierDropdown">
+                <summary>
+                  <span class="training-tier-current" id="l2CertSelectedTierSummary">Choose a tier</span>
+                </summary>
+                <div id="l2CertGroupRail" class="tier-list training-tier-menu"></div>
+              </details>
+              <div id="l2CertSelectedRungs" class="l2-rail-items training-selected-rungs"></div>
+              <p id="l2CertRungDescription" class="training-rung-description">Pick a rung to see what the exam will cover.</p>
+            </div>
+          </aside>
+        </div>
+
       </div>
     </section>
   </main>
