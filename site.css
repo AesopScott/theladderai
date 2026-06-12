@@ -6170,7 +6170,7 @@ select:focus-visible {
 /* one section at a time */
 html {
   font-size: 75%;           /* scale all rem-based text to 75% so content fits the page */
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: none;
   scroll-padding-top: 56px;  /* nav is smaller at 75% type */
   scroll-behavior: smooth;
 }
