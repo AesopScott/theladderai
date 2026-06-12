@@ -1,14 +1,14 @@
-name: Deploy to Mocahost
+name: Deploy to Cloudflare Pages
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:        # manual "Run workflow" button for force redeploys
+  workflow_dispatch:
 
 concurrency:
-  group: deploy-mocahost
-  cancel-in-progress: false   # let runs queue + finish in order (latest still wins)
+  group: deploy-cloudflare-pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -17,31 +17,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Prepare static deploy folder
+        run: |
+          mkdir -p _site
+          rsync -av ./ _site/ \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.claude/' \
+            --exclude 'node_modules/' \
+            --exclude 'aesop-api/' \
+            --exclude 'cgi-bin/' \
+            --exclude '*.php' \
+            --exclude '*secret*' \
+            --exclude '*.bat' \
+            --exclude '*.ps1' \
+            --exclude '.htaccess' \
+            --exclude 'firebase.json' \
+            --exclude 'firestore.rules' \
+            --exclude 'README.md'
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          server: 65.181.111.131
-          username: hivetec1
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftps
-          local-dir: ./
-          server-dir: /public_html/theladderai/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.github/**
-            **/.claude/**
-            **/secrets.php
-            **/proxy.php
-            **/secrets.local.php
-            **/config.local.php
-            **/*.bat
-            **/*.ps1
-            **/README.md
-            firebase.json
-            firestore.rules
-            **/.DS_Store
-            cgi-bin/**
-            .htaccess
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy _site --project-name theladderai-com --branch main
