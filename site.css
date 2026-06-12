@@ -7343,6 +7343,17 @@ body.l2 #certification .l2-section-head {
   align-self: start;
   padding-right: calc(48% + 1.25rem);
   min-height: 8.6rem;
+  border-bottom: 0;
+}
+body.l2 #training .l2-section-head::after,
+body.l2 #certification .l2-section-head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: calc(48% + 1.25rem);
+  bottom: 0;
+  height: 1px;
+  background: var(--l2-line);
 }
 body.l2 #training .l2-section-head > .training-chat-column,
 body.l2 #certification .l2-section-head > .certification-header-column {
@@ -7359,6 +7370,11 @@ body.l2 #certification > .workspace {
   grid-row: 2;
   width: 100%;
 }
+body.l2 #certification > .workspace {
+  display: grid;
+  grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
+  column-gap: 1.25rem;
+}
 body.l2 #certification .certification-header-column {
   display: grid;
   gap: 0.85rem;
@@ -7366,6 +7382,9 @@ body.l2 #certification .certification-header-column {
 }
 body.l2 #certification .certification-account-gate {
   margin: 0;
+}
+body.l2 #certification .certification-setup-column {
+  grid-column: 2;
 }
 body.l2 #l2CertChatShell[hidden],
 body.l2 #l2AccountGate[hidden] {
@@ -8118,12 +8137,20 @@ body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800
   body.l2 #certification .l2-section-head {
     padding-right: 0;
     min-height: 0;
+    border-bottom: 1px solid var(--l2-line);
+  }
+  body.l2 #training .l2-section-head::after,
+  body.l2 #certification .l2-section-head::after {
+    display: none;
   }
   body.l2 #training .l2-section-head > .training-chat-column,
   body.l2 #certification .l2-section-head > .certification-header-column {
     position: static;
     width: 100%;
     min-width: 0;
+  }
+  body.l2 #certification .certification-setup-column {
+    grid-column: 1;
   }
   body.l2 .l2-footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   body.l2 .l2-section { min-height: 0; }
