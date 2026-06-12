@@ -1888,8 +1888,11 @@ function renderHeroSignup() {
 async function startCertification() {
   const it = activeItem();
   if (!it) { alert(tx().auth.pickRungFirst); return; }
-  const adultTier = ADULT_TIERS.has(selectedLevel());
-  if (adultTier && !state.authUser) { document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  if (!state.authUser) {
+    setStatus('l2AccountError', 'Sign in before starting certification.', 'error');
+    document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   const depth = selectedDepth();
   const selectedRole = professionalRoleForLabel(selectedLevel());
