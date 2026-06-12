@@ -8063,7 +8063,7 @@ body.l2 .l2-signed-in {
 body.l2 .l2-signup:has(.l2-signed-in:not([hidden])) {
   width: min(430px, calc(100vw - 4rem));
   margin-left: auto;
-  margin-right: clamp(2rem, 8vw, 7rem);
+  margin-right: auto;
   padding: 1.05rem 1.15rem;
   border-radius: 8px;
 }
@@ -8086,11 +8086,11 @@ body.l2 .l2-signed-in .l2-signup-signin {
   text-align: center;
 }
 body.l2 .l2-signup.is-signed-in {
-  width: 360px !important;
+  width: min(430px, calc(100vw - 4rem)) !important;
   max-width: calc(100vw - 6rem);
   margin-left: auto !important;
-  margin-right: 7rem !important;
-  transform: translateX(-3rem);
+  margin-right: auto !important;
+  transform: none;
 }
 @media (max-width: 560px) {
   body.l2 .l2-signup-form, body.l2 .l2-signin-form { flex-direction: column; }
@@ -8119,9 +8119,9 @@ body.l2 .l2-signup.is-signed-in {
     margin-right: clamp(2.5rem, 9vw, 8rem);
   }
   body.l2 .l2-signup.is-signed-in {
-    width: 360px !important;
-    margin-right: 7rem !important;
-    transform: translateX(-3rem);
+    width: min(430px, calc(100vw - 4rem)) !important;
+    margin-right: auto !important;
+    transform: none;
   }
 }
 
