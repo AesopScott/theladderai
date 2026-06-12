@@ -7337,15 +7337,20 @@ body.l2 #certification {
 }
 body.l2 #training .l2-section-head,
 body.l2 #certification .l2-section-head {
-  grid-column: 1;
+  position: relative;
+  grid-column: 1 / -1;
   grid-row: 1;
   align-self: start;
+  padding-right: calc(48% + 1.25rem);
+  min-height: 8.6rem;
 }
-body.l2 #training > .training-chat-column,
-body.l2 #certification > .training-chat-column {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: start;
+body.l2 #training .l2-section-head > .training-chat-column,
+body.l2 #certification .l2-section-head > .certification-header-column {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(48%, 52rem);
+  min-width: min(100%, 360px);
 }
 body.l2 #training > .workspace,
 body.l2 #certification > .workspace {
@@ -7354,10 +7359,13 @@ body.l2 #certification > .workspace {
   grid-row: 2;
   width: 100%;
 }
-body.l2 #certification > .certification-account-gate {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: start;
+body.l2 #certification .certification-header-column {
+  display: grid;
+  gap: 0.85rem;
+  align-content: start;
+}
+body.l2 #certification .certification-account-gate {
+  margin: 0;
 }
 body.l2 #l2CertChatShell[hidden],
 body.l2 #l2AccountGate[hidden] {
@@ -8101,11 +8109,21 @@ body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800
   body.l2 #certification .l2-section-head,
   body.l2 #training > .workspace,
   body.l2 #certification > .workspace,
-  body.l2 #training > .training-chat-column,
-  body.l2 #certification > .training-chat-column,
-  body.l2 #certification > .certification-account-gate {
+  body.l2 #training .l2-section-head > .training-chat-column,
+  body.l2 #certification .l2-section-head > .certification-header-column {
     grid-column: 1;
     grid-row: auto;
+  }
+  body.l2 #training .l2-section-head,
+  body.l2 #certification .l2-section-head {
+    padding-right: 0;
+    min-height: 0;
+  }
+  body.l2 #training .l2-section-head > .training-chat-column,
+  body.l2 #certification .l2-section-head > .certification-header-column {
+    position: static;
+    width: 100%;
+    min-width: 0;
   }
   body.l2 .l2-footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   body.l2 .l2-section { min-height: 0; }
