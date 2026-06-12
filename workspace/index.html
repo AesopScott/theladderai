@@ -258,34 +258,6 @@
           <p style="color:var(--l2-ink-2);">Training conversations and progress are saved to your learner record once you're signed in. You can browse the ladder without an account, but progress won't persist.</p>
           <a class="l2-btn" href="#certification">Sign in below</a>
         </div>
-      </div>
-      <div class="workspace training-body-grid" id="l2Workspace">
-        <div class="training-left-column">
-          <p class="l2-section-lead">Pick a focus, choose a rung, and learn through a guided conversation. Your focus is a toggle — concepts, products, and use cases share the same engine and the same record.</p>
-
-          <!-- focus toggle (replaces the 3 separate pages) -->
-          <div class="l2-focus-toggle" id="l2FocusToggle" role="tablist" aria-label="Training focus">
-            <button class="l2-focus-btn is-active" data-focus="concepts" role="tab" type="button">AI Concepts</button>
-            <button class="l2-focus-btn" data-focus="products" role="tab" type="button">Products</button>
-            <button class="l2-focus-btn" data-focus="use-cases" role="tab" type="button">Use Cases</button>
-          </div>
-
-          <aside class="training-nav-panel" aria-label="Training navigation">
-          <div class="training-tier-picker" aria-label="Training tier selection">
-            <span class="rail-product-label training-focus-label" id="l2FocusLabel">AI Concepts</span>
-            <span class="rail-tier-status" id="l2GroupStatus">Loading rungs…</span>
-            <details class="training-tier-dropdown" id="l2TierDropdown">
-              <summary>
-                <span class="training-tier-current" id="l2SelectedTierSummary">Choose a tier</span>
-              </summary>
-              <div id="l2GroupRail" class="tier-list training-tier-menu"></div>
-            </details>
-            <div id="l2SelectedRungs" class="l2-rail-items training-selected-rungs"></div>
-            <p id="l2RungDescription" class="training-rung-description">Pick a rung to see what the conversation will cover.</p>
-          </div>
-          </aside>
-        </div>
-
         <section class="topic-column training-chat-column">
           <section class="conversation-panel training-chat-panel">
             <div class="training-chat-actions">
@@ -318,6 +290,33 @@
             </div>
           </section>
         </section>
+      </div>
+      <div class="workspace training-body-grid" id="l2Workspace">
+        <div class="training-left-column">
+          <p class="l2-section-lead">Pick a focus, choose a rung, and learn through a guided conversation. Your focus is a toggle — concepts, products, and use cases share the same engine and the same record.</p>
+
+          <!-- focus toggle (replaces the 3 separate pages) -->
+          <div class="l2-focus-toggle" id="l2FocusToggle" role="tablist" aria-label="Training focus">
+            <button class="l2-focus-btn is-active" data-focus="concepts" role="tab" type="button">AI Concepts</button>
+            <button class="l2-focus-btn" data-focus="products" role="tab" type="button">Products</button>
+            <button class="l2-focus-btn" data-focus="use-cases" role="tab" type="button">Use Cases</button>
+          </div>
+
+          <aside class="training-nav-panel" aria-label="Training navigation">
+          <div class="training-tier-picker" aria-label="Training tier selection">
+            <span class="rail-product-label training-focus-label" id="l2FocusLabel">AI Concepts</span>
+            <span class="rail-tier-status" id="l2GroupStatus">Loading rungs…</span>
+            <details class="training-tier-dropdown" id="l2TierDropdown">
+              <summary>
+                <span class="training-tier-current" id="l2SelectedTierSummary">Choose a tier</span>
+              </summary>
+              <div id="l2GroupRail" class="tier-list training-tier-menu"></div>
+            </details>
+            <div id="l2SelectedRungs" class="l2-rail-items training-selected-rungs"></div>
+            <p id="l2RungDescription" class="training-rung-description">Pick a rung to see what the conversation will cover.</p>
+          </div>
+          </aside>
+        </div>
       </div>
     </section>
 

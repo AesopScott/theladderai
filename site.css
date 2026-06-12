@@ -7325,8 +7325,18 @@ body.l2 .l2-gate p { color: var(--l2-ink-2); line-height: 1.6; max-width: 60ch; 
 
 body.l2 #training .l2-section-head {
   align-items: flex-start;
+  position: relative;
+  padding-right: calc(48% + 1.25rem);
+  min-height: 8.6rem;
 }
 body.l2 #training { justify-content: flex-start; }
+body.l2 #training .l2-section-head > .training-chat-column {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(48%, 52rem);
+  min-width: min(100%, 360px);
+}
 body.l2 #training .workspace,
 body.l2 #certification .workspace {
   grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
@@ -7984,6 +7994,15 @@ body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800
   body.l2 .l2-navlinks { display: none; }
   body.l2 .l2-profile-grid > * + * { border-left: none; padding-left: 0 !important; }
   body.l2 .l2-cert-grid { grid-template-columns: 1fr !important; }
+  body.l2 #training .l2-section-head {
+    padding-right: 0;
+    min-height: 0;
+  }
+  body.l2 #training .l2-section-head > .training-chat-column {
+    position: static;
+    width: 100%;
+    min-width: 0;
+  }
   body.l2 .l2-footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   body.l2 .l2-section { min-height: 0; }
 }
