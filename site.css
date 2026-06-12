@@ -7323,6 +7323,9 @@ body.l2 .l2-gate p { color: var(--l2-ink-2); line-height: 1.6; max-width: 60ch; 
 body.l2 #training .l2-section-head {
   align-items: flex-start;
 }
+body.l2 #certification .l2-section-head {
+  align-items: flex-start;
+}
 body.l2 #training { justify-content: flex-start; }
 body.l2 #training .workspace,
 body.l2 #certification .workspace {
@@ -7789,13 +7792,12 @@ body.l2 .certification-setup-panel .account-attestation {
   margin: 0.25rem 0;
 }
 body.l2 .certification-account-gate {
-  grid-column: 1 / 2 !important;
-  justify-self: start;
-  width: 320px;
+  flex: 0 1 340px;
+  width: 340px;
   max-width: 100%;
-  margin: 0.3rem 0 0;
-  padding: 1rem 0 0;
-  border-top: 1px solid var(--l2-line);
+  margin: 0;
+  padding: 0;
+  border-top: 0;
 }
 body.l2 .certification-account-gate .account-form,
 body.l2 .certification-account-gate .account-actions {
@@ -7863,6 +7865,15 @@ body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
   min-height: clamp(14rem, calc(62vh - 20rem), 22rem);
 }
 @media (max-width: 720px) {
+  body.l2 #training .l2-section-head,
+  body.l2 #certification .l2-section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  body.l2 .certification-account-gate {
+    width: 100%;
+    flex-basis: auto;
+  }
   body.l2 .training-eval-action {
     grid-template-columns: 1fr;
     gap: 0.4rem;

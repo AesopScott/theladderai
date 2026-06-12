@@ -1756,7 +1756,7 @@ function renderAuthGates() {
   const acctForm = $('l2AccountForm');
   const status = $('l2AccountStatus');
   const msg = $('l2AccountMsg');
-  if (acctGate) acctGate.hidden = signedIn || !adultTier;
+  if (acctGate) acctGate.hidden = signedIn;
   if (status) status.textContent = signedIn ? fmt(t.auth.signedIn, { email: state.authUser.email }) : adultTier ? t.auth.accountRequired : t.auth.accountOptional;
   if (msg) msg.textContent = signedIn
     ? t.auth.accountSaved
