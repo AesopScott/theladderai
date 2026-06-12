@@ -967,6 +967,33 @@ export const LADDER_TIERS = [
       'Future-of-work planning',
       'AI strategist readiness check'
     ]
+  },
+  {
+    id: 'tier-16',
+    name: 'Memory Systems',
+    title: 'Context, Retrieval, Graphs, and Agent Memory',
+    accent: '#4f8f8f',
+    vocabulary: ['working context', 'durable memory', 'short-term memory', 'long-term memory', 'episodic memory', 'semantic memory', 'procedural memory', 'reasoning memory', 'memory injection', 'context selection', 'context compression', 'ranking signal', 'context graph', 'knowledge graph', 'graph community', 'hub node', 'bridge node', 'provenance', 'staleness', 'retention policy', 'agent memory', 'task state', 'user memory', 'project memory', 'handoff memory', 'shared memory', 'context packet', 'memory audit trail', 'memory failure mode'],
+    topics: [
+      'Memory foundations',
+      'Working context vs durable memory',
+      'Short-term, long-term, episodic, semantic, procedural, and reasoning memory',
+      'What AI systems should never remember',
+      'Memory injection',
+      'Hard instructions, soft context, and evidence',
+      'Context selection and compression',
+      'Retrieval ranking signals',
+      'Memory provenance and citations',
+      'Memory freshness and staleness',
+      'Memory safety and retention boundaries',
+      'Knowledge graphs and context graphs',
+      'Entity links, relationships, decisions, and evidence',
+      'Graph communities, hubs, and bridges',
+      'Agent memory architecture',
+      'Task state vs user memory vs project memory',
+      'Session handoff and multi-agent shared memory',
+      'Memory-aware tool use, audit trails, and failure modes'
+    ]
   }
 ].map((tier, tierIndex) => ({
   ...tier,

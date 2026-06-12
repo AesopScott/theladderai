@@ -193,6 +193,14 @@ export function depthForLabel(label) {
   return CERT_DEPTHS.find((depth) => depth.label === label) || CERT_DEPTHS[0];
 }
 
+function tierTopics(tier) {
+  return (tier?.topics || []).map((topic) => topic?.title || topic).filter(Boolean);
+}
+
+function tierVocabulary(tier) {
+  return (tier?.vocabulary || []).map((term) => String(term || '').trim()).filter(Boolean);
+}
+
 /**
  * Examiner blueprint for buildExaminerSystemPrompt(blueprint).
  * `level` is the education tier the learner studied at (College/Workforce/...),
@@ -200,8 +208,12 @@ export function depthForLabel(label) {
  */
 export function buildConceptsBlueprint({ tier, level, depth }) {
   const itemLabel = `${tier.name} (${tier.title})`;
+  const specificTopics = tierTopics(tier);
+  const requiredVocabulary = tierVocabulary(tier);
   return {
     itemLabel,
+    activeRung: itemLabel,
+    certificationSet: `${tier.name}: ${tier.title}`,
     educationTierLabel: level ? `${level} concepts course` : 'Concepts course',
     certificationTierLabel: depth.certificationTierLabel,
     standards: `AESOP AI Fluency — ${tier.name}`,
@@ -210,6 +222,8 @@ export function buildConceptsBlueprint({ tier, level, depth }) {
     depthEvidence: depth.evidence,
     depthPassingStandard: depth.passingStandard,
     depthReview: depth.review,
+    requiredVocabulary,
+    specificTopics,
     languageLabel: 'English'
   };
 }
@@ -221,15 +235,21 @@ export function buildConceptsBlueprint({ tier, level, depth }) {
  */
 export function buildConceptsCertContext({ tier, depth, learnerId }) {
   const attemptId = `conceptcert_${tier.id}_${depth.id}_${Date.now()}`;
+  const specificTopics = tierTopics(tier);
+  const requiredVocabulary = tierVocabulary(tier);
   return {
     attemptId,
     pathway: 'concepts',
     learnerId: learnerId || '',
     itemId: tier.id,
     itemLabel: `${tier.name} (${tier.title})`,
+    activeRung: `${tier.name} (${tier.title})`,
+    certificationSet: `${tier.name}: ${tier.title}`,
     certificationTierId: depth.id,
     certificationTierLabel: depth.certificationTierLabel,
     standards: `AESOP AI Fluency — ${tier.name}`,
+    requiredVocabulary,
+    specificTopics,
     testDepthId: depth.id,
     testDepthLabel: depth.label,
     testDepthOutcome: depth.outcome,

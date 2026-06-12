@@ -27,12 +27,12 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
 
-import { LADDER_TIERS } from './ladder-data.js?v=2';
+import { LADDER_TIERS } from './ladder-data.js?v=3';
 import {
   WORKSPACE_LANGUAGE_KEY, WELCOME_LANGUAGE_KEY, WORKSPACE_LANGUAGES,
   workspaceLanguageInfo, workspaceText, formatText
 } from './workspace-i18n.js?v=3';
-import * as Concepts from './concepts-ladder.js?v=2';
+import * as Concepts from './concepts-ladder.js?v=3';
 import * as Products from '/theladder-products/products-ladder.js?v=2';
 import * as UseCases from '/theladder-use-cases/use-cases-ladder.js?v=2';
 
