@@ -6623,7 +6623,7 @@ body.l2 .l2-section {
   box-sizing: border-box;
 }
 body.l2 #certification {
-  scroll-margin-top: -1.3in;
+  scroll-margin-top: 6rem;
 }
 body.l2 .l2-section-head {
   display: flex;
