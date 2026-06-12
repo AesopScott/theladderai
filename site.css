@@ -7371,6 +7371,7 @@ body.l2 #certification > .workspace {
   width: 100%;
 }
 body.l2 #certification > .workspace {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
   column-gap: 1.25rem;
