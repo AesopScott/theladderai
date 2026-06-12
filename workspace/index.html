@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=44">
+  <link rel="stylesheet" href="/site.css?v=46">
 </head>
 <body class="l2">
 
@@ -251,15 +251,39 @@
           <span class="l2-eyebrow">Climb rung by rung</span>
           <h2 class="l2-section-title">Training</h2>
         </div>
-        <div class="l2-gate training-account-gate section-signin-gate" id="l2TrainingGate">
-          <form class="section-signin-form" id="l2TrainingSigninForm" novalidate>
-            <input id="l2TrainingSigninEmail" class="section-signin-input" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
-            <input id="l2TrainingSigninPassword" class="section-signin-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
-            <button id="l2TrainingSigninBtn" class="section-signin-btn" type="submit">Sign in</button>
-          </form>
-          <p id="l2TrainingSigninMsg" class="section-signin-msg" hidden role="status"></p>
-        </div>
       </div>
+      <section class="topic-column training-chat-column">
+        <section class="conversation-panel training-chat-panel">
+          <div class="training-chat-actions">
+            <button id="l2StartChat" type="button">Start conversation</button>
+            <button id="l2ResetChat" class="secondary" type="button">Reset</button>
+          </div>
+          <div id="l2ChatLog" class="chat-log" aria-live="polite"></div>
+          <form id="l2ChatForm" class="chat-form">
+            <textarea id="l2ChatInput" rows="2" placeholder="Answer the guide or ask for the next challenge here" autocomplete="off"></textarea>
+            <button type="submit">Send</button>
+          </form>
+          <label class="training-text-size" for="l2TrainingTextSize">
+            <span>Text size</span>
+            <input id="l2TrainingTextSize" type="range" min="1" max="1.6" step="0.05" value="1">
+          </label>
+          <div class="training-standards-eval" aria-label="Standards evaluation options">
+            <label class="training-eval-check" for="l2EduEval">
+              <input id="l2EduEval" type="checkbox" data-training-eval="education">
+              <span>Education Standards Evaluation</span>
+            </label>
+            <label class="training-eval-check" for="l2EmployEval">
+              <input id="l2EmployEval" type="checkbox" data-training-eval="employment">
+              <span>Employment Standards Evaluation</span>
+            </label>
+            <div class="training-eval-action">
+              <button id="l2RunStandardsEval" class="training-eval-run" type="button">Run selected evaluations</button>
+              <p>Checks the current training transcript against the selected standards and saves the evaluation evidence for the rung.</p>
+            </div>
+            <p id="l2StandardsEvalStatus" class="training-eval-status" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+      </section>
       <div class="workspace training-body-grid" id="l2Workspace">
         <div class="training-left-column">
           <p class="l2-section-lead">Pick a focus, choose a rung, and learn through a guided conversation. Your focus is a toggle — concepts, products, and use cases share the same engine and the same record.</p>
@@ -286,39 +310,6 @@
           </div>
           </aside>
         </div>
-
-        <section class="topic-column training-chat-column">
-          <section class="conversation-panel training-chat-panel">
-            <div class="training-chat-actions">
-              <button id="l2StartChat" type="button">Start conversation</button>
-              <button id="l2ResetChat" class="secondary" type="button">Reset</button>
-            </div>
-            <div id="l2ChatLog" class="chat-log" aria-live="polite"></div>
-            <form id="l2ChatForm" class="chat-form">
-              <textarea id="l2ChatInput" rows="2" placeholder="Answer the guide or ask for the next challenge here" autocomplete="off"></textarea>
-              <button type="submit">Send</button>
-            </form>
-            <label class="training-text-size" for="l2TrainingTextSize">
-              <span>Text size</span>
-              <input id="l2TrainingTextSize" type="range" min="1" max="1.6" step="0.05" value="1">
-            </label>
-            <div class="training-standards-eval" aria-label="Standards evaluation options">
-              <label class="training-eval-check" for="l2EduEval">
-                <input id="l2EduEval" type="checkbox" data-training-eval="education">
-                <span>Education Standards Evaluation</span>
-              </label>
-              <label class="training-eval-check" for="l2EmployEval">
-                <input id="l2EmployEval" type="checkbox" data-training-eval="employment">
-                <span>Employment Standards Evaluation</span>
-              </label>
-              <div class="training-eval-action">
-                <button id="l2RunStandardsEval" class="training-eval-run" type="button">Run selected evaluations</button>
-                <p>Checks the current training transcript against the selected standards and saves the evaluation evidence for the rung.</p>
-              </div>
-              <p id="l2StandardsEvalStatus" class="training-eval-status" role="status" aria-live="polite"></p>
-            </div>
-          </section>
-        </section>
       </div>
     </section>
 
@@ -331,24 +322,24 @@
           <span class="l2-eyebrow">Prove it</span>
           <h2 class="l2-section-title">Certification</h2>
         </div>
-        <!-- certification-header-auth-v2 -->
-        <div class="l2-gate certification-account-gate section-signin-gate" id="l2AccountGate">
-          <form class="section-signin-form" id="l2AccountForm" novalidate>
-            <input id="l2AccountEmail" class="section-signin-input" type="email" placeholder="Email" autocomplete="username" aria-label="Email">
-            <input id="l2AccountPassword" class="section-signin-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
-            <button id="l2AccountSignIn" class="section-signin-btn" type="submit">Sign in</button>
-          </form>
-          <label class="account-attestation" id="l2AdultAttestLabel" hidden>
-            <input id="l2AdultAttest" type="checkbox">
-            <span>I confirm I am 18 or older.</span>
-          </label>
-          <button id="l2AccountCreate" type="button" class="secondary" hidden>Create account</button>
-          <button id="l2AccountSignOut" type="button" class="secondary" hidden>Sign out</button>
-          <button id="l2AccountConfirmAdult" type="button" hidden>Confirm adult access</button>
-          <span class="panel-label" id="l2AccountStatus" hidden>Account</span>
-          <p id="l2AccountMsg" hidden></p>
-          <p id="l2AccountError" class="section-signin-msg" hidden role="alert"></p>
-        </div>
+      </div>
+      <!-- certification-header-auth-v2 -->
+      <div class="l2-gate certification-account-gate section-signin-gate" id="l2AccountGate">
+        <form class="section-signin-form" id="l2AccountForm" novalidate>
+          <input id="l2AccountEmail" class="section-signin-input" type="email" placeholder="Email" autocomplete="username" aria-label="Email">
+          <input id="l2AccountPassword" class="section-signin-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+          <button id="l2AccountSignIn" class="section-signin-btn" type="submit">Sign in</button>
+        </form>
+        <label class="account-attestation" id="l2AdultAttestLabel" hidden>
+          <input id="l2AdultAttest" type="checkbox">
+          <span>I confirm I am 18 or older.</span>
+        </label>
+        <button id="l2AccountCreate" type="button" class="secondary" hidden>Create account</button>
+        <button id="l2AccountSignOut" type="button" class="secondary" hidden>Sign out</button>
+        <button id="l2AccountConfirmAdult" type="button" hidden>Confirm adult access</button>
+        <span class="panel-label" id="l2AccountStatus" hidden>Account</span>
+        <p id="l2AccountMsg" hidden></p>
+        <p id="l2AccountError" class="section-signin-msg" hidden role="alert"></p>
       </div>
       <div class="l2-cert-grid workspace training-body-grid">
 
@@ -370,11 +361,6 @@
               <p id="l2CertRungDescription" class="training-rung-description">Pick a rung to see what the exam will cover.</p>
             </div>
           </aside>
-        </div>
-
-        <!-- right: examiner conversation -->
-        <section class="topic-column training-chat-column">
-        <section class="conversation-panel training-chat-panel certification-chat-panel">
           <div class="certification-setup-panel" id="l2CertSetupPanel">
             <span class="panel-label">Certify this rung</span>
             <p id="l2CertTarget" class="certification-target">Choose a rung, then set the learner level or professional role for the exam.</p>
@@ -410,7 +396,11 @@
               <a href="/ladder-certifications.html">Certification record</a>
             </div>
           </div>
+        </div>
 
+        <!-- right: examiner conversation -->
+        <section class="topic-column training-chat-column">
+        <section class="conversation-panel training-chat-panel certification-chat-panel" id="l2CertChatShell" hidden>
           <div id="l2CertExamPanel" class="certification-exam-panel" hidden>
             <div class="panel-heading">
               <div>
@@ -513,6 +503,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=45"></script>
+  <script type="module" src="/components/ladder2-app.js?v=46"></script>
 </body>
 </html>

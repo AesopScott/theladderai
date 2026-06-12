@@ -7326,11 +7326,45 @@ body.l2 #training .l2-section-head {
 body.l2 #certification .l2-section-head {
   align-items: flex-start;
 }
-body.l2 #training { justify-content: flex-start; }
+body.l2 #training,
+body.l2 #certification {
+  display: grid;
+  grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
+  column-gap: 1.25rem;
+  row-gap: 1.25rem;
+  align-content: start;
+  justify-content: stretch;
+}
+body.l2 #training .l2-section-head,
+body.l2 #certification .l2-section-head {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+}
+body.l2 #training > .training-chat-column,
+body.l2 #certification > .training-chat-column {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+}
+body.l2 #training > .workspace,
+body.l2 #certification > .workspace {
+  display: block;
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+}
+body.l2 #certification > .certification-account-gate {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+}
+body.l2 #l2CertChatShell[hidden],
+body.l2 #l2AccountGate[hidden] {
+  display: none !important;
+}
 body.l2 #training .workspace,
 body.l2 #certification .workspace {
-  grid-template-columns: minmax(430px, 1fr) minmax(360px, 0.95fr);
-  gap: 1.25rem;
   align-items: start;
   background: none;
   border: none;
@@ -8059,6 +8093,20 @@ body.l2 .l2-footer-support h3 { font-family: var(--l2-display); font-weight: 800
   body.l2 .l2-navlinks { display: none; }
   body.l2 .l2-profile-grid > * + * { border-left: none; padding-left: 0 !important; }
   body.l2 .l2-cert-grid { grid-template-columns: 1fr !important; }
+  body.l2 #training,
+  body.l2 #certification {
+    grid-template-columns: 1fr;
+  }
+  body.l2 #training .l2-section-head,
+  body.l2 #certification .l2-section-head,
+  body.l2 #training > .workspace,
+  body.l2 #certification > .workspace,
+  body.l2 #training > .training-chat-column,
+  body.l2 #certification > .training-chat-column,
+  body.l2 #certification > .certification-account-gate {
+    grid-column: 1;
+    grid-row: auto;
+  }
   body.l2 .l2-footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   body.l2 .l2-section { min-height: 0; }
 }

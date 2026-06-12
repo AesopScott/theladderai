@@ -538,9 +538,6 @@ function applyWorkspaceLanguage() {
   setNodeAttr('#l2SignupEmail', 'placeholder', t.marketing.emailPlaceholder);
   setNodeAttr('#l2SigninEmail', 'placeholder', t.marketing.email);
   setNodeAttr('#l2SigninPw', 'placeholder', t.marketing.password);
-  setNodeAttr('#l2TrainingSigninEmail', 'placeholder', t.marketing.email);
-  setNodeAttr('#l2TrainingSigninPassword', 'placeholder', t.marketing.password);
-  setNodeText('#l2TrainingSigninBtn', t.marketing.signin);
   setNodeText('#l2SignupForm button[type="submit"]', t.marketing.signup);
   setNodeText('#l2SigninToggle', t.marketing.signinToggle);
   setNodeText('#l2SigninForm button[type="submit"]', t.marketing.signin);
@@ -1669,10 +1666,6 @@ function setupCertification() {
   $('l2ProctoringSelect')?.addEventListener('change', () => { state.identityGate.proctoringId = $('l2ProctoringSelect').value; });
   $('l2IdentityAttest')?.addEventListener('change', () => { state.identityGate.identitySigned = $('l2IdentityAttest').checked; renderIdentityGate(); });
   $('l2AdultAttest')?.addEventListener('change', () => { state.identityGate.adultAttested = $('l2AdultAttest').checked; renderAuthGates(); });
-  $('l2TrainingSigninForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    passwordSignIn($('l2TrainingSigninEmail')?.value, $('l2TrainingSigninPassword')?.value, 'l2TrainingSigninMsg');
-  });
   $('l2AccountForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     signIn(false);
@@ -1752,10 +1745,6 @@ function renderAuthGates() {
   const t = tx();
   const signedIn = Boolean(state.authUser);
   const adultTier = ADULT_TIERS.has(selectedLevel());
-
-  // Training gate: show when an account would be needed to persist
-  const trainGate = $('l2TrainingGate');
-  if (trainGate) trainGate.hidden = signedIn;
 
   // Certification account gate
   const acctGate = $('l2AccountGate');
@@ -1934,6 +1923,8 @@ async function startCertification() {
 
   state.activeCert = { item: it, level: selectedLevel(), depth, blueprint, context };
   state.certMessages = [{ role: 'user', content: 'I am ready to begin the certification exam.' }];
+  if ($('l2CertChatShell')) $('l2CertChatShell').hidden = false;
+  if ($('l2AccountGate')) $('l2AccountGate').hidden = true;
   if ($('l2CertSetupPanel')) $('l2CertSetupPanel').hidden = true;
   if ($('l2CertExamPanel')) $('l2CertExamPanel').hidden = false;
   $('l2CertModeBar').hidden = false;
@@ -2028,10 +2019,12 @@ function endCertification() {
   }
   state.activeCert = null; state.certMessages = []; state._pendingResult = null;
   if ($('l2CertSetupPanel')) $('l2CertSetupPanel').hidden = false;
+  if ($('l2CertChatShell')) $('l2CertChatShell').hidden = true;
   if ($('l2CertExamPanel')) $('l2CertExamPanel').hidden = true;
   $('l2CertModeBar').hidden = true;
   $('l2CertExamSummary').textContent = 'Start a certification above to begin the examined conversation.';
   renderChat($('l2CertLog'), []);
+  renderAuthGates();
 }
 
 // =============================================================================
