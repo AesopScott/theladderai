@@ -115,7 +115,54 @@ function neighboring(items, index) {
   return [items[index - 1], items[index + 1]].filter(Boolean).map((item) => item.title || item.name);
 }
 
+const MEMORY_SYSTEM_TOPICS = new Set([
+  'Decide what should be remembered',
+  'Separate working context from durable memory',
+  'Classify memory by purpose and lifespan',
+  'Set never-remember rules and retention boundaries',
+  'Capture memory with source and consent',
+  'Retrieve candidate memories',
+  'Rank memories by relevance and freshness',
+  'Compress memory for the context window',
+  'Inject memory into the current task',
+  'Separate instructions, context, and evidence',
+  'Cite memory provenance',
+  'Refresh, expire, or delete stale memory',
+  'Build context graphs from remembered facts',
+  'Find graph communities, hubs, and bridges',
+  'Design agent memory architecture',
+  'Separate task state, user memory, and project memory',
+  'Hand off memory across sessions and agents',
+  'Audit memory failures and unsafe tool use'
+]);
+
 function criteria(title, neighbors = []) {
+  if (MEMORY_SYSTEM_TOPICS.has(title)) {
+    const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby memory functions';
+    return {
+      certification: [
+        `Explains what decision or operation "${title}" controls inside an AI memory pipeline.`,
+        `Uses relevant Memory Systems vocabulary while explaining "${title}", such as working context, durable memory, retrieval, ranking, injection, provenance, staleness, or retention boundary.`,
+        `Distinguishes "${title}" from ${neighborText} by naming what each function is responsible for.`,
+        `Applies "${title}" to one bounded workflow, such as a support assistant, project copilot, command center, or coding agent.`,
+        `Identifies one failure mode, safety boundary, or human-review checkpoint for "${title}".`
+      ],
+      expert: [
+        `Transfers "${title}" to a higher-stakes or unfamiliar setting where stale, sensitive, missing, or over-weighted memory could affect the outcome.`,
+        `Compares "${title}" with ${neighborText} and defends which memory function should handle a given need.`,
+        `Handles edge cases for "${title}", including conflicting facts, missing provenance, token-budget pressure, unsafe retention, or bad tool use.`,
+        `Explains tradeoffs for "${title}" among relevance, specificity, freshness, authority, diversity, token budget, privacy, and auditability.`,
+        `Coaches another learner to improve "${title}" by separating capture, retrieval, ranking, compression, injection, and audit responsibilities.`
+      ],
+      mastery: [
+        `Designs how "${title}" fits into a production memory architecture with clear ownership, inputs, outputs, and audit records.`,
+        `Maps "${title}" to evidence requirements such as source, timestamp, consent, provenance, retention rule, ranking signal, or tool trace.`,
+        `Defends how "${title}" prevents unsafe memory use, including stale recall, context pollution, sensitive-data retention, or ungrounded personalization.`,
+        `Synthesizes "${title}" with retrieval, graph relationships, compression, injection, and audit trails in a real workflow.`,
+        `Defines review criteria another team could use to verify that "${title}" is accurate, bounded, auditable, and safe.`
+      ]
+    };
+  }
   const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby rung topics';
   return {
     certification: [

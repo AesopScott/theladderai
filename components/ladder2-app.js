@@ -27,7 +27,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { FIREBASE_CONFIG } from '/ai-academy/js/firebase-config.js?v=3';
 
-import { LADDER_TIERS } from './ladder-data.js?v=3';
+import { LADDER_TIERS } from './ladder-data.js?v=4';
 import {
   WORKSPACE_LANGUAGE_KEY, WELCOME_LANGUAGE_KEY, WORKSPACE_LANGUAGES,
   workspaceLanguageInfo, workspaceText, formatText
@@ -841,10 +841,10 @@ function criteriaDepthTextFromMap(criteriaByDepth) {
   const entries = [
     ['Core', source.certification || source.core || source.Core],
     ['Expert', source.expert || source.Expert],
-    ['Mastery', source.mastery || source.Mastery]
+    ['Mastery', source.master || source.mastery || source.Master || source.Mastery]
   ].filter(([, criteria]) => Array.isArray(criteria) && criteria.length);
   const fallback = Object.entries(source)
-    .filter(([depth]) => !['certification', 'core', 'Core', 'expert', 'Expert', 'mastery', 'Mastery'].includes(depth))
+    .filter(([depth]) => !['certification', 'core', 'Core', 'expert', 'Expert', 'master', 'mastery', 'Master', 'Mastery'].includes(depth))
     .map(([depth, criteria]) => [criteriaDepthLabel(depth), criteria]);
   return [...entries, ...fallback]
     .map(([label, criteria]) => `${label}:\n${criteriaListText(criteria)}`)
@@ -899,7 +899,40 @@ function neighboringTopicsFor(it, group) {
   return [topics[index - 1], topics[index + 1]].filter(Boolean);
 }
 
+function memorySystemsCriteriaByDepthFor(it, group) {
+  const isMemoryTier = group?.id === 'tier-16' || group?.raw?.id === 'tier-16';
+  if (!isMemoryTier) return null;
+  const title = it?.label || 'this memory function';
+  const neighbors = neighboringTopicsFor(it, group);
+  const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby memory functions';
+  return {
+    certification: [
+      `Explains what decision or operation "${title}" controls inside an AI memory pipeline.`,
+      `Uses relevant Memory Systems vocabulary while explaining "${title}", such as working context, durable memory, retrieval, ranking, injection, provenance, staleness, or retention boundary.`,
+      `Distinguishes "${title}" from ${neighborText} by naming what each function is responsible for.`,
+      `Applies "${title}" to one bounded workflow, such as a support assistant, project copilot, command center, or coding agent.`,
+      `Identifies one failure mode, safety boundary, or human-review checkpoint for "${title}".`
+    ],
+    expert: [
+      `Transfers "${title}" to a higher-stakes or unfamiliar setting where stale, sensitive, missing, or over-weighted memory could affect the outcome.`,
+      `Compares "${title}" with ${neighborText} and defends which memory function should handle a given need.`,
+      `Handles edge cases for "${title}", including conflicting facts, missing provenance, token-budget pressure, unsafe retention, or bad tool use.`,
+      `Explains tradeoffs for "${title}" among relevance, specificity, freshness, authority, diversity, token budget, privacy, and auditability.`,
+      `Coaches another learner to improve "${title}" by separating capture, retrieval, ranking, compression, injection, and audit responsibilities.`
+    ],
+    master: [
+      `Designs how "${title}" fits into a production memory architecture with clear ownership, inputs, outputs, and audit records.`,
+      `Maps "${title}" to evidence requirements such as source, timestamp, consent, provenance, retention rule, ranking signal, or tool trace.`,
+      `Defends how "${title}" prevents unsafe memory use, including stale recall, context pollution, sensitive-data retention, or ungrounded personalization.`,
+      `Synthesizes "${title}" with retrieval, graph relationships, compression, injection, and audit trails in a real workflow.`,
+      `Defines review criteria another team could use to verify that "${title}" is accurate, bounded, auditable, and safe.`
+    ]
+  };
+}
+
 function criteriaByDepthFor(it, group) {
+  const memoryCriteria = memorySystemsCriteriaByDepthFor(it, group);
+  if (memoryCriteria) return memoryCriteria;
   const title = it?.label || 'this rung';
   const neighbors = neighboringTopicsFor(it, group);
   const neighborText = neighbors.length ? neighbors.join(' and ') : 'nearby rung topics';
@@ -918,7 +951,7 @@ function criteriaByDepthFor(it, group) {
       `Explains tradeoffs for "${title}" at the selected education or role level.`,
       `Gives feedback or coaching that would help another learner improve on "${title}".`
     ],
-    mastery: [
+    master: [
       `Synthesizes "${title}" with multiple topics in the same certification set.`,
       `Produces portfolio-quality reasoning, design, or evidence involving "${title}".`,
       `Maps "${title}" to standards, governance, risk, or organizational impact.`,
@@ -970,7 +1003,7 @@ function localTrainingStandardFor(it, group) {
       outcome: depth.outcome,
       evidence: depth.evidence,
       passingStandard: depth.passingStandard,
-      criteria: depthMap[depth.id] || depthMap.certification
+      criteria: depthMap[depth.id] || (depth.id === 'master' ? depthMap.mastery : null) || depthMap.certification
     })),
     criteriaByDepth: depthMap,
     roleCriteria: defaultRoleCriteria(),
