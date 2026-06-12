@@ -7612,6 +7612,62 @@ body.l2 .training-account-gate p {
   margin: 0.35rem 0 0.45rem;
   line-height: 1.45;
 }
+body.l2 .section-signin-gate {
+  flex: 0 1 840px;
+  width: min(840px, 100%);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+body.l2 .section-signin-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  gap: 0.7rem;
+  align-items: stretch;
+}
+body.l2 .section-signin-input {
+  min-width: 0;
+  height: 4.25rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--l2-line);
+  border-radius: 12px;
+  background: #fff;
+  color: #0d1b2a;
+  font: inherit;
+  font-size: 1.05rem;
+}
+[data-theme="dark"] body.l2 .section-signin-input {
+  background: #0b1622;
+  color: var(--l2-ink);
+}
+body.l2 .section-signin-input:focus {
+  outline: none;
+  border-color: var(--l2-gold);
+  box-shadow: 0 0 0 3px rgba(201, 160, 90, 0.2);
+}
+body.l2 .section-signin-btn {
+  min-width: 8.5rem;
+  height: 4.25rem;
+  justify-content: center;
+  padding: 0 1.8rem !important;
+  border-radius: 12px 12px 0 0 !important;
+  background: var(--l2-gold) !important;
+  color: #15233a !important;
+}
+body.l2 .section-signin-btn::after {
+  display: none;
+}
+body.l2 .section-signin-msg {
+  margin: 0.5rem 0 0;
+  color: var(--l2-ink-2);
+  font-size: 0.92rem;
+}
+body.l2 .section-signin-msg[data-state="error"] {
+  color: #c0492f;
+}
+body.l2 .section-signin-msg[data-state="ok"] {
+  color: var(--l2-gold-deep);
+}
 body.l2 .training-chat-actions {
   display: flex;
   align-items: center;
@@ -7792,8 +7848,8 @@ body.l2 .certification-setup-panel .account-attestation {
   margin: 0.25rem 0;
 }
 body.l2 .certification-account-gate {
-  flex: 0 1 340px;
-  width: 340px;
+  flex-basis: 840px;
+  width: min(840px, 100%);
   max-width: 100%;
   margin: 0;
   padding: 0;
@@ -7873,6 +7929,13 @@ body.l2 .certification-chat-panel .certification-mode-bar + .chat-log {
   body.l2 .certification-account-gate {
     width: 100%;
     flex-basis: auto;
+  }
+  body.l2 .section-signin-form {
+    grid-template-columns: 1fr;
+  }
+  body.l2 .section-signin-input,
+  body.l2 .section-signin-btn {
+    width: 100%;
   }
   body.l2 .training-eval-action {
     grid-template-columns: 1fr;

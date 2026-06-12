@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=42">
+  <link rel="stylesheet" href="/site.css?v=43">
 </head>
 <body class="l2">
 
@@ -251,12 +251,13 @@
           <span class="l2-eyebrow">Climb rung by rung</span>
           <h2 class="l2-section-title">Training</h2>
         </div>
-        <!-- account gate (shown only when signed out) -->
-        <div class="l2-gate training-account-gate" id="l2TrainingGate">
-          <span class="panel-label">Sign in to train</span>
-          <h3>Create a free account to save your rungs</h3>
-          <p style="color:var(--l2-ink-2);">Training conversations and progress are saved to your learner record once you're signed in. You can browse the ladder without an account, but progress won't persist.</p>
-          <a class="l2-btn" href="#certification">Sign in below</a>
+        <div class="l2-gate training-account-gate section-signin-gate" id="l2TrainingGate">
+          <form class="section-signin-form" id="l2TrainingSigninForm" novalidate>
+            <input id="l2TrainingSigninEmail" class="section-signin-input" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
+            <input id="l2TrainingSigninPassword" class="section-signin-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+            <button id="l2TrainingSigninBtn" class="section-signin-btn" type="submit">Sign in</button>
+          </form>
+          <p id="l2TrainingSigninMsg" class="section-signin-msg" hidden role="status"></p>
         </div>
       </div>
       <div class="workspace training-body-grid" id="l2Workspace">
@@ -331,25 +332,22 @@
           <h2 class="l2-section-title">Certification</h2>
         </div>
         <!-- certification-header-auth-v2 -->
-        <div class="l2-gate certification-account-gate" id="l2AccountGate">
-          <span class="panel-label" id="l2AccountStatus">Account</span>
-          <h3>Account</h3>
-          <p id="l2AccountMsg" style="color:var(--l2-ink-2);">Adult education tiers and identity-assured certification require a verified account.</p>
-          <label class="account-attestation" id="l2AdultAttestLabel">
-            <input id="l2AdultAttest" type="checkbox">
-            <span>I confirm I am 18 or older (required for adult education tiers).</span>
-          </label>
-          <form class="account-form" id="l2AccountForm">
-            <input id="l2AccountEmail" type="email" placeholder="name@example.com" autocomplete="username">
-            <input id="l2AccountPassword" type="password" placeholder="Password" autocomplete="current-password">
-            <div class="account-actions">
-              <button id="l2AccountSignIn" type="button">Sign in</button>
-              <button id="l2AccountCreate" type="button" class="secondary">Create account</button>
-            </div>
+        <div class="l2-gate certification-account-gate section-signin-gate" id="l2AccountGate">
+          <form class="section-signin-form" id="l2AccountForm" novalidate>
+            <input id="l2AccountEmail" class="section-signin-input" type="email" placeholder="Email" autocomplete="username" aria-label="Email">
+            <input id="l2AccountPassword" class="section-signin-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
+            <button id="l2AccountSignIn" class="section-signin-btn" type="submit">Sign in</button>
           </form>
-          <button id="l2AccountSignOut" type="button" class="secondary" style="margin-top:0.75rem;" hidden>Sign out</button>
-          <button id="l2AccountConfirmAdult" type="button" style="margin-top:0.75rem;" hidden>Confirm adult access</button>
-          <p id="l2AccountError" class="evaluation-cooldown" hidden role="alert"></p>
+          <label class="account-attestation" id="l2AdultAttestLabel" hidden>
+            <input id="l2AdultAttest" type="checkbox">
+            <span>I confirm I am 18 or older.</span>
+          </label>
+          <button id="l2AccountCreate" type="button" class="secondary" hidden>Create account</button>
+          <button id="l2AccountSignOut" type="button" class="secondary" hidden>Sign out</button>
+          <button id="l2AccountConfirmAdult" type="button" hidden>Confirm adult access</button>
+          <span class="panel-label" id="l2AccountStatus" hidden>Account</span>
+          <p id="l2AccountMsg" hidden></p>
+          <p id="l2AccountError" class="section-signin-msg" hidden role="alert"></p>
         </div>
       </div>
       <div class="l2-cert-grid workspace training-body-grid">
@@ -515,6 +513,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app.js?v=42"></script>
+  <script type="module" src="/components/ladder2-app.js?v=43"></script>
 </body>
 </html>

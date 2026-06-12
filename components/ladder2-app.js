@@ -538,6 +538,9 @@ function applyWorkspaceLanguage() {
   setNodeAttr('#l2SignupEmail', 'placeholder', t.marketing.emailPlaceholder);
   setNodeAttr('#l2SigninEmail', 'placeholder', t.marketing.email);
   setNodeAttr('#l2SigninPw', 'placeholder', t.marketing.password);
+  setNodeAttr('#l2TrainingSigninEmail', 'placeholder', t.marketing.email);
+  setNodeAttr('#l2TrainingSigninPassword', 'placeholder', t.marketing.password);
+  setNodeText('#l2TrainingSigninBtn', t.marketing.signin);
   setNodeText('#l2SignupForm button[type="submit"]', t.marketing.signup);
   setNodeText('#l2SigninToggle', t.marketing.signinToggle);
   setNodeText('#l2SigninForm button[type="submit"]', t.marketing.signin);
@@ -573,10 +576,6 @@ function applyWorkspaceLanguage() {
 
   setNodeText('#training .l2-eyebrow', t.training.eyebrow);
   setNodeText('#training .l2-section-title', t.training.title);
-  setNodeText('#l2TrainingGate .panel-label', t.training.gateLabel);
-  setNodeText('#l2TrainingGate h3', t.training.gateTitle);
-  setNodeText('#l2TrainingGate p', t.training.gateCopy);
-  setNodeText('#l2TrainingGate .l2-btn', t.training.signInBelow);
   setNodeText('#training .training-left-column > .l2-section-lead', t.training.lead);
   setNodesText('#l2FocusToggle .l2-focus-btn', [t.training.concepts, t.training.products, t.training.useCases]);
   setNodeAttr('.training-nav-panel', 'aria-label', t.training.navLabel);
@@ -603,9 +602,9 @@ function applyWorkspaceLanguage() {
   setNodeText('#l2AccountGate h3', t.certification.account);
   setNodeText('#l2AccountMsg', t.certification.accountMsg);
   setNodeText('#l2AdultAttestLabel span', t.certification.adultAttest);
-  setNodeAttr('#l2AccountEmail', 'placeholder', t.certification.emailPlaceholder);
-  setNodeAttr('#l2AccountPassword', 'placeholder', t.certification.passwordPlaceholder);
-  setNodeText('#l2AccountSignIn', t.certification.signIn);
+  setNodeAttr('#l2AccountEmail', 'placeholder', t.marketing.email);
+  setNodeAttr('#l2AccountPassword', 'placeholder', t.marketing.password);
+  setNodeText('#l2AccountSignIn', t.marketing.signin);
   setNodeText('#l2AccountCreate', t.certification.createAccount);
   setNodeText('#l2AccountConfirmAdult', t.certification.confirmAdult);
   setNodeText('#l2StartCert', t.certification.start);
@@ -1670,7 +1669,14 @@ function setupCertification() {
   $('l2ProctoringSelect')?.addEventListener('change', () => { state.identityGate.proctoringId = $('l2ProctoringSelect').value; });
   $('l2IdentityAttest')?.addEventListener('change', () => { state.identityGate.identitySigned = $('l2IdentityAttest').checked; renderIdentityGate(); });
   $('l2AdultAttest')?.addEventListener('change', () => { state.identityGate.adultAttested = $('l2AdultAttest').checked; renderAuthGates(); });
-  $('l2AccountSignIn')?.addEventListener('click', () => signIn(false));
+  $('l2TrainingSigninForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    passwordSignIn($('l2TrainingSigninEmail')?.value, $('l2TrainingSigninPassword')?.value, 'l2TrainingSigninMsg');
+  });
+  $('l2AccountForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    signIn(false);
+  });
   $('l2AccountCreate')?.addEventListener('click', () => signIn(true));
   $('l2AccountSignOut')?.addEventListener('click', signOut);
   $('l2StartCert')?.addEventListener('click', startCertification);
