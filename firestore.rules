@@ -15,6 +15,7 @@ service cloud.firestore {
 
     function ownsLearner(learnerId, resourceData) {
       return isAdmin()
+        || (isSignedIn() && learnerId == request.auth.uid)
         || (isSignedIn() && resourceData != null && resourceData.accountUid == request.auth.uid)
         || (resourceData == null)
         || (resourceData != null && (resourceData.accountUid == null || resourceData.accountUid == ''));

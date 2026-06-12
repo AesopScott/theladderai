@@ -267,7 +267,11 @@ export async function loadLearnerRecord(learnerId) {
     const snap = await getDoc(doc(db, 'learners', id));
     if (!snap.exists()) {
       // first contact: seed remote from local cache (one-time backfill)
-      await setDoc(doc(db, 'learners', id), { ...local, learnerId: id }, { merge: true });
+      await setDoc(doc(db, 'learners', id), {
+        ...local,
+        learnerId: id,
+        accountUid: local.accountUid || '',
+      }, { merge: true });
       writeLocalRecord(local);
       return local;
     }
@@ -299,6 +303,7 @@ export async function saveLearnerProgress(pathway, data) {
   try {
     await setDoc(doc(db, 'learners', id), {
       learnerId: id,
+      accountUid: record.accountUid || '',
       lastActiveAt: record.lastActiveAt,
       [key]: record[key],
     }, { merge: true });

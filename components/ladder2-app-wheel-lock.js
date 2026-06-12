@@ -19,7 +19,7 @@ import {
   recordCompletion, recordCertification,
   getLearnerId, setLearnerId,
   loadTrainingPedagogy, loadTrainingStandard
-} from '/theladder-shared/data-layer.js?v=3';
+} from '/theladder-shared/data-layer.js?v=4';
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getAuth, onAuthStateChanged, sendSignInLinkToEmail,
