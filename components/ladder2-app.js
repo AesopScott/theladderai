@@ -1888,8 +1888,9 @@ function renderHeroSignup() {
 async function startCertification() {
   const it = activeItem();
   if (!it) { alert(tx().auth.pickRungFirst); return; }
-  if (!state.authUser) {
-    setStatus('l2AccountError', 'Sign in before starting certification.', 'error');
+  const roleRequiresLogin = PROFESSIONAL_ROLE_LABELS.has(selectedLevel());
+  if (roleRequiresLogin && !state.authUser) {
+    setStatus('l2AccountError', 'Sign in before starting role certification.', 'error');
     document.getElementById('l2AccountGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
