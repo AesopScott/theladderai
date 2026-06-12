@@ -420,10 +420,8 @@ async function init() {
   loadTrainingPedagogy()
     .then((pedagogy) => { state.trainingPedagogy = pedagogy; })
     .catch((e) => console.warn('training pedagogy load failed (local fallback)', e));
-  try {
-    const rec = storedId ? await loadLearnerRecord(storedId) : null;
-    if (rec) hydrate(rec);
-  } catch (e) { console.warn('learner record load failed', e); }
+  // Remote learner docs are account-bound; wait for Firebase Auth before reading.
+  // onAuthChange() loads learners/{uid} once request.auth is available.
   initFirebaseAuth();
 
   await activateFocus(state.focusId);
