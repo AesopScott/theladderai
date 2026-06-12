@@ -7619,6 +7619,10 @@ body.l2 .section-signin-gate {
   padding: 0;
   border: 0;
 }
+body.l2 .section-signin-gate > :not(.section-signin-form):not(.section-signin-msg),
+body.l2 .section-signin-gate > [hidden] {
+  display: none !important;
+}
 body.l2 .section-signin-form {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
