@@ -6370,6 +6370,7 @@ body.l2 .ladder-nav {
 body.l2 {
   --l2-nav-logo-size: 44px;
   --l2-nav-word-top: 0.43in;
+  --l2-nav-label-top: calc(var(--l2-nav-word-top) + 0.25in);
   --l2-nav-word-center-adjust: calc(0.85rem + 6px);
   --l2-nav-logo-edge: calc(var(--l2-nav-word-top) + var(--l2-nav-word-center-adjust) - (var(--l2-nav-logo-size) / 2));
 }
@@ -6455,7 +6456,7 @@ body.l2 .ladder-top-actions #l2Lang { background: transparent !important; border
 body.l2 .hero-navlabels-wrap {
   position: absolute;
   left: 10%; right: 10%;                /* == main.ladder-app's 80% centered column */
-  top: 0.43in;                          /* lands the words at the original nav row (cy~57) */
+  top: var(--l2-nav-label-top);         /* keep the actual overlay links pinned to the lowered nav row */
   z-index: 210;
   pointer-events: none;                 /* only the words themselves are clickable */
 }
