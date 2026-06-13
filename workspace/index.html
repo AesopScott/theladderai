@@ -28,7 +28,7 @@
   <script>
     if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   </script>
-  <link rel="stylesheet" href="/site.css?v=49">
+  <link rel="stylesheet" href="/site.css?v=50">
 </head>
 <body class="l2">
 
@@ -237,6 +237,7 @@
         <div>
           <strong>Placement complete</strong>
           <p style="margin:0.4rem 0 0;color:var(--l2-ink-2);">Your placed-out tiers and assigned rungs are saved. Pick up training below.</p>
+          <div id="l2PlacementDoneMetrics" class="placement-metrics" style="margin-top:1rem;"></div>
         </div>
         <a class="l2-btn" href="#training">Continue to training</a>
       </div>
@@ -515,6 +516,6 @@
     // section (Profile) permanently underlined. Removed: the underline now follows the
     // pointer only and nothing pins it on scroll.
   </script>
-  <script type="module" src="/components/ladder2-app-wheel-lock.js?v=7"></script>
+  <script type="module" src="/components/ladder2-app-wheel-lock.js?v=8"></script>
 </body>
 </html>

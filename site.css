@@ -7485,6 +7485,13 @@ body.l2 .l2-tier-option:hover,
 body.l2 .l2-tier-option.is-active {
   background: rgba(201, 160, 90, 0.12);
 }
+body.l2 .l2-tier-option.is-placed-out {
+  background: rgba(61, 126, 88, 0.12);
+  color: #2d6b47;
+}
+body.l2 .l2-tier-option.is-placed-out .l2-rail-num {
+  color: #2d6b47;
+}
 body.l2 .l2-tier-option .l2-rail-num {
   font-size: 0.98rem;
   line-height: 1.1;
@@ -7525,6 +7532,43 @@ body.l2 .training-selected-rungs .l2-rail-item::before {
 }
 body.l2 .training-selected-rungs .l2-rail-item::after {
   display: none;
+}
+body.l2 .training-selected-rungs .l2-rail-item.is-assigned {
+  color: var(--l2-gold-deep);
+  font-weight: 700;
+}
+body.l2 .training-selected-rungs .l2-rail-item.is-assigned::before {
+  background: var(--l2-gold);
+  opacity: 1;
+}
+body.l2 #l2PlacementDoneMetrics {
+  width: min(760px, 100%);
+}
+body.l2 #l2PlacementDoneMetrics .assigned-rungs-panel {
+  max-height: 42vh;
+}
+body.l2 .assigned-rung-link {
+  display: block;
+  width: 100%;
+  justify-content: flex-start;
+  background: #f7f2e8;
+  border: 1px solid var(--l2-line);
+  color: var(--l2-ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 0.5rem 0.6rem;
+}
+body.l2 .assigned-rung-link::after {
+  display: none;
+}
+body.l2 .assigned-rung-link:hover {
+  background: rgba(201, 160, 90, 0.18);
+  color: var(--l2-ink);
+  transform: none;
 }
 body.l2 .training-rung-description {
   margin: 1rem 0 0;

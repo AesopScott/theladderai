@@ -1511,20 +1511,28 @@ function renderRungPicker(ids) {
   if (!rail || !selectedRungs) return;
   const total = state.groups.reduce((n, g) => n + g.items.length, 0);
   const done = Object.keys(state.completed).filter((k) => k.startsWith(`${focus().pathway}:`)).length;
+  const placedOut = new Set(state.placement?.grantedTierIds || []);
+  const assigned = new Set(state.placement?.assignedTopicIds || []);
   setText(ids.focusLabel, focusDisplayLabel());
   setText(ids.status, `${done}/${total} - ${focusDisplayLabel()}`);
   const activeIndex = Math.max(0, state.groups.findIndex((g) => g.id === state.activeGroupId));
   const active = state.groups[activeIndex];
   const summary = $(ids.summary);
   if (summary) summary.textContent = active ? `Tier ${activeIndex + 1}: ${active.label}` : tx().training.chooseTier;
-  rail.innerHTML = state.groups.map((g, i) =>
-    `<button class="l2-tier-option ${g.id === state.activeGroupId ? 'is-active' : ''}" data-group="${g.id}" type="button">
+  rail.innerHTML = state.groups.map((g, i) => {
+    const classes = [
+      'l2-tier-option',
+      g.id === state.activeGroupId ? 'is-active' : '',
+      placedOut.has(g.id) ? 'is-placed-out' : ''
+    ].filter(Boolean).join(' ');
+    return `<button class="${classes}" data-group="${g.id}" type="button">
       <span class="l2-rail-num">${i + 1}</span>
       <span class="l2-tier-meta">
-        <small>${g.items.length}</small>
+        <small>${placedOut.has(g.id) ? 'placed out' : `${g.items.length}`}</small>
         <strong>${escapeHtml(g.label)}</strong>
       </span>
-    </button>`).join('');
+    </button>`;
+  }).join('');
   rail.querySelectorAll('[data-group]').forEach((b) => b.addEventListener('click', () => {
     state.activeGroupId = b.dataset.group;
     const g = activeGroup();
@@ -1534,8 +1542,14 @@ function renderRungPicker(ids) {
     renderRail(); renderActiveItem();
   }));
   selectedRungs.innerHTML = active
-    ? active.items.map((it) =>
-      `<button class="l2-rail-item ${it.id === state.activeItemId ? 'is-active' : ''}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`).join('')
+    ? active.items.map((it) => {
+      const classes = [
+        'l2-rail-item',
+        it.id === state.activeItemId ? 'is-active' : '',
+        assigned.has(it.id) ? 'is-assigned' : ''
+      ].filter(Boolean).join(' ');
+      return `<button class="${classes}" data-item="${it.id}" type="button">${escapeHtml(it.label)}</button>`;
+    }).join('')
     : '';
   selectedRungs.querySelectorAll('[data-item]').forEach((b) => b.addEventListener('click', () => {
     state.activeItemId = b.dataset.item;
@@ -1735,6 +1749,8 @@ function applyPlacement(placement) {
     version: 'v1',
     placement: { ...placement }
   }).catch(() => {});
+  if (placement.assignedTopicIds?.[0]) selectPlacementItem(placement.assignedTopicIds[0], { scroll: false });
+  else renderRail();
   renderMarketing();
   renderProfile();
 }
@@ -1765,23 +1781,59 @@ function placementLabelsFor(placement = {}) {
   return { placedOut, assigned };
 }
 
+function assignedGroupsForPlacement(placement = {}) {
+  const assigned = new Set(placement.assignedTopicIds || []);
+  return state.groups.map((group, index) => ({
+    group,
+    index,
+    items: group.items.filter((item) => assigned.has(item.id))
+  })).filter(({ items }) => items.length);
+}
+
+function selectPlacementItem(itemId, { scroll = true } = {}) {
+  if (!itemId) return;
+  const group = state.groups.find((candidate) => candidate.items.some((item) => item.id === itemId));
+  if (!group) return;
+  state.activeGroupId = group.id;
+  state.activeItemId = itemId;
+  state.trainMessages = [];
+  renderRail();
+  renderActiveItem();
+  if (scroll) document.querySelector('#training')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderPlacementResults(placement = state.placement) {
-  const metrics = $('l2PlacementMetrics');
-  if (!metrics) return;
+  const targets = [$('l2PlacementMetrics'), $('l2PlacementDoneMetrics')].filter(Boolean);
+  if (!targets.length) return;
   if (!placement) {
-    metrics.innerHTML = '';
+    targets.forEach((metrics) => { metrics.innerHTML = ''; });
     return;
   }
   const { placedOut, assigned } = placementLabelsFor(placement);
   const scoreLine = `Scores: capability ${placement.capabilityScore ?? 0}, technical ${placement.technicalScore ?? 0}, governance ${placement.governanceScore ?? 0}`;
-  const assignedText = assigned.length
-    ? `${assigned.slice(0, 18).join(', ')}${assigned.length > 18 ? `, plus ${assigned.length - 18} more` : ''}`
-    : 'Start with the first available rung';
-  metrics.innerHTML = `
+  const assignedGroups = assignedGroupsForPlacement(placement);
+  const assignedList = assignedGroups.map(({ group, index, items }) => `
+    <li>
+      <strong>Tier ${index + 1}: ${escapeHtml(group.label)}</strong>
+      <ol>
+        ${items.map((item) => `<li><button type="button" class="assigned-rung-link" data-placement-item="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button></li>`).join('')}
+      </ol>
+    </li>
+  `).join('');
+  const html = `
     <span>${escapeHtml(scoreLine)}</span>
     <small><strong>Placed out:</strong> ${escapeHtml(placedOut.length ? placedOut.join(', ') : 'No tiers skipped yet')}</small>
-    <small><strong>Assigned classes:</strong> ${escapeHtml(assignedText)}</small>
+    <details class="assigned-rungs-panel" open>
+      <summary>${assigned.length} assigned rung${assigned.length === 1 ? '' : 's'} to complete</summary>
+      <ul>${assignedList || '<li><strong>Start with the first available rung.</strong></li>'}</ul>
+    </details>
   `;
+  targets.forEach((metrics) => {
+    metrics.innerHTML = html;
+    metrics.querySelectorAll('[data-placement-item]').forEach((button) => {
+      button.addEventListener('click', () => selectPlacementItem(button.dataset.placementItem));
+    });
+  });
 }
 
 // =============================================================================
