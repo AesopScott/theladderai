@@ -1112,8 +1112,6 @@ Specific topics in this certification set:
 ${listText(ctx.topics)}
 Certification map:
 ${ctx.certificationMap}
-Depth-specific criteria:
-${ctx.depthCriteria}
 Selected education/role criteria:
 ${JSON.stringify(ctx.roleCriteria)}
 Catalog context:
@@ -1125,11 +1123,8 @@ Your job is to lead the learner somewhere specific: by the end, they should be a
 
 Before the lesson begins, follow this readiness sequence:
 1. The first assistant message must only preview the lesson content and required vocabulary, then ask whether the learner is ready to begin.
-2. When the learner says they are ready, show the test criteria they will need to satisfy as readable bullet lists grouped under Core, Expert, and Mastery.
-3. After the criteria, show the approximate time to complete this rung.
-4. Then ask one short readiness question before beginning the lesson.
-5. Begin the actual lesson only after that readiness gate is complete.
-If the conversation already contains "Test criteria:" and "Approximate time to complete this rung:" and the learner says they are ready, do not repeat the criteria; begin the lesson.
+2. When the learner says they are ready, begin the actual lesson immediately.
+3. Do not show certification criteria, test criteria, or assessment rubrics in training unless the learner explicitly asks for exam preparation.
 
 Run a short guided lesson with this arc:
 1. Orient: state the destination in plain language after the readiness sequence is complete, and ask one diagnostic question only if needed.
@@ -1140,7 +1135,7 @@ Run a short guided lesson with this arc:
 Teaching rules:
 - Do not begin the lesson in the first assistant message.
 - If the learner has not confirmed readiness yet, ask whether they are ready instead of teaching.
-- Never present test criteria as a single semicolon-separated paragraph; use one criterion per line.
+- Keep assessment criteria out of the training lesson unless the learner explicitly asks for exam preparation.
 - Lead the learner through the path. Do not wait for them to choose the curriculum.
 - Do not behave like a certification exam. Be instructional, warm, and practical.
 - Do not answer as a one-off Q&A unless the answer moves the lesson forward.
@@ -1164,7 +1159,9 @@ ${listText(ctx.topics, 6)}
 Required vocabulary:
 ${listText(ctx.vocabulary, 8)}
 
-When you are ready, I will show the test criteria, the approximate time to complete this rung, and then ask one quick ready-to-begin question before we start the lesson. Are you ready?`;
+Approximate time to complete this rung: ${ctx.approximateTime}.
+
+When you are ready, we will start the lesson. Are you ready?`;
 }
 
 function isReadyResponse(content) {
@@ -1172,24 +1169,14 @@ function isReadyResponse(content) {
 }
 
 function shouldShowPreLessonBriefing(messages, content) {
-  if (!isReadyResponse(content)) return false;
-  const assistantMessages = (messages || []).filter((message) => message.role === 'assistant');
-  if (assistantMessages.length !== 1) return false;
-  const opening = assistantMessages[0]?.content || '';
-  return opening.includes('before the lesson begins') && opening.includes('Are you ready?');
+  return false;
 }
 
 function preLessonBriefingFor(it, group, standard = null) {
   const ctx = trainingContextFor(it, group, standard);
-  return `Great. Here is what you will be tested against before the lesson begins.
+  return `Great. Let's begin "${ctx.title}".
 
-Test criteria:
-${ctx.depthCriteria}
-
-Approximate time to complete this rung:
-${ctx.approximateTime}
-
-When you are ready to begin the lesson, say "ready."`;
+We will build the idea step by step, use the key vocabulary in context, practice it in a realistic workflow, and close with a quick readiness check.`;
 }
 
 function upgradeSavedTrainingMessages(messages, it, group, standard) {
@@ -1199,8 +1186,7 @@ function upgradeSavedTrainingMessages(messages, it, group, standard) {
   }
   const oldCriteriaIndex = upgraded.findIndex((message) =>
     message.role === 'assistant'
-    && /Great\. Here is what you will be tested against before the lesson begins\./.test(message.content || '')
-    && /;\s+\w/.test(message.content || '')
+    && (message.content || '').includes(['Great. Here is what you will be', 'against before the lesson begins.'].join(' tested '))
   );
   if (oldCriteriaIndex >= 0) {
     upgraded[oldCriteriaIndex] = { role: 'assistant', content: preLessonBriefingFor(it, group, standard) };
