@@ -253,13 +253,14 @@ Allowed interestTags:
 ${interestTags.join(', ')}
 
 When you have enough signal after at least ${minLearnerTurns} learner replies:
-1. Give a short visible summary.
+1. Give a short visible summary that names the assigned Ladder classes/rungs in plain language.
 2. Append this exact marker on a new line:
 <!--LADDER_PLACEMENT_COMPLETE:{"capabilityScore":NN,"technicalScore":NN,"governanceScore":NN,"interestTags":["tag1","tag2"],"reasoning":"one concise sentence"}-->
 
 Rules:
 - Scores are integers 0-100.
 - interestTags must use the allowed list.
+- The hidden marker only carries scores and tags. The app maps those signals to exact Ladder classes/rungs after parsing.
 - Do not mention the marker or JSON to the learner.
 - ${assessment.redirectGuidance}`;
   }

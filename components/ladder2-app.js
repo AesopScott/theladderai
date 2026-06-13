@@ -12,7 +12,7 @@
  * conversation), Certification (account gate + identity assurance + proctoring).
  * ========================================================================== */
 
-import { createPlacementEngine } from '/theladder-shared/placement-engine.js';
+import { createPlacementEngine } from '/theladder-shared/placement-engine.js?v=2';
 import { createCertificationEngine } from '/theladder-shared/certification-engine.js?v=2';
 import {
   initDataLayer, loadLearnerRecord, saveLearnerProgress,
@@ -443,6 +443,29 @@ function hydrate(rec) {
     });
   });
   state._record = rec;
+  syncPlacementFromRecord();
+}
+
+function savedPlacementForFocus() {
+  const progressKeys = { concept: 'ladderProgress', product: 'productProgress', 'use-case': 'useCaseProgress' };
+  return state._record?.[progressKeys[focus().pathway]]?.placement || null;
+}
+
+function syncPlacementFromRecord() {
+  const savedPlacement = savedPlacementForFocus();
+  if (savedPlacement) {
+    state.placement = savedPlacement;
+    document.body.classList.add('placement-complete');
+    if ($('l2PlacementStatus')) $('l2PlacementStatus').textContent = tx().assessment.complete;
+    if ($('l2PlacementSummary')) $('l2PlacementSummary').textContent = savedPlacement.reasoning || tx().assessment.completeCopy;
+    renderPlacementResults(savedPlacement);
+    return;
+  }
+  state.placement = null;
+  document.body.classList.remove('placement-complete');
+  if ($('l2PlacementStatus')) $('l2PlacementStatus').textContent = tx().assessment.notPlaced;
+  if ($('l2PlacementSummary')) $('l2PlacementSummary').textContent = tx().assessment.summary;
+  renderPlacementResults(null);
 }
 
 // =============================================================================
@@ -768,6 +791,7 @@ async function activateFocus(focusId) {
   state.catalog = await focus().loadCatalog();
   state.groups = focus().buildGroups(state.catalog);
   placementEngine = createPlacementEngine(focus().placementDescriptor(state.catalog));
+  syncPlacementFromRecord();
   restoreAssessmentDraft();
 
   // reset active selection to first group/item
@@ -1653,9 +1677,11 @@ function setupAssessment() {
     clearAssessmentDraft();
     document.body.classList.remove('placement-complete');
     $('l2PlacementStatus').textContent = tx().assessment.notPlaced;
+    $('l2PlacementSummary').textContent = tx().assessment.summary;
     if ($('l2AssessInput')) $('l2AssessInput').value = '';
     renderChat($('l2AssessLog'), state.assessMessages);
     renderPlacementProgress();
+    renderPlacementResults(null);
   });
   $('l2AssessForm')?.addEventListener('submit', submitAssessment);
   $('l2AssessInput')?.addEventListener('input', saveAssessmentDraft);
@@ -1702,6 +1728,7 @@ function applyPlacement(placement) {
   state.placement = placement;
   $('l2PlacementStatus').textContent = tx().assessment.complete;
   $('l2PlacementSummary').textContent = placement.reasoning || tx().assessment.completeCopy;
+  renderPlacementResults(placement);
   document.body.classList.add('placement-complete');
   clearAssessmentDraft();
   saveLearnerProgress(focus().pathway, {
@@ -1709,6 +1736,7 @@ function applyPlacement(placement) {
     placement: { ...placement }
   }).catch(() => {});
   renderMarketing();
+  renderProfile();
 }
 
 function renderPlacementProgress() {
@@ -1716,6 +1744,44 @@ function renderPlacementProgress() {
   const pct = Math.min(100, Math.round((learnerTurns() / 6) * 100));
   const bar = $('l2AssessProgressBar');
   if (bar) bar.style.width = `${pct}%`;
+}
+
+function placementLabelsFor(placement = {}) {
+  const groupsById = new Map(state.groups.map((group) => [group.id, group]));
+  const itemsById = new Map();
+  state.groups.forEach((group) => {
+    group.items.forEach((item) => itemsById.set(item.id, { item, group }));
+  });
+  const placedOut = (placement.grantedTierIds || [])
+    .map((id) => groupsById.get(id)?.label || id)
+    .filter(Boolean);
+  const assigned = (placement.assignedTopicIds || [])
+    .map((id) => {
+      const hit = itemsById.get(id);
+      if (!hit) return id;
+      return `${hit.item.label} (${hit.group.label})`;
+    })
+    .filter(Boolean);
+  return { placedOut, assigned };
+}
+
+function renderPlacementResults(placement = state.placement) {
+  const metrics = $('l2PlacementMetrics');
+  if (!metrics) return;
+  if (!placement) {
+    metrics.innerHTML = '';
+    return;
+  }
+  const { placedOut, assigned } = placementLabelsFor(placement);
+  const scoreLine = `Scores: capability ${placement.capabilityScore ?? 0}, technical ${placement.technicalScore ?? 0}, governance ${placement.governanceScore ?? 0}`;
+  const assignedText = assigned.length
+    ? `${assigned.slice(0, 18).join(', ')}${assigned.length > 18 ? `, plus ${assigned.length - 18} more` : ''}`
+    : 'Start with the first available rung';
+  metrics.innerHTML = `
+    <span>${escapeHtml(scoreLine)}</span>
+    <small><strong>Placed out:</strong> ${escapeHtml(placedOut.length ? placedOut.join(', ') : 'No tiers skipped yet')}</small>
+    <small><strong>Assigned classes:</strong> ${escapeHtml(assignedText)}</small>
+  `;
 }
 
 // =============================================================================
