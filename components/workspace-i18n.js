@@ -20,7 +20,7 @@ const EN = {
   nav: { profile: 'Profile', assessment: 'Assessment', training: 'Training', certification: 'Certification', support: 'Support' },
   marketing: {
     eyebrow: 'How high can you climb?',
-    cascade: ['Every AI Concept', 'Every AI Product', 'Every AI Use Case', 'Trained and Certified'],
+    cascade: ['Every AI Concept', 'Every AI Product', 'Every AI Use Case', 'Certified'],
     cta: 'Find your starting rung →',
     trustTitle: 'Why Employers Trust the Ladder',
     trust: [
@@ -31,7 +31,7 @@ const EN = {
     ],
     stairsAlt: 'The Ladder AI levels - Core, Expert, Master',
     broughtBy: 'Brought to you by Aesop AI Academy',
-    signupEyebrow: 'Get Trained, Get Certified. Get Noticed.',
+    signupEyebrow: 'Get Certified. Get Noticed.',
     emailPlaceholder: 'Enter your e-mail',
     emailLabel: 'Email address',
     signup: 'Sign Up',
