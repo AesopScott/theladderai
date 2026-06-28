@@ -787,7 +787,7 @@ async function activateFocus(focusId) {
   setText('l2FocusLabel', focus().label);
   setText('l2CertFocusLabel', focus().label);
 
-  $('l2GroupStatus').textContent = tx().training.loadingRungs;
+  setText('l2GroupStatus', tx().training.loadingRungs);
   state.catalog = await focus().loadCatalog();
   state.groups = focus().buildGroups(state.catalog);
   placementEngine = createPlacementEngine(focus().placementDescriptor(state.catalog));
@@ -1861,20 +1861,21 @@ function setupCertification() {
 
 function renderCertConfig() {
   const tierSel = $('l2CertTierSelect');
+  const depthSel = $('l2CertDepthSelect');
+  const idSel = $('l2IdentitySelect');
+  const procSel = $('l2ProctoringSelect');
+  if (!tierSel || !depthSel || !idSel || !procSel) return;
   if (tierSel) {
     const current = CERTIFICATION_LEVELS.includes(tierSel.value) ? tierSel.value : EDUCATION_TIERS[0];
     tierSel.innerHTML = certificationLevelOptionsHtml(current);
     tierSel.value = current;
   }
-  const depthSel = $('l2CertDepthSelect');
   depthSel.innerHTML = focus().CERT_DEPTHS.map((d) => `<option value="${d.label}">${d.label}</option>`).join('');
 
-  const idSel = $('l2IdentitySelect');
   idSel.innerHTML = focus().IDENTITY_LEVELS.map((lvl) => `<option value="${lvl.id}">${lvl.label}</option>`).join('');
   if (!state.identityGate.levelId) state.identityGate.levelId = focus().IDENTITY_LEVELS[0]?.id;
   idSel.value = state.identityGate.levelId;
 
-  const procSel = $('l2ProctoringSelect');
   procSel.innerHTML = PROCTORING_MODES.map((p) => `<option value="${p.id}">${p.label}</option>`).join('');
   procSel.value = state.identityGate.proctoringId;
 
@@ -1882,10 +1883,11 @@ function renderCertConfig() {
   renderCertTarget();
 }
 
-function selectedDepth() { return focus().depthForLabel($('l2CertDepthSelect').value); }
-function selectedLevel() { return $('l2CertTierSelect').value || EDUCATION_TIERS[0]; }
+function selectedDepth() { return focus().depthForLabel($('l2CertDepthSelect')?.value); }
+function selectedLevel() { return $('l2CertTierSelect')?.value || EDUCATION_TIERS[0]; }
 
 function renderCertTargetLegacy() {
+  if (!$('l2CertTarget')) return;
   const it = activeItem();
   const depth = selectedDepth();
   $('l2CertTarget').textContent = it
@@ -1894,6 +1896,7 @@ function renderCertTargetLegacy() {
 }
 
 function renderCertTarget() {
+  if (!$('l2CertTarget')) return;
   const it = activeItem();
   const depth = selectedDepth();
   const role = professionalRoleForLabel(selectedLevel());
@@ -1903,13 +1906,14 @@ function renderCertTarget() {
 }
 
 function renderIdentityGate() {
+  if (!$('l2IdentityAttestLabel')) return;
   const gate = { ...state.identityGate, account: state.authUser };
   let resolved;
   try { resolved = focus().resolveIdentityLevel(gate); } catch { resolved = null; }
   const requiresSig = resolved?.requiresSignature;
   // proctoring field visible for the external/authenticated choice or when sig required
   const showProc = true;
-  $('l2ProctoringField').hidden = !showProc;
+  if ($('l2ProctoringField')) $('l2ProctoringField').hidden = !showProc;
   // attestation visible when the chosen level needs a signature
   $('l2IdentityAttestLabel').hidden = !requiresSig;
   const notice = $('l2IdentityNotice');
@@ -1942,8 +1946,8 @@ function renderAuthGates() {
     : adultTier ? t.auth.accountRequiredMsg
       : t.auth.accountOptionalMsg;
   if (acctForm) acctForm.hidden = signedIn;
-  $('l2AccountSignOut').hidden = !signedIn;
-  $('l2AdultAttestLabel').hidden = !adultTier || signedIn;
+  if ($('l2AccountSignOut')) $('l2AccountSignOut').hidden = !signedIn;
+  if ($('l2AdultAttestLabel')) $('l2AdultAttestLabel').hidden = !adultTier || signedIn;
 }
 
 // --- real Firebase auth: email-link sign-up + password sign-in --------------

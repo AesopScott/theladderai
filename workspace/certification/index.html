@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- theladder2-v0.1.0 | routed workspace -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="/favicon_512.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certification - The Ladder AI Workspace</title>
+  <meta name="description" content="One guided AI learning ladder — concepts, products, and use cases — with placement, training conversations, certification, and transcript evidence.">
+
+  <!-- Canonical + Open Graph / Twitter social preview -->
+  <link rel="canonical" href="https://theladderai.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Ladder AI">
+  <meta property="og:title" content="The Ladder AI - AESOP AI Academy">
+  <meta property="og:description" content="One guided AI learning ladder — concepts, products, and use cases — with placement, training conversations, certification, and transcript evidence.">
+  <meta property="og:url" content="https://theladderai.com/">
+  <meta property="og:image" content="https://theladderai.com/components/og-theladder.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Ladder AI - AESOP AI Academy">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Ladder AI - AESOP AI Academy">
+  <meta name="twitter:description" content="One guided AI learning ladder — concepts, products, and use cases — with placement, training conversations, certification, and transcript evidence.">
+  <meta name="twitter:image" content="https://theladderai.com/components/og-theladder.jpg">
+  <script>
+    if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
+  <link rel="stylesheet" href="/site.css?v=50">
+</head>
+<body class="l2 l2-loaded">
+
+  <!-- ============ INTRO SPLASH (marketing image, dissolves into the page) ============ -->
+  <div class="l2-preloader" id="l2Preloader" aria-hidden="true">
+    <img class="l2-preloader__img l2-preloader__img--ladder4" src="/components/ladder4.png?v=1" alt="The Ladder AI">
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner ladder-nav">
+      <a class="nav-brand-group" href="/workspace/" aria-label="The Ladder AI workspace home">
+        <span class="nav-brand-logo" aria-hidden="true"></span>
+      </a>
+      <div class="hero-navlabels-wrap">
+        <div class="hero-navlabels">
+          <div class="hero-navlabel-group">
+            <label class="hero-language-control hero-navlabel hero-navlabel--l">
+              <select id="l2Lang" class="ladder-select hero-language-select" aria-label="Language">
+                <option value="en">English</option>
+              </select>
+            </label>
+            <a class="l2-navlink hero-navlabel hero-navlabel--r" href="/workspace/profile/">Profile</a>
+          </div>
+          <div class="hero-navlabel-group">
+            <a class="l2-navlink hero-navlabel hero-navlabel--l" href="/workspace/certification/">Certification</a>
+            <a class="l2-navlink hero-navlabel hero-navlabel--r" href="/workspace/support/">Support</a>
+          </div>
+        </div>
+      </div>
+      <div class="ladder-corner-controls">
+        <button class="theme-toggle" id="l2DarkToggle" type="button" aria-label="Toggle dark mode"></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="ladder-app">
+    <section class="l2-section" id="certification">
+          <div class="l2-section-head">
+            <div>
+              <span class="l2-eyebrow">Prove it</span>
+              <h2 class="l2-section-title">Certification</h2>
+            </div>
+          </div>
+          <div class="l2-cert-grid workspace training-body-grid">
+    
+            <!-- left: configure + gates -->
+            <div class="training-left-column certification-left-column">
+              <p class="l2-section-lead">Choose the rung you want to certify, then begin an adaptive oral exam. An independent second model must confirm the result before any credential is recorded.</p>
+    
+              <aside class="training-nav-panel certification-nav-panel" aria-label="Certification rung navigation">
+                <div class="training-tier-picker certification-tier-picker" aria-label="Certification rung selection">
+                  <span class="rail-product-label training-focus-label" id="l2CertFocusLabel">AI Concepts</span>
+                  <span class="rail-tier-status" id="l2CertGroupStatus">Loading rungs...</span>
+                  <details class="training-tier-dropdown" id="l2CertTierDropdown">
+                    <summary>
+                      <span class="training-tier-current" id="l2CertSelectedTierSummary">Choose a tier</span>
+                    </summary>
+                    <div id="l2CertGroupRail" class="tier-list training-tier-menu"></div>
+                  </details>
+                  <div id="l2CertSelectedRungs" class="l2-rail-items training-selected-rungs"></div>
+                  <p id="l2CertRungDescription" class="training-rung-description">Pick a rung to see what the exam will cover.</p>
+                </div>
+              </aside>
+            </div>
+    
+            <!-- right: examiner conversation -->
+            <section class="topic-column training-chat-column">
+            <section class="conversation-panel training-chat-panel certification-chat-panel">
+              <div class="certification-setup-panel" id="l2CertSetupPanel">
+                <span class="panel-label">Certify this rung</span>
+                <p id="l2CertTarget" class="certification-target">Choose a rung, then set the learner level or professional role for the exam.</p>
+    
+                <label class="evaluation-field" for="l2CertTierSelect">
+                  <span>Learner level / professional role</span>
+                  <select id="l2CertTierSelect" class="evaluation-select"></select>
+                </label>
+                <label class="evaluation-field" for="l2CertDepthSelect">
+                  <span>Mastery level</span>
+                  <select id="l2CertDepthSelect" class="evaluation-select"></select>
+                </label>
+    
+                <label class="evaluation-field" for="l2IdentitySelect">
+                  <span>Identity assurance</span>
+                  <select id="l2IdentitySelect" class="evaluation-select"></select>
+                </label>
+                <div id="l2ProctoringField" hidden>
+                  <label class="evaluation-field" for="l2ProctoringSelect">
+                    <span>Proctoring level</span>
+                    <select id="l2ProctoringSelect" class="evaluation-select"></select>
+                  </label>
+                </div>
+                <label class="identity-attestation" id="l2IdentityAttestLabel">
+                  <input id="l2IdentityAttest" type="checkbox">
+                  <span>I confirm I am the person taking this attempt and that any credential will represent my own work.</span>
+                </label>
+                <p id="l2IdentityNotice" class="evaluation-cooldown" hidden></p>
+                <p id="l2CertCooldown" class="evaluation-cooldown" hidden></p>
+    
+                <div class="l2-gate certification-account-gate" id="l2AccountGate" hidden>
+                  <span class="panel-label" id="l2AccountStatus">Account</span>
+                  <h3>Account</h3>
+                  <p id="l2AccountMsg" style="color:var(--l2-ink-2);">Adult education tiers and identity-assured certification require a verified account.</p>
+                  <label class="account-attestation" id="l2AdultAttestLabel">
+                    <input id="l2AdultAttest" type="checkbox">
+                    <span>I confirm I am 18 or older (required for adult education tiers).</span>
+                  </label>
+                  <form class="account-form" id="l2AccountForm">
+                    <input id="l2AccountEmail" type="email" placeholder="name@example.com" autocomplete="username">
+                    <input id="l2AccountPassword" type="password" placeholder="Password" autocomplete="current-password">
+                    <div class="account-actions">
+                      <button id="l2AccountSignIn" type="button">Sign in</button>
+                      <button id="l2AccountCreate" type="button" class="secondary">Create account</button>
+                    </div>
+                  </form>
+                  <button id="l2AccountSignOut" type="button" class="secondary" style="margin-top:0.75rem;" hidden>Sign out</button>
+                  <button id="l2AccountConfirmAdult" type="button" style="margin-top:0.75rem;" hidden>Confirm adult access</button>
+                  <p id="l2AccountError" class="evaluation-cooldown" hidden role="alert"></p>
+                </div>
+    
+                <button id="l2StartCert" class="l2-cta certification-start-btn" type="button">Start certification</button>
+                <div class="certification-record-link">
+                  <a href="/ladder-certifications.html">Certification record</a>
+                </div>
+              </div>
+    
+              <div id="l2CertExamPanel" class="certification-exam-panel" hidden>
+                <div class="panel-heading">
+                  <div>
+                    <h3 id="l2CertExamTitle">Certification exam</h3>
+                    <p id="l2CertExamSummary">Start certification to begin the examined conversation.</p>
+                  </div>
+                </div>
+                <div id="l2CertModeBar" class="certification-mode-bar" hidden>
+                  <span class="panel-label">Exam in progress</span>
+                  <div class="certification-mode-actions">
+                    <div class="certification-mode-action">
+                      <button id="l2FinalizeCert" type="button">Finalize my determination</button>
+                      <p>Ask the examiner to stop questioning and render the certification determination for this attempt.</p>
+                    </div>
+                    <div class="certification-mode-action">
+                      <button id="l2EndCert" class="secondary" type="button">End exam</button>
+                      <p>Stop this attempt and return to setup without recording a credential.</p>
+                    </div>
+                  </div>
+                </div>
+                <div id="l2CertLog" class="chat-log" aria-live="polite"></div>
+                <form id="l2CertForm" class="chat-form">
+                  <textarea id="l2CertInput" rows="2" placeholder="Respond to the examiner" autocomplete="off"></textarea>
+                  <button type="submit">Send</button>
+                </form>
+              </div>
+            </section>
+            </section>
+    
+          </div>
+        </section>
+
+  </main>
+
+  <footer class="l2-footer">
+    <h2 class="l2-footer-cta">Ready to prove it? <a href="/workspace/certification/">Choose a certification rung.</a></h2>
+    <div class="l2-footer-grid">
+      <div class="l2-footer-col">
+        <span class="nav-brand-primary" style="font-size:1.3rem;">The Ladder AI</span>
+        <p style="color:var(--l2-muted);margin:1rem 0 0;max-width:34ch;">One AI learning ladder — concepts, products, and use cases — with certification and a verifiable transcript.</p>
+      </div>
+      <div class="l2-footer-col">
+        <h4>The Ladder AI</h4>
+        <a href="/workspace/certification/">Certification</a>
+        <a href="/workspace/support/">Support</a>
+        <a href="/workspace/profile/">Profile</a>
+      </div>
+      <div class="l2-footer-col">
+        <h4>Academy</h4>
+        <a href="/ladder-certifications.html">Certification record</a>
+        <a href="/ai-academy/">AESOP AI Academy</a>
+      </div>
+    </div>
+    <div class="l2-footer-legal">
+      <span>&copy; 2026 AESOP AI Academy — All Rights Reserved.</span><br>
+      <span>The Ladder AI / AESOP Engine — Patent Pending — U.S. Provisional Patent Application No. 64/085,986</span>
+    </div>
+  </footer>
+
+  <script>
+    if (localStorage.getItem('aesop-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
+  <script type="module" src="/components/ladder2-app-wheel-lock.js?v=10"></script>
+</body>
+</html>
+
+

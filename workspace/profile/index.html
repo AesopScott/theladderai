@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_32.png">
   <link rel="apple-touch-icon" sizes="512x512" href="/favicon_512.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Ladder AI Workspace - AESOP AI Academy</title>
+  <title>Profile - The Ladder AI Workspace</title>
   <meta name="description" content="One guided AI learning ladder — concepts, products, and use cases — with placement, training conversations, certification, and transcript evidence.">
 
   <!-- Canonical + Open Graph / Twitter social preview -->
@@ -65,64 +65,55 @@
   </nav>
 
   <main class="ladder-app">
-    <section class="l2-section" id="marketing">
-          <div class="hero-aurora" aria-hidden="true">
-            <span class="aurora-blob a"></span>
-            <span class="aurora-blob b"></span>
-            <span class="aurora-blob c"></span>
-          </div>
-          <div class="ladder-hero">
-            <div class="ladder-hero-copy">
-              <div class="hero-ornaments" aria-hidden="true">
-                <svg class="hero-ornament" viewBox="0 0 440 24"><g fill="currentColor" stroke="currentColor" stroke-width="1.3"><line x1="6" y1="12" x2="176" y2="12"/><circle cx="186" cy="12" r="2.6" stroke="none"/><circle cx="208" cy="12" r="11" fill="none"/><circle cx="232" cy="12" r="11" fill="none"/><circle cx="254" cy="12" r="2.6" stroke="none"/><line x1="264" y1="12" x2="434" y2="12"/></g></svg>
-                <svg class="hero-ornament" viewBox="0 0 440 24"><g fill="currentColor" stroke="currentColor" stroke-width="1.3"><line x1="6" y1="12" x2="176" y2="12"/><circle cx="186" cy="12" r="2.6" stroke="none"/><circle cx="208" cy="12" r="11" fill="none"/><circle cx="232" cy="12" r="11" fill="none"/><circle cx="254" cy="12" r="2.6" stroke="none"/><line x1="264" y1="12" x2="434" y2="12"/></g></svg>
-                <svg class="hero-ornament" viewBox="0 0 440 24"><g fill="currentColor" stroke="currentColor" stroke-width="1.3"><line x1="6" y1="12" x2="176" y2="12"/><circle cx="186" cy="12" r="2.6" stroke="none"/><circle cx="208" cy="12" r="11" fill="none"/><circle cx="232" cy="12" r="11" fill="none"/><circle cx="254" cy="12" r="2.6" stroke="none"/><line x1="264" y1="12" x2="434" y2="12"/></g></svg>
-              </div>
-              <p class="eyebrow">How high can you climb?</p>
-              <h1>The Ladder <span class="ai-shimmer">AI</span></h1>
-              <div class="hero-cascade">
-                <span class="hero-cascade-line">Every AI Concept</span>
-                <span class="hero-cascade-line">Every AI Product</span>
-                <span class="hero-cascade-line">Every AI Use Case</span>
-                <span class="hero-cascade-divider" aria-hidden="true"></span>
-                <span class="hero-cascade-final">Trained and Certified</span>
-              </div>
-              <a class="l2-hero-primary-cta" href="/workspace/certification/">Choose a certification rung &rarr;</a>
+    <section class="l2-section" id="profile">
+          <div class="l2-section-head">
+            <div>
+              <span class="l2-eyebrow">Your record</span>
+              <h2 class="l2-section-title">Profile</h2>
             </div>
           </div>
-          <aside class="why-trust">
-            <h2 class="why-trust-title">Why Employers Trust the Ladder</h2>
-            <ul class="why-trust-list">
-              <li>Every credential is examined by two independent models.</li>
-              <li>Your exam is a real conversation, not just a question bank.</li>
-              <li>Your exam is measured against audit-grade evidence mapped to standards that matter, like the O*NET and World Economic Forum Future of Jobs Economic Standards &amp; the NIST AI RMF and EU AI Acts.</li>
-              <li>Your exam results can be downloaded and used as an interview reference by an organization's recruiting team.</li>
-            </ul>
-          </aside>
-          <aside class="ladder-stairs-aside">
-            <img class="ladder-stairs ladder-stairs--light" src="/components/ladder-stairs.png?v=4" alt="The Ladder AI levels — Core, Expert, Master">
-            <img class="ladder-stairs ladder-stairs--dark" src="/components/ladder-stairs-dark.png?v=7" alt="" aria-hidden="true">
-            <p class="ladder-stairs-caption">Brought to you by Aesop AI Academy</p>
-          </aside>
+          <div class="l2-profile-lead-row">
+            <p class="l2-section-lead">Everything you've earned and where you left off — plus a direct line to support.</p>
+            <div class="l2-learner-id">
+              <span class="l2-learner-id-label">Learner ID</span>
+              <span id="l2LearnerId" class="l2-learner-id-value">—</span>
+            </div>
+          </div>
     
-          <!-- bottom-centre: email-verify onboarding (replaces login/account creation) -->
-          <div class="l2-signup" id="l2Signup">
-            <p class="l2-signup-eyebrow">Get Trained, Get Certified. Get Noticed.</p>
-            <form class="l2-signup-form" id="l2SignupForm" novalidate>
-              <input id="l2SignupEmail" class="l2-signup-input" type="email" placeholder="Enter your e-mail" autocomplete="email" aria-label="Email address">
-              <button class="l2-signup-btn" type="submit">Sign Up</button>
-            </form>
-            <p class="l2-signup-msg" id="l2SignupMsg" hidden role="status"></p>
-            <a class="l2-signup-signin" id="l2SigninToggle" href="#">Already have an account? Sign in</a>
-            <form class="l2-signin-form" id="l2SigninForm" hidden novalidate>
-              <input id="l2SigninEmail" class="l2-signup-input" type="email" placeholder="Email" autocomplete="email" aria-label="Email">
-              <input id="l2SigninPw" class="l2-signup-input" type="password" placeholder="Password" autocomplete="current-password" aria-label="Password">
-              <button class="l2-signup-btn" type="submit">Sign in</button>
-            </form>
-            <div class="l2-signed-in" id="l2SignedIn" hidden>
-              <span>Signed in as <b id="l2SignedInEmail"></b></span>
-              <button class="l2-signup-signin" id="l2HeroSignOut" type="button">Sign out</button>
+          <!-- certifications + progress (moved here from the top page) -->
+          <div class="l2-cert-strip">
+            <div class="hero-certifications-row">
+              <span class="hero-cert-label">Certifications earned</span>
+              <span id="l2HeroCertCount" class="hero-cert-count">0</span>
             </div>
+            <div class="ladder-hero-stats" aria-label="Ladder progress summary">
+              <div class="ladder-hero-stat ladder-hero-stat--primary">
+                <strong id="l2StatCourses">0 / 15</strong>
+                <span>tiers completed</span>
+              </div>
+              <div class="ladder-hero-stat">
+                <strong id="l2StatTiers">0</strong>
+                <span>tiers placed out</span>
+              </div>
+              <div class="ladder-hero-stat">
+                <strong id="l2StatCertified">0</strong>
+                <span>core</span>
+              </div>
+              <div class="ladder-hero-stat">
+                <strong id="l2StatExpert">0</strong>
+                <span>expert</span>
+              </div>
+              <div class="ladder-hero-stat">
+                <strong id="l2StatMastery">0</strong>
+                <span>mastery</span>
+              </div>
+            </div>
+            <a class="l2-btn l2-btn--ghost" href="/ladder-certifications.html" style="margin-top:1rem;">View certification record</a>
+          </div>
+    
+          <div class="l2-open-courses-block">
+            <span class="panel-label">Open courses</span>
+            <div id="l2OpenCourses" class="l2-open-courses"></div>
           </div>
         </section>
 
